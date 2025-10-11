@@ -6,10 +6,8 @@ export async function getAdminSettings() {
   return {
     payment: {
       stripe: {
-        publishableKey:
-          "pk_test_51HdqBKJ8lXK7O9Z2tvjG7S5RrGJkDytfWO8qBKJ8lXK7O9Z2tvjG7S5RrGJkDytfWO",
-        secretKey:
-          "sk_test_51HdqBKJ8lXK7O9Z2tvjG7S5RrGJkDytfWO8qBKJ8lXK7O9Z2tvjG7S5RrGJkDytfWO",
+        publishableKey: "",
+        secretKey: "",
         enabled: true,
       },
       paypal: {
