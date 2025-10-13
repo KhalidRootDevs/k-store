@@ -251,7 +251,7 @@ export function ProductForm({
         categoryId:
           typeof product.categoryId === "string"
             ? product.categoryId
-            : product.categoryId._id,
+            : product.categoryId?._id,
         tags: product.tags || [],
         stock: product.stock,
         weight: product.weight || undefined,
@@ -1014,16 +1014,19 @@ export function ProductForm({
                             Variant Image
                           </Label>
                           <Select
-                            value={watch(`variants.${index}.image`) || ""}
+                            value={watch(`variants.${index}.image`) || "none"}
                             onValueChange={(value) =>
-                              setValue(`variants.${index}.image`, value)
+                              setValue(
+                                `variants.${index}.image`,
+                                value === "none" ? "" : value
+                              )
                             }
                           >
                             <SelectTrigger>
                               <SelectValue placeholder="Select an image" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="">
+                              <SelectItem value="none">
                                 No specific image
                               </SelectItem>
                               {availableImages.map((image, imgIndex) => (

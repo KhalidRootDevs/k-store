@@ -530,7 +530,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             {groupedVariants.map((variant, index) => (
               <div key={index}>
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-medium">{variant.name}</h3>
+                  <h3 className="font-medium capitalize">{variant.name}</h3>
                   {variant.hasPriceVariation && (
                     <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
                       Affects price
