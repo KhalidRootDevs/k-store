@@ -4,6 +4,7 @@ import { Product } from "@/models/Product";
 import { verifyToken } from "@/lib/auth";
 import { uploadToCloudinary, deleteFromCloudinary } from "@/lib/cloudinary";
 import connectDB from "@/lib/database";
+import { extractPublicIdFromUrl } from "@/lib/utils";
 
 export async function GET(
   request: NextRequest,
@@ -266,10 +267,12 @@ export async function DELETE(
     }
 
     // Optional: Delete Cloudinary images
-    // for (const imageUrl of product.images) {
-    //   const publicId = extractPublicIdFromUrl(imageUrl);
-    //   await deleteFromCloudinary(publicId);
-    // }
+    for (const imageUrl of product.images) {
+      const publicId = extractPublicIdFromUrl(imageUrl);
+      if (publicId) {
+        await deleteFromCloudinary(publicId);
+      }
+    }
 
     await Product.findByIdAndDelete(params.id);
 
