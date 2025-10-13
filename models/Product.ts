@@ -1,11 +1,11 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IVariant {
-  name: string;
-  options: string;
+  sku?: string;
+  attributes: Record<string, string>; // dynamic key-value attributes
   price?: number;
   stock?: number;
-  sku?: string;
+  image?: string;
 }
 
 export interface ISeo {
@@ -42,31 +42,34 @@ export interface IProduct extends Document {
   updatedAt: Date;
 }
 
-const variantSchema = new Schema<IVariant>({
-  name: {
-    type: String,
-    required: [true, "Variant name is required"],
-    trim: true,
+const variantSchema = new Schema<IVariant>(
+  {
+    sku: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
+    attributes: {
+      type: Schema.Types.Mixed, // stores JSON object like { color: "Red", size: "M" }
+      required: [true, "Variant attributes are required"],
+    },
+    price: {
+      type: Number,
+      min: 0,
+    },
+    stock: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    image: {
+      type: String,
+      trim: true,
+    },
   },
-  options: {
-    type: String,
-    required: [true, "Variant options are required"],
-    trim: true,
-  },
-  price: {
-    type: Number,
-    min: 0,
-  },
-  stock: {
-    type: Number,
-    default: 0,
-    min: 0,
-  },
-  sku: {
-    type: String,
-    trim: true,
-  },
-});
+  { _id: false }
+);
 
 const seoSchema = new Schema<ISeo>({
   title: {
@@ -199,22 +202,32 @@ const productSchema = new Schema<IProduct>(
   }
 );
 
-// Generate SKU if not provided
+// Auto-generate SKU if missing
 productSchema.pre<IProduct>("save", function (next) {
   if (!this.sku) {
-    this.sku = `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    this.sku = `SKU-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
   }
+
+  this.variants.forEach((variant) => {
+    if (!variant.sku) {
+      variant.sku = `${this.sku}-${Math.random().toString(36).substr(2, 5)}`;
+    }
+  });
+
   next();
 });
 
-// Indexes for efficient queries
+// Indexes
 productSchema.index({ categoryId: 1, active: 1 });
 productSchema.index({ barcode: 1 });
 productSchema.index({ tags: 1 });
 productSchema.index({ featured: 1, active: 1 });
 productSchema.index({ name: "text", description: "text" });
 
-// Virtual for product slug (if needed)
+// Optional: index variant attributes (PostgreSQL-style not possible, but can flatten for search)
+productSchema.index({ "variants.attributes": 1 });
+
+// Virtual slug
 productSchema.virtual("slug").get(function () {
   return this.name
     .toLowerCase()

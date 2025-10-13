@@ -39,17 +39,18 @@ interface Product {
   length?: number;
   width?: number;
   height?: number;
+  brand?: string;
   active: boolean;
   featured: boolean;
   rating: number;
   reviewCount: number;
   salesCount: number;
   variants: Array<{
-    name: string;
-    options: string;
+    sku?: string;
+    attributes: Record<string, string>;
     price?: number;
     stock?: number;
-    sku?: string;
+    image?: string;
   }>;
   seo: {
     title?: string;
@@ -72,9 +73,8 @@ interface Review {
 interface GroupedVariant {
   name: string;
   options: string[];
-  prices?: number[];
-  stocks?: number[];
-  skus?: string[];
+  hasPriceVariation: boolean;
+  hasStockVariation: boolean;
 }
 
 // Mock reviews data (you can replace this with an API later)
@@ -119,47 +119,67 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
 
-  // Group variants by name
+  // Extract all unique variant attributes and group options
   const groupedVariants = useMemo((): GroupedVariant[] => {
-    if (!product?.variants) return [];
+    if (!product?.variants || product.variants.length === 0) return [];
 
-    const grouped: Record<string, GroupedVariant> = {};
+    const attributeMap: Record<string, Set<string>> = {};
+    const priceVariation: Record<string, boolean> = {};
+    const stockVariation: Record<string, boolean> = {};
 
+    // First pass: collect all attributes and their possible values
     product.variants.forEach((variant) => {
-      if (!grouped[variant.name]) {
-        grouped[variant.name] = {
-          name: variant.name,
-          options: [],
-          prices: [],
-          stocks: [],
-          skus: [],
-        };
-      }
+      Object.entries(variant.attributes).forEach(([key, value]) => {
+        if (!attributeMap[key]) {
+          attributeMap[key] = new Set();
+        }
+        attributeMap[key].add(value);
 
-      // Split options by comma and trim each option
-      const variantOptions = variant.options
-        .split(",")
-        .map((opt) => opt.trim());
+        // Check for price variation
+        if (variant.price !== undefined && variant.price !== product.price) {
+          priceVariation[key] = true;
+        }
 
-      grouped[variant.name].options.push(...variantOptions);
-
-      if (variant.price) {
-        grouped[variant.name].prices?.push(variant.price);
-      }
-      if (variant.stock) {
-        grouped[variant.name].stocks?.push(variant.stock);
-      }
-      if (variant.sku) {
-        grouped[variant.name].skus?.push(variant.sku);
-      }
+        // Check for stock variation
+        if (variant.stock !== undefined && variant.stock !== product.stock) {
+          stockVariation[key] = true;
+        }
+      });
     });
 
-    // Remove duplicates from options and return as array
-    return Object.values(grouped).map((group) => ({
-      ...group,
-      options: [...new Set(group.options)], // Remove duplicate options
+    // Convert to array format
+    return Object.entries(attributeMap).map(([name, optionsSet]) => ({
+      name,
+      options: Array.from(optionsSet),
+      hasPriceVariation: priceVariation[name] || false,
+      hasStockVariation: stockVariation[name] || false,
     }));
-  }, [product?.variants]);
+  }, [product?.variants, product?.price, product?.stock]);
+
+  // Find the selected variant based on selected options
+  const selectedVariant = useMemo(() => {
+    if (!product?.variants || Object.keys(selectedOptions).length === 0) {
+      return null;
+    }
+
+    return product.variants.find((variant) =>
+      Object.entries(selectedOptions).every(
+        ([key, value]) => variant.attributes[key] === value
+      )
+    );
+  }, [product?.variants, selectedOptions]);
+
+  // Get display price (variant price or base product price)
+  const displayPrice = selectedVariant?.price ?? product?.price ?? 0;
+
+  // Get display stock (variant stock or base product stock)
+  const displayStock = selectedVariant?.stock ?? product?.stock ?? 0;
+
+  // Get variant image if available
+  const displayImage = selectedVariant?.image
+    ? product?.images.find((img) => img === selectedVariant.image) ||
+      product?.images[0]
+    : product?.images[0];
 
   // Fetch product data
   useEffect(() => {
@@ -201,7 +221,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   // Handle quantity changes
   const increaseQuantity = () => {
-    if (product && quantity < product.stock) {
+    if (quantity < displayStock) {
       setQuantity(quantity + 1);
     }
   };
@@ -214,10 +234,40 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   // Handle variant selection
   const handleVariantSelect = (variantName: string, option: string) => {
-    setSelectedOptions((prev) => ({
-      ...prev,
+    const newSelectedOptions = {
+      ...selectedOptions,
       [variantName]: option,
-    }));
+    };
+
+    // If selecting this option would create an invalid combination, clear dependent options
+    const currentAttributes = Object.keys(newSelectedOptions);
+    const validVariants =
+      product?.variants.filter((variant) =>
+        currentAttributes.every(
+          (key) => newSelectedOptions[key] === variant.attributes[key]
+        )
+      ) || [];
+
+    // Find which attributes are still valid
+    const validAttributes: Record<string, Set<string>> = {};
+    validVariants.forEach((variant) => {
+      Object.entries(variant.attributes).forEach(([key, value]) => {
+        if (!validAttributes[key]) {
+          validAttributes[key] = new Set();
+        }
+        validAttributes[key].add(value);
+      });
+    });
+
+    // Clear invalid selections
+    const cleanedOptions = { ...newSelectedOptions };
+    Object.keys(cleanedOptions).forEach((key) => {
+      if (!validAttributes[key]?.has(cleanedOptions[key])) {
+        delete cleanedOptions[key];
+      }
+    });
+
+    setSelectedOptions(cleanedOptions);
   };
 
   // Check if all required variants are selected
@@ -248,11 +298,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   // Calculate discount percentage
   const calculateDiscount = () => {
-    if (!product?.compareAtPrice || product.compareAtPrice <= product.price)
-      return 0;
-    return Math.round(
-      ((product.compareAtPrice - product.price) / product.compareAtPrice) * 100
-    );
+    const comparePrice = product?.compareAtPrice;
+    if (!comparePrice || comparePrice <= displayPrice) return 0;
+    return Math.round(((comparePrice - displayPrice) / comparePrice) * 100);
   };
 
   // Handle add to cart
@@ -274,19 +322,22 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     // Simulate a slight delay for better UX
     setTimeout(() => {
       addItem({
-        id: Date.now().toString(),
+        id: selectedVariant?.sku || product._id,
         productId: product._id,
         name: product.name,
-        price: product.price,
+        price: displayPrice,
         quantity,
-        image: product.images[0],
+        image: displayImage || product.images[0],
         variant: formatSelectedVariants(),
         selectedOptions,
+        variantSku: selectedVariant?.sku,
       });
 
       toast({
         title: "Added to cart",
-        description: `${quantity} × ${product.name} has been added to your cart.`,
+        description: `${quantity} × ${product.name}${
+          formatSelectedVariants() ? ` (${formatSelectedVariants()})` : ""
+        } has been added to your cart.`,
       });
 
       setIsAddingToCart(false);
@@ -352,7 +403,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   }
 
   const discount = calculateDiscount();
-  const isInStock = product.stock > 0;
+  const isInStock = displayStock > 0;
 
   return (
     <Container>
@@ -376,7 +427,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               }
             >
               <Image
-                src={product.images[activeImage] || "/placeholder.svg"}
+                src={displayImage || "/placeholder.svg"}
                 alt={product.name}
                 fill
                 className="object-cover"
@@ -416,6 +467,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             <p className="text-muted-foreground">
               Category: {product.categoryId?.name}
             </p>
+            {product.brand && (
+              <p className="text-sm text-muted-foreground">
+                Brand: {product.brand}
+              </p>
+            )}
             {product.sku && (
               <p className="text-sm text-muted-foreground">
                 SKU: {product.sku}
@@ -447,7 +503,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             {discount > 0 ? (
               <>
                 <span className="text-3xl font-bold">
-                  ${product.price.toFixed(2)}
+                  ${displayPrice.toFixed(2)}
                 </span>
                 <span className="text-xl text-muted-foreground line-through">
                   ${product.compareAtPrice?.toFixed(2)}
@@ -458,9 +514,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               </>
             ) : (
               <span className="text-3xl font-bold">
-                ${product.price.toFixed(2)}
+                ${displayPrice.toFixed(2)}
               </span>
             )}
+            {selectedVariant?.price !== undefined &&
+              selectedVariant.price !== product.price && (
+                <span className="text-sm text-green-600">(Variant price)</span>
+              )}
           </div>
 
           <p className="text-muted-foreground">{product.description}</p>
@@ -469,26 +529,56 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <div className="space-y-4">
             {groupedVariants.map((variant, index) => (
               <div key={index}>
-                <h3 className="font-medium mb-2">{variant.name}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="font-medium">{variant.name}</h3>
+                  {variant.hasPriceVariation && (
+                    <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                      Affects price
+                    </span>
+                  )}
+                  {variant.hasStockVariation && (
+                    <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                      Affects stock
+                    </span>
+                  )}
+                </div>
                 <div className="flex flex-wrap gap-2">
-                  {variant.options.map((option, optionIndex) => (
-                    <Button
-                      key={optionIndex}
-                      variant={
-                        selectedOptions[variant.name] === option
-                          ? "default"
-                          : "outline"
-                      }
-                      className="h-10 px-4"
-                      onClick={() => handleVariantSelect(variant.name, option)}
-                    >
-                      {option}
-                    </Button>
-                  ))}
+                  {variant.options.map((option, optionIndex) => {
+                    const isSelected = selectedOptions[variant.name] === option;
+                    const isValidOption = true; // You can add logic to disable invalid combinations
+
+                    return (
+                      <Button
+                        key={optionIndex}
+                        variant={isSelected ? "default" : "outline"}
+                        className="h-10 px-4"
+                        onClick={() =>
+                          handleVariantSelect(variant.name, option)
+                        }
+                        disabled={!isValidOption}
+                      >
+                        {option}
+                      </Button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Selected Variant Info */}
+          {selectedVariant && (
+            <div className="rounded-md bg-blue-50 p-4 text-sm">
+              <p className="font-medium text-blue-800">
+                Selected: {formatSelectedVariants()}
+              </p>
+              {selectedVariant.sku && (
+                <p className="text-blue-700">
+                  Variant SKU: {selectedVariant.sku}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Quantity and Actions */}
           <div className="space-y-4">
@@ -511,14 +601,14 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                   size="icon"
                   className="h-10 w-10 rounded-none"
                   onClick={increaseQuantity}
-                  disabled={quantity >= product.stock}
+                  disabled={quantity >= displayStock}
                 >
                   <Plus className="h-4 w-4" />
                   <span className="sr-only">Increase quantity</span>
                 </Button>
               </div>
               <span className="ml-4 text-sm text-muted-foreground">
-                {product.stock} available
+                {displayStock} available
               </span>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
@@ -553,11 +643,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 product={{
                   id: product._id,
                   name: product.name,
-                  price: product.price,
-                  image: product.images[0],
+                  price: displayPrice,
+                  image: displayImage || product.images[0],
                   category: product.categoryId?.name,
                 }}
-                variant="icon"
+                variant="outline"
                 size="lg"
                 className="h-12 w-12"
               />
@@ -677,6 +767,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               <div className="flex justify-between py-2 border-b">
                 <span className="font-medium">Height</span>
                 <span>{product.height} cm</span>
+              </div>
+            )}
+            {product.brand && (
+              <div className="flex justify-between py-2 border-b">
+                <span className="font-medium">Brand</span>
+                <span>{product.brand}</span>
               </div>
             )}
             {product.sku && (

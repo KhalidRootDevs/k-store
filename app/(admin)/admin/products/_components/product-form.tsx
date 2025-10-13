@@ -57,16 +57,21 @@ const productSchema = z.object({
   length: z.coerce.number().positive().optional().nullable(),
   width: z.coerce.number().positive().optional().nullable(),
   height: z.coerce.number().positive().optional().nullable(),
+  brand: z.string().optional(),
   active: z.boolean().default(true),
   featured: z.boolean().default(false),
   variants: z
     .array(
       z.object({
-        name: z.string().min(1, { message: "Variant name is required" }),
-        options: z.string().min(1, { message: "Options are required" }),
-        price: z.coerce.number().positive().optional(),
-        stock: z.coerce.number().int().nonnegative().optional(),
         sku: z.string().optional(),
+        attributes: z
+          .record(z.string())
+          .refine((attrs) => Object.keys(attrs).length > 0, {
+            message: "At least one attribute is required",
+          }),
+        price: z.coerce.number().positive().optional().nullable(),
+        stock: z.coerce.number().int().nonnegative().optional().nullable(),
+        image: z.string().optional(),
       })
     )
     .optional(),
@@ -103,14 +108,15 @@ interface Product {
   length?: number;
   width?: number;
   height?: number;
+  brand?: string;
   active: boolean;
   featured: boolean;
   variants: Array<{
-    name: string;
-    options: string;
+    sku?: string;
+    attributes: Record<string, string>;
     price?: number;
     stock?: number;
-    sku?: string;
+    image?: string;
   }>;
   seo?: {
     title?: string;
@@ -137,6 +143,18 @@ const tags = [
   { id: "sale", label: "Sale" },
 ];
 
+// Common variant attributes
+const commonAttributes = [
+  { value: "size", label: "Size" },
+  { value: "color", label: "Color" },
+  { value: "material", label: "Material" },
+  { value: "style", label: "Style" },
+  { value: "weight", label: "Weight" },
+  { value: "capacity", label: "Capacity" },
+  { value: "pattern", label: "Pattern" },
+  { value: "finish", label: "Finish" },
+];
+
 export function ProductForm({
   product,
   isEditing = false,
@@ -148,6 +166,7 @@ export function ProductForm({
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [availableImages, setAvailableImages] = useState<string[]>([]);
 
   const {
     register,
@@ -174,6 +193,7 @@ export function ProductForm({
       length: undefined,
       width: undefined,
       height: undefined,
+      brand: "",
       active: true,
       featured: false,
       variants: [],
@@ -238,6 +258,7 @@ export function ProductForm({
         length: product.length || undefined,
         width: product.width || undefined,
         height: product.height || undefined,
+        brand: product.brand || "",
         active: product.active,
         featured: product.featured,
         variants: product.variants || [],
@@ -252,6 +273,7 @@ export function ProductForm({
       if (product.images && product.images.length > 0) {
         setMainImage(product.images[0]);
         setAdditionalImages(product.images.slice(1));
+        setAvailableImages(product.images);
       }
     }
   }, [product, isEditing, reset]);
@@ -327,6 +349,7 @@ export function ProductForm({
             if (newImages.length === files.length) {
               setAdditionalImages((prev) => [...prev, ...newImages]);
               setImageFiles((prev) => [...prev, ...newFiles]);
+              setAvailableImages((prev) => [...prev, ...newImages]);
             }
           }
         };
@@ -337,10 +360,12 @@ export function ProductForm({
 
   const removeImage = (index: number) => {
     setAdditionalImages((prev) => prev.filter((_, i) => i !== index));
+    setAvailableImages((prev) => prev.filter((_, i) => i !== index + 1));
   };
 
   const removeMainImage = () => {
     setMainImage("");
+    setAvailableImages((prev) => prev.slice(1));
   };
 
   const onSubmit = async (data: ProductFormValues) => {
@@ -406,6 +431,7 @@ export function ProductForm({
           setMainImage("");
           setAdditionalImages([]);
           setImageFiles([]);
+          setAvailableImages([]);
         }
 
         // Call success callback
@@ -440,11 +466,48 @@ export function ProductForm({
 
   const addVariant = () => {
     append({
-      name: "",
-      options: "",
+      sku: "",
+      attributes: {},
       price: undefined,
       stock: undefined,
-      sku: "",
+      image: "",
+    });
+  };
+
+  const addAttributeToVariant = (
+    variantIndex: number,
+    attributeName: string
+  ) => {
+    const currentAttributes =
+      watch(`variants.${variantIndex}.attributes`) || {};
+    setValue(`variants.${variantIndex}.attributes`, {
+      ...currentAttributes,
+      [attributeName]: "",
+    });
+  };
+
+  const removeAttributeFromVariant = (
+    variantIndex: number,
+    attributeName: string
+  ) => {
+    const currentAttributes = {
+      ...watch(`variants.${variantIndex}.attributes`),
+    };
+    delete currentAttributes[attributeName];
+    setValue(`variants.${variantIndex}.attributes`, currentAttributes);
+  };
+
+  const updateVariantAttribute = (
+    variantIndex: number,
+    attributeName: string,
+    value: string
+  ) => {
+    const currentAttributes = {
+      ...watch(`variants.${variantIndex}.attributes`),
+    };
+    setValue(`variants.${variantIndex}.attributes`, {
+      ...currentAttributes,
+      [attributeName]: value,
     });
   };
 
@@ -633,6 +696,33 @@ export function ProductForm({
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="brand">Brand</Label>
+                    <Input
+                      id="brand"
+                      placeholder="e.g., Nike, Apple, etc."
+                      {...register("brand")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="stock">
+                      Inventory <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="stock"
+                      type="number"
+                      placeholder="0"
+                      {...register("stock")}
+                    />
+                    {errors.stock && (
+                      <p className="text-sm text-red-500">
+                        {errors.stock.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label>Tags</Label>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -662,23 +752,6 @@ export function ProductForm({
                       </div>
                     ))}
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="stock">
-                    Inventory <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="stock"
-                    type="number"
-                    placeholder="0"
-                    {...register("stock")}
-                  />
-                  {errors.stock && (
-                    <p className="text-sm text-red-500">
-                      {errors.stock.message}
-                    </p>
-                  )}
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -897,106 +970,167 @@ export function ProductForm({
               <CardHeader>
                 <CardTitle>Product Variants</CardTitle>
                 <CardDescription>
-                  Add variants like size, color, material, etc.
+                  Add variants with dynamic attributes like size, color,
+                  material, etc.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {fields.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className="flex items-end gap-4 border-b pb-4"
-                  >
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor={`variants.${index}.name`}>
-                        Variant Name
-                      </Label>
-                      <select
-                        id={`variants.${index}.name`}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                        {...register(`variants.${index}.name` as const)}
-                      >
-                        <option value="">Select a variant type</option>
-                        <option value="Size">Size</option>
-                        <option value="Color">Color</option>
-                        <option value="Material">Material</option>
-                        <option value="Style">Style</option>
-                        <option value="Weight">Weight</option>
-                        <option value="Capacity">Capacity</option>
-                      </select>
-                      {errors.variants?.[index]?.name && (
-                        <p className="text-sm text-red-500">
-                          {errors.variants[index]?.name?.message}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor={`variants.${index}.options`}>
-                        Options (comma separated)
-                      </Label>
-                      <Input
-                        id={`variants.${index}.options`}
-                        placeholder="e.g., Small, Medium, Large"
-                        {...register(`variants.${index}.options` as const)}
-                      />
-                      {errors.variants?.[index]?.options && (
-                        <p className="text-sm text-red-500">
-                          {errors.variants[index]?.options?.message}
-                        </p>
-                      )}
-                    </div>
+                {fields.map((field, index) => {
+                  const variantAttributes =
+                    watch(`variants.${index}.attributes`) || {};
 
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor={`variants.${index}.price`}>Price</Label>
-                      <Input
-                        id={`variants.${index}.price`}
-                        placeholder="100"
-                        {...register(`variants.${index}.price` as const)}
-                      />
-                      {errors.variants?.[index]?.price && (
-                        <p className="text-sm text-red-500">
-                          {errors.variants[index]?.price?.message}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor={`variants.${index}.stock`}>Stock</Label>
-                      <Input
-                        id={`variants.${index}.stock`}
-                        placeholder="100"
-                        {...register(`variants.${index}.stock` as const)}
-                      />
-                      {errors.variants?.[index]?.stock && (
-                        <p className="text-sm text-red-500">
-                          {errors.variants[index]?.stock?.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="flex-1 space-y-2">
-                      <Label htmlFor={`variants.${index}.sku`}>SKU</Label>
-                      <Input
-                        id={`variants.${index}.sku`}
-                        placeholder="e.g., Size"
-                        {...register(`variants.${index}.sku` as const)}
-                      />
-                      {errors.variants?.[index]?.sku && (
-                        <p className="text-sm text-red-500">
-                          {errors.variants[index]?.sku?.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      type="button"
-                      onClick={() => remove(index)}
+                  return (
+                    <div
+                      key={field.id}
+                      className="border rounded-lg p-4 space-y-4"
                     >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Remove variant</span>
-                    </Button>
-                  </div>
-                ))}
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Variant {index + 1}</h4>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          type="button"
+                          onClick={() => remove(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          <span className="sr-only">Remove variant</span>
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`variants.${index}.sku`}>
+                            Variant SKU
+                          </Label>
+                          <Input
+                            id={`variants.${index}.sku`}
+                            placeholder="e.g., TSHIRT-RED-M"
+                            {...register(`variants.${index}.sku`)}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor={`variants.${index}.image`}>
+                            Variant Image
+                          </Label>
+                          <Select
+                            value={watch(`variants.${index}.image`) || ""}
+                            onValueChange={(value) =>
+                              setValue(`variants.${index}.image`, value)
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an image" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="">
+                                No specific image
+                              </SelectItem>
+                              {availableImages.map((image, imgIndex) => (
+                                <SelectItem key={imgIndex} value={image}>
+                                  Image {imgIndex + 1}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`variants.${index}.price`}>
+                            Variant Price
+                          </Label>
+                          <Input
+                            id={`variants.${index}.price`}
+                            type="number"
+                            step="0.01"
+                            placeholder="Leave empty to use base price"
+                            {...register(`variants.${index}.price`)}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor={`variants.${index}.stock`}>
+                            Variant Stock
+                          </Label>
+                          <Input
+                            id={`variants.${index}.stock`}
+                            type="number"
+                            placeholder="Leave empty to use base stock"
+                            {...register(`variants.${index}.stock`)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label>Attributes</Label>
+                          <Select
+                            onValueChange={(value) =>
+                              addAttributeToVariant(index, value)
+                            }
+                          >
+                            <SelectTrigger className="w-40">
+                              <SelectValue placeholder="Add attribute" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {commonAttributes.map((attr) => (
+                                <SelectItem key={attr.value} value={attr.value}>
+                                  {attr.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        {Object.entries(variantAttributes).map(
+                          ([key, value]) => (
+                            <div key={key} className="flex items-center gap-2">
+                              <Label className="w-20 capitalize">{key}:</Label>
+                              <Input
+                                value={value as string}
+                                onChange={(e) =>
+                                  updateVariantAttribute(
+                                    index,
+                                    key,
+                                    e.target.value
+                                  )
+                                }
+                                placeholder={`Enter ${key} value`}
+                                className="flex-1"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() =>
+                                  removeAttributeFromVariant(index, key)
+                                }
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )
+                        )}
+
+                        {Object.keys(variantAttributes).length === 0 && (
+                          <p className="text-sm text-muted-foreground text-center py-2">
+                            No attributes added. Click "Add attribute" to define
+                            variant properties.
+                          </p>
+                        )}
+                      </div>
+
+                      {errors.variants?.[index]?.attributes && (
+                        <p className="text-sm text-red-500">
+                          {errors.variants[index]?.attributes?.message}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+
                 <Button
                   type="button"
                   variant="outline"
