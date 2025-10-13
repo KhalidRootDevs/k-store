@@ -29,7 +29,7 @@ async function getProducts(
 ): Promise<Product[]> {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/products?type=${type}&limit=8`,
+      `${process.env.APP_URL}/api/products?type=${type}&limit=8`,
       {
         next: {
           revalidate: 3600, // Revalidate every hour

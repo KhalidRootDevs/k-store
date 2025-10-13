@@ -16,7 +16,7 @@ interface Category {
 async function getTopCategories(): Promise<Category[]> {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/categories?topCategories=true&limit=6`,
+      `${process.env.APP_URL}/api/categories?topCategories=true&limit=6`,
       {
         next: {
           revalidate: 3600, // Revalidate every hour
