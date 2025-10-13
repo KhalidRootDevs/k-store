@@ -9,9 +9,21 @@ import { useModal } from "@/context/modal-context";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldSeparator,
+} from "../ui/field";
 
 const loginSchema = z.object({
   email: z
@@ -151,392 +163,388 @@ export function LoginModal() {
     }
   };
 
-  const handleTabChange = (value: string) => {
+  const switchToRegister = () => {
     setError(null);
     setSuccess(null);
-    switchAuthMode(value as "login" | "register");
+    switchAuthMode("register");
   };
+
+  const switchToLogin = () => {
+    setError(null);
+    setSuccess(null);
+    switchAuthMode("login");
+  };
+
+  // Theme-aware styles
+  const dialogContentClass = "sm:max-w-[480px] p-0 gap-0 bg-background border";
+  const cardClass = "bg-transparent border shadow-none";
+  const buttonOutlineClass =
+    "w-full bg-secondary border border-border hover:bg-accent text-foreground h-11";
+  const buttonPrimaryClass =
+    "w-full bg-primary text-primary-foreground hover:bg-primary/90 h-11 font-medium";
+  const inputClass =
+    "bg-background border-border text-foreground placeholder:text-muted-foreground h-11 focus:border-primary";
+  const textMutedClass = "text-muted-foreground";
+  const textPrimaryClass = "text-foreground";
+  const errorClass =
+    "bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm mb-4";
+  const successClass =
+    "bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400 px-4 py-3 rounded-lg text-sm mb-4";
 
   return (
     <Dialog
       open={isLoginModalOpen}
       onOpenChange={(open) => !open && closeAuthModal()}
     >
-      <DialogContent className="sm:max-w-[480px] bg-black border-gray-800 text-white p-0 gap-0">
+      <DialogContent className={dialogContentClass}>
         <div className="p-8">
-          <Tabs
-            value={authMode}
-            onValueChange={handleTabChange}
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-2 bg-gray-900 border border-gray-800 p-1 mb-8">
-              <TabsTrigger
-                value="login"
-                className="data-[state=active]:bg-white data-[state=active]:text-black text-gray-400"
-              >
-                Login
-              </TabsTrigger>
-              <TabsTrigger
-                value="register"
-                className="data-[state=active]:bg-white data-[state=active]:text-black text-gray-400"
-              >
-                Register
-              </TabsTrigger>
-            </TabsList>
+          {authMode === "login" ? (
+            <Card className={cardClass}>
+              <CardHeader className="text-center pb-6">
+                <CardTitle className={`text-xl ${textPrimaryClass}`}>
+                  Welcome back
+                </CardTitle>
+                <CardDescription className={textMutedClass}>
+                  Login with your Apple or Google account
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <form onSubmit={handleLoginSubmit(onLoginSubmit)}>
+                  <FieldGroup>
+                    {error && <div className={errorClass}>{error}</div>}
 
-            <TabsContent value="login" className="mt-0">
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-2">Welcome back</h2>
-                <p className="text-gray-400 text-sm">
-                  Enter your credentials to access your account
-                </p>
-              </div>
+                    {success && <div className={successClass}>{success}</div>}
 
-              <form
-                onSubmit={handleLoginSubmit(onLoginSubmit)}
-                className="space-y-5"
-              >
-                {error && (
-                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
-                    {error}
-                  </div>
-                )}
+                    <Field>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className={buttonOutlineClass}
+                        onClick={() => handleSocialLogin("apple")}
+                        disabled={isLoading}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          className="w-5 h-5 mr-2"
+                        >
+                          <path
+                            d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        Login with Apple
+                      </Button>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className={buttonOutlineClass}
+                        onClick={() => handleSocialLogin("google")}
+                        disabled={isLoading}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          className="w-5 h-5 mr-2"
+                        >
+                          <path
+                            d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        Login with Google
+                      </Button>
+                    </Field>
 
-                {success && (
-                  <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg text-sm">
-                    {success}
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="login-email"
-                    className="text-sm text-gray-300"
-                  >
-                    Email Address
-                  </Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="Enter your email address"
-                    className="bg-gray-900 border-gray-800 text-white placeholder:text-gray-500 h-11 focus:border-gray-600"
-                    {...registerLoginForm("email")}
-                  />
-                  {loginErrors.email && (
-                    <p className="text-sm text-red-400">
-                      {loginErrors.email.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="login-password"
-                    className="text-sm text-gray-300"
-                  >
-                    Password
-                  </Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="Enter your password"
-                    className="bg-gray-900 border-gray-800 text-white placeholder:text-gray-500 h-11 focus:border-gray-600"
-                    {...registerLoginForm("password")}
-                  />
-                  {loginErrors.password && (
-                    <p className="text-sm text-red-400">
-                      {loginErrors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-white text-black hover:bg-gray-200 h-11 font-medium"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Logging in...
-                    </>
-                  ) : (
-                    "Login"
-                  )}
-                </Button>
-
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-800"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-black px-2 text-gray-500">
+                    <FieldSeparator
+                      className={`*:data-[slot=field-separator-content]:bg-background ${textMutedClass}`}
+                    >
                       Or continue with
-                    </span>
-                  </div>
-                </div>
+                    </FieldSeparator>
 
-                <div className="grid grid-cols-3 gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="bg-gray-900 border-gray-800 hover:bg-gray-800 text-white h-11"
-                    onClick={() => handleSocialLogin("google")}
-                    disabled={isLoading}
-                  >
-                    <svg className="h-5 w-5" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    <Field>
+                      <FieldLabel
+                        htmlFor="login-email"
+                        className={textPrimaryClass}
+                      >
+                        Email
+                      </FieldLabel>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        placeholder="m@example.com"
+                        className={inputClass}
+                        required
+                        {...registerLoginForm("email")}
                       />
-                      <path
-                        fill="currentColor"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      />
-                    </svg>
-                  </Button>
+                      {loginErrors.email && (
+                        <p className="text-sm text-destructive mt-1">
+                          {loginErrors.email.message}
+                        </p>
+                      )}
+                    </Field>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="bg-gray-900 border-gray-800 hover:bg-gray-800 text-white h-11"
-                    onClick={() => handleSocialLogin("facebook")}
-                    disabled={isLoading}
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                    </svg>
-                  </Button>
+                    <Field>
+                      <div className="flex items-center">
+                        <FieldLabel
+                          htmlFor="login-password"
+                          className={textPrimaryClass}
+                        >
+                          Password
+                        </FieldLabel>
+                        <a
+                          href="#"
+                          className={`ml-auto text-sm ${textMutedClass} underline-offset-4 hover:${textPrimaryClass} hover:underline`}
+                        >
+                          Forgot your password?
+                        </a>
+                      </div>
+                      <Input
+                        id="login-password"
+                        type="password"
+                        className={inputClass}
+                        required
+                        {...registerLoginForm("password")}
+                      />
+                      {loginErrors.password && (
+                        <p className="text-sm text-destructive mt-1">
+                          {loginErrors.password.message}
+                        </p>
+                      )}
+                    </Field>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="bg-gray-900 border-gray-800 hover:bg-gray-800 text-white h-11"
-                    onClick={() => handleSocialLogin("apple")}
-                    disabled={isLoading}
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                    </svg>
-                  </Button>
-                </div>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="register" className="mt-0">
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-2">
+                    <Field>
+                      <Button
+                        type="submit"
+                        className={buttonPrimaryClass}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Logging in...
+                          </>
+                        ) : (
+                          "Login"
+                        )}
+                      </Button>
+                      <FieldDescription
+                        className={`text-center ${textMutedClass}`}
+                      >
+                        Don&apos;t have an account?{" "}
+                        <button
+                          type="button"
+                          className={`${textPrimaryClass} hover:underline underline-offset-4 bg-transparent border-none cursor-pointer`}
+                          onClick={switchToRegister}
+                        >
+                          Sign up
+                        </button>
+                      </FieldDescription>
+                    </Field>
+                  </FieldGroup>
+                </form>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className={cardClass}>
+              <CardHeader className="text-center pb-6">
+                <CardTitle className={`text-xl ${textPrimaryClass}`}>
                   Create an account
-                </h2>
-                <p className="text-gray-400 text-sm">
+                </CardTitle>
+                <CardDescription className={textMutedClass}>
                   Get started with your free account
-                </p>
-              </div>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <form onSubmit={handleRegisterSubmit(onRegisterSubmit)}>
+                  <FieldGroup>
+                    {error && <div className={errorClass}>{error}</div>}
 
-              <form
-                onSubmit={handleRegisterSubmit(onRegisterSubmit)}
-                className="space-y-5"
-              >
-                {error && (
-                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm">
-                    {error}
-                  </div>
-                )}
+                    {success && <div className={successClass}>{success}</div>}
 
-                {success && (
-                  <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-lg text-sm">
-                    {success}
-                  </div>
-                )}
+                    <Field>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className={buttonOutlineClass}
+                        onClick={() => handleSocialLogin("apple")}
+                        disabled={isLoading}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          className="w-5 h-5 mr-2"
+                        >
+                          <path
+                            d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        Sign up with Apple
+                      </Button>
+                      <Button
+                        variant="outline"
+                        type="button"
+                        className={buttonOutlineClass}
+                        onClick={() => handleSocialLogin("google")}
+                        disabled={isLoading}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          className="w-5 h-5 mr-2"
+                        >
+                          <path
+                            d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        Sign up with Google
+                      </Button>
+                    </Field>
 
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="register-name"
-                    className="text-sm text-gray-300"
-                  >
-                    Full Name
-                  </Label>
-                  <Input
-                    id="register-name"
-                    placeholder="Enter your full name"
-                    className="bg-gray-900 border-gray-800 text-white placeholder:text-gray-500 h-11 focus:border-gray-600"
-                    {...registerRegisterForm("name")}
-                  />
-                  {registerErrors.name && (
-                    <p className="text-sm text-red-400">
-                      {registerErrors.name.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="register-email"
-                    className="text-sm text-gray-300"
-                  >
-                    Email Address
-                  </Label>
-                  <Input
-                    id="register-email"
-                    type="email"
-                    placeholder="Enter your email address"
-                    className="bg-gray-900 border-gray-800 text-white placeholder:text-gray-500 h-11 focus:border-gray-600"
-                    {...registerRegisterForm("email")}
-                  />
-                  {registerErrors.email && (
-                    <p className="text-sm text-red-400">
-                      {registerErrors.email.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="register-password"
-                    className="text-sm text-gray-300"
-                  >
-                    Password
-                  </Label>
-                  <Input
-                    id="register-password"
-                    type="password"
-                    placeholder="Create a password"
-                    className="bg-gray-900 border-gray-800 text-white placeholder:text-gray-500 h-11 focus:border-gray-600"
-                    {...registerRegisterForm("password")}
-                  />
-                  {registerErrors.password && (
-                    <p className="text-sm text-red-400">
-                      {registerErrors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="register-confirmPassword"
-                    className="text-sm text-gray-300"
-                  >
-                    Confirm Password
-                  </Label>
-                  <Input
-                    id="register-confirmPassword"
-                    type="password"
-                    placeholder="Confirm your password"
-                    className="bg-gray-900 border-gray-800 text-white placeholder:text-gray-500 h-11 focus:border-gray-600"
-                    {...registerRegisterForm("confirmPassword")}
-                  />
-                  {registerErrors.confirmPassword && (
-                    <p className="text-sm text-red-400">
-                      {registerErrors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-white text-black hover:bg-gray-200 h-11 font-medium"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating account...
-                    </>
-                  ) : (
-                    "Create Account"
-                  )}
-                </Button>
-
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-800"></div>
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-black px-2 text-gray-500">
+                    <FieldSeparator
+                      className={`*:data-[slot=field-separator-content]:bg-background ${textMutedClass}`}
+                    >
                       Or continue with
-                    </span>
-                  </div>
-                </div>
+                    </FieldSeparator>
 
-                <div className="grid grid-cols-3 gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="bg-gray-900 border-gray-800 hover:bg-gray-800 text-white h-11"
-                    onClick={() => handleSocialLogin("google")}
-                    disabled={isLoading}
-                  >
-                    <svg className="h-5 w-5" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    <Field>
+                      <FieldLabel
+                        htmlFor="register-name"
+                        className={textPrimaryClass}
+                      >
+                        Full Name
+                      </FieldLabel>
+                      <Input
+                        id="register-name"
+                        placeholder="Enter your full name"
+                        className={inputClass}
+                        {...registerRegisterForm("name")}
                       />
-                      <path
-                        fill="currentColor"
-                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                      />
-                    </svg>
-                  </Button>
+                      {registerErrors.name && (
+                        <p className="text-sm text-destructive mt-1">
+                          {registerErrors.name.message}
+                        </p>
+                      )}
+                    </Field>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="bg-gray-900 border-gray-800 hover:bg-gray-800 text-white h-11"
-                    onClick={() => handleSocialLogin("facebook")}
-                    disabled={isLoading}
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                    </svg>
-                  </Button>
+                    <Field>
+                      <FieldLabel
+                        htmlFor="register-email"
+                        className={textPrimaryClass}
+                      >
+                        Email
+                      </FieldLabel>
+                      <Input
+                        id="register-email"
+                        type="email"
+                        placeholder="m@example.com"
+                        className={inputClass}
+                        {...registerRegisterForm("email")}
+                      />
+                      {registerErrors.email && (
+                        <p className="text-sm text-destructive mt-1">
+                          {registerErrors.email.message}
+                        </p>
+                      )}
+                    </Field>
 
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="bg-gray-900 border-gray-800 hover:bg-gray-800 text-white h-11"
-                    onClick={() => handleSocialLogin("apple")}
-                    disabled={isLoading}
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-                    </svg>
-                  </Button>
-                </div>
-              </form>
-            </TabsContent>
-          </Tabs>
+                    <Field>
+                      <FieldLabel
+                        htmlFor="register-password"
+                        className={textPrimaryClass}
+                      >
+                        Password
+                      </FieldLabel>
+                      <Input
+                        id="register-password"
+                        type="password"
+                        placeholder="Create a password"
+                        className={inputClass}
+                        {...registerRegisterForm("password")}
+                      />
+                      {registerErrors.password && (
+                        <p className="text-sm text-destructive mt-1">
+                          {registerErrors.password.message}
+                        </p>
+                      )}
+                    </Field>
+
+                    <Field>
+                      <FieldLabel
+                        htmlFor="register-confirmPassword"
+                        className={textPrimaryClass}
+                      >
+                        Confirm Password
+                      </FieldLabel>
+                      <Input
+                        id="register-confirmPassword"
+                        type="password"
+                        placeholder="Confirm your password"
+                        className={inputClass}
+                        {...registerRegisterForm("confirmPassword")}
+                      />
+                      {registerErrors.confirmPassword && (
+                        <p className="text-sm text-destructive mt-1">
+                          {registerErrors.confirmPassword.message}
+                        </p>
+                      )}
+                    </Field>
+
+                    <Field>
+                      <Button
+                        type="submit"
+                        className={buttonPrimaryClass}
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Creating account...
+                          </>
+                        ) : (
+                          "Create Account"
+                        )}
+                      </Button>
+                      <FieldDescription
+                        className={`text-center ${textMutedClass}`}
+                      >
+                        Already have an account?{" "}
+                        <button
+                          type="button"
+                          className={`${textPrimaryClass} hover:underline underline-offset-4 bg-transparent border-none cursor-pointer`}
+                          onClick={switchToLogin}
+                        >
+                          Login
+                        </button>
+                      </FieldDescription>
+                    </Field>
+                  </FieldGroup>
+                </form>
+              </CardContent>
+            </Card>
+          )}
+
+          <FieldDescription
+            className={`px-0 text-center ${textMutedClass} mt-6`}
+          >
+            By clicking continue, you agree to our{" "}
+            <a
+              href="#"
+              className={`${textPrimaryClass} hover:underline underline-offset-4`}
+            >
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a
+              href="#"
+              className={`${textPrimaryClass} hover:underline underline-offset-4`}
+            >
+              Privacy Policy
+            </a>
+            .
+          </FieldDescription>
         </div>
       </DialogContent>
     </Dialog>
