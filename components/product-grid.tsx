@@ -317,7 +317,7 @@ export async function ProductGrid({
                   {product.description}
                 </p>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>{product.categoryId.name}</span>
+                  <span>{product.categoryId?.name}</span>
                   <span>•</span>
                   <span>⭐ {product.rating}</span>
                   <span>•</span>

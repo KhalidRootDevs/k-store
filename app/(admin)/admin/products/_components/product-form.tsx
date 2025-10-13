@@ -908,13 +908,21 @@ export function ProductForm({
                   >
                     <div className="flex-1 space-y-2">
                       <Label htmlFor={`variants.${index}.name`}>
-                        Variant Name (e.g., Size, Color)
+                        Variant Name
                       </Label>
-                      <Input
+                      <select
                         id={`variants.${index}.name`}
-                        placeholder="e.g., Size"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                         {...register(`variants.${index}.name` as const)}
-                      />
+                      >
+                        <option value="">Select a variant type</option>
+                        <option value="Size">Size</option>
+                        <option value="Color">Color</option>
+                        <option value="Material">Material</option>
+                        <option value="Style">Style</option>
+                        <option value="Weight">Weight</option>
+                        <option value="Capacity">Capacity</option>
+                      </select>
                       {errors.variants?.[index]?.name && (
                         <p className="text-sm text-red-500">
                           {errors.variants[index]?.name?.message}

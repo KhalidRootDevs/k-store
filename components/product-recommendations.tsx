@@ -222,7 +222,7 @@ export function ProductRecommendations({
                       name: product.name,
                       price: product.price,
                       image: product.images[0],
-                      category: product.categoryId.name,
+                      category: product.categoryId?.name,
                     }}
                   />
                 </div>
@@ -236,7 +236,7 @@ export function ProductRecommendations({
                 </Link>
 
                 <p className="text-xs text-muted-foreground mb-2">
-                  {product.categoryId.name}
+                  {product.categoryId?.name}
                 </p>
 
                 {/* Star Rating */}
