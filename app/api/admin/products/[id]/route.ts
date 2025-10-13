@@ -47,6 +47,7 @@ export async function PUT(
 
     const formData = await request.formData();
 
+    // Base fields
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = formData.get("price")
@@ -87,12 +88,16 @@ export async function PUT(
       formData.get("featured") !== null
         ? formData.get("featured") === "true"
         : undefined;
+
+    // Handle variants
     const variants = formData.get("variants")
       ? JSON.parse(formData.get("variants") as string)
       : undefined;
+
     const seo = formData.get("seo")
       ? JSON.parse(formData.get("seo") as string)
       : undefined;
+
     const imageFiles = formData.getAll("images") as File[];
     const keepExistingImages = formData.get("keepExistingImages") === "true";
 
@@ -128,9 +133,27 @@ export async function PUT(
       }
     }
 
+    // Validate variant SKUs for uniqueness across the database
+    if (variants && Array.isArray(variants)) {
+      for (const variant of variants) {
+        if (variant.sku) {
+          const existingVariant = await Product.findOne({
+            "variants.sku": variant.sku,
+            _id: { $ne: params.id },
+          });
+          if (existingVariant) {
+            return NextResponse.json(
+              { error: `Variant SKU "${variant.sku}" already exists` },
+              { status: 409 }
+            );
+          }
+        }
+      }
+    }
+
     let imageUrls = keepExistingImages ? product.images : [];
 
-    // Upload new images to Cloudinary
+    // Upload new product-level images
     if (imageFiles.length > 0) {
       for (const imageFile of imageFiles) {
         try {
@@ -146,7 +169,29 @@ export async function PUT(
       }
     }
 
-    // Update product
+    // Process variant image uploads if any
+    if (variants) {
+      for (const variant of variants) {
+        if (variant.newImages && Array.isArray(variant.newImages)) {
+          const uploadedVariantImages: string[] = [];
+          for (const image of variant.newImages) {
+            try {
+              const uploadResult = await uploadToCloudinary(image);
+              uploadedVariantImages.push(uploadResult.secure_url);
+            } catch (uploadError) {
+              console.error("Variant image upload error:", uploadError);
+            }
+          }
+          variant.images = [
+            ...(variant.images || []),
+            ...uploadedVariantImages,
+          ];
+        }
+        delete variant.newImages; // Cleanup
+      }
+    }
+
+    // Prepare update payload
     const updateData: any = {
       ...(name && { name }),
       ...(description && { description }),
@@ -164,8 +209,8 @@ export async function PUT(
       ...(height !== undefined && { height }),
       ...(active !== undefined && { active }),
       ...(featured !== undefined && { featured }),
-      ...(variants !== undefined && { variants }),
       ...(seo !== undefined && { seo }),
+      ...(variants !== undefined && { variants }),
       ...(imageUrls.length > 0 && { images: imageUrls }),
     };
 
@@ -220,11 +265,13 @@ export async function DELETE(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Delete product
-    await Product.findByIdAndDelete(params.id);
+    // Optional: Delete Cloudinary images
+    // for (const imageUrl of product.images) {
+    //   const publicId = extractPublicIdFromUrl(imageUrl);
+    //   await deleteFromCloudinary(publicId);
+    // }
 
-    // Optionally delete images from Cloudinary
-    // You might want to extract public_ids from image URLs and delete them
+    await Product.findByIdAndDelete(params.id);
 
     return NextResponse.json({
       message: "Product deleted successfully",

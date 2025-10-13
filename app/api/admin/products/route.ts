@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-
 import { Product } from "@/models/Product";
 import { verifyToken } from "@/lib/auth";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import connectDB from "@/lib/database";
 
+/**
+ * POST /api/products
+ * Creates a new product with dynamic variant attributes (JSON hybrid model)
+ */
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -18,6 +21,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
 
+    // Basic fields
     const name = formData.get("name") as string;
     const description = formData.get("description") as string;
     const price = parseFloat(formData.get("price") as string);
@@ -48,12 +52,33 @@ export async function POST(request: NextRequest) {
       : undefined;
     const active = formData.get("active") === "true";
     const featured = formData.get("featured") === "true";
-    const variants = formData.get("variants")
-      ? JSON.parse(formData.get("variants") as string)
-      : [];
     const seo = formData.get("seo")
       ? JSON.parse(formData.get("seo") as string)
       : {};
+
+    // Parse variants JSON
+    let variants: any[] = [];
+    if (formData.get("variants")) {
+      try {
+        variants = JSON.parse(formData.get("variants") as string);
+
+        // Ensure correct format: [{ attributes: {...}, price, stock, image }]
+        variants = variants.map((v) => ({
+          attributes: v.attributes || {},
+          price: v.price ? parseFloat(v.price) : undefined,
+          stock: v.stock ? parseInt(v.stock) : 0,
+          sku: v.sku || undefined,
+          image: v.image || undefined,
+        }));
+      } catch (err) {
+        return NextResponse.json(
+          { error: "Invalid variants format — must be valid JSON" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Parse uploaded images
     const imageFiles = formData.getAll("images") as File[];
 
     // Validate required fields
@@ -62,7 +87,6 @@ export async function POST(request: NextRequest) {
       !description ||
       !price ||
       !categoryId ||
-      !stock ||
       imageFiles.length === 0
     ) {
       return NextResponse.json(
@@ -92,7 +116,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Upload images to Cloudinary
+    // Upload product images to Cloudinary
     const imageUrls: string[] = [];
     for (const imageFile of imageFiles) {
       try {
@@ -101,13 +125,13 @@ export async function POST(request: NextRequest) {
       } catch (uploadError) {
         console.error("Image upload error:", uploadError);
         return NextResponse.json(
-          { error: "Failed to upload images" },
+          { error: "Failed to upload product images" },
           { status: 500 }
         );
       }
     }
 
-    // Create product
+    // Create the product document
     const product = await Product.create({
       name,
       description,
@@ -165,6 +189,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * GET /api/products
+ * Fetches products with pagination, search, and filtering
+ */
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
@@ -181,7 +209,6 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get("sortBy") || "createdAt";
     const sortOrder = searchParams.get("sortOrder") || "desc";
 
-    // Build query
     const query: any = {};
 
     // Search filter
@@ -191,6 +218,8 @@ export async function GET(request: NextRequest) {
         { description: { $regex: search, $options: "i" } },
         { sku: { $regex: search, $options: "i" } },
         { tags: { $in: [new RegExp(search, "i")] } },
+        { "variants.attributes.color": { $regex: search, $options: "i" } },
+        { "variants.attributes.size": { $regex: search, $options: "i" } },
       ];
     }
 
@@ -200,26 +229,36 @@ export async function GET(request: NextRequest) {
     }
 
     // Featured filter
-    if (featured !== null && featured !== "all") {
+    if (featured && featured !== "all") {
       query.featured = featured === "true";
     }
 
     // Active filter
-    if (active !== null && active !== "all") {
+    if (active && active !== "all") {
       query.active = active === "true";
     }
 
-    // Price range filter
+    // Price filter (handles both product base price and variant prices)
     if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+      query.$or = [
+        {
+          price: {
+            ...(minPrice && { $gte: parseFloat(minPrice) }),
+            ...(maxPrice && { $lte: parseFloat(maxPrice) }),
+          },
+        },
+        {
+          "variants.price": {
+            ...(minPrice && { $gte: parseFloat(minPrice) }),
+            ...(maxPrice && { $lte: parseFloat(maxPrice) }),
+          },
+        },
+      ];
     }
 
     const skip = (page - 1) * limit;
     const sort: any = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
 
-    // Get products with pagination and populate category
     const products = await Product.find(query)
       .populate("categoryId", "name slug")
       .sort(sort)
