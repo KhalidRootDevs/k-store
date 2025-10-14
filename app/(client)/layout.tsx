@@ -1,7 +1,7 @@
-import type React from "react";
-import type { Metadata } from "next";
-import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { Header } from "@/components/layout/header";
+import type { Metadata } from "next";
+import type React from "react";
 
 interface Category {
   _id: string;
