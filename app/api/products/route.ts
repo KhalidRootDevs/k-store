@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Product } from "@/models/Product";
+import { Category } from "@/models/Category"; // Import Category model
 import connectDB from "@/lib/database";
+import mongoose from "mongoose";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +12,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "12");
     const search = searchParams.get("search") || "";
-    const categories =
+    const categorySlugs =
       searchParams.get("categories")?.split(",").filter(Boolean) || [];
     const brands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
     const minPrice = parseFloat(searchParams.get("minPrice") || "0");
@@ -36,13 +38,21 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // Category filter
-    if (categories.length > 0) {
-      query.categoryId = { $in: categories };
+    // Category filter by slug
+    if (categorySlugs.length > 0) {
+      // Find category IDs based on slugs
+      const categories = await Category.find({
+        slug: { $in: categorySlugs },
+      }).select("_id");
+
+      const categoryIds = categories.map((cat) => cat._id);
+
+      if (categoryIds.length > 0) {
+        query.categoryId = { $in: categoryIds };
+      }
     }
 
-    // Brand filter (if you have brands in your product model)
-    // Note: You'll need to add brand field to your Product model
+    // Brand filter
     if (brands.length > 0) {
       query.brand = { $in: brands };
     }
@@ -93,9 +103,26 @@ export async function GET(request: NextRequest) {
     const total = await Product.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
 
-    // Get categories and brands for filters (you might want to create separate APIs for these)
-    const allCategories = await Product.distinct("categoryId");
-    const allBrands = await Product.distinct("brand"); // If you have brand field
+    // Get categories and brands for filters
+    const allCategories = await Category.find({ active: true })
+      .select("name slug")
+      .sort({ name: 1 });
+
+    const allBrands = await Product.distinct("brand", { active: true });
+
+    // Calculate actual price range
+    const priceStats = await Product.aggregate([
+      { $match: { active: true } },
+      {
+        $group: {
+          _id: null,
+          minPrice: { $min: "$price" },
+          maxPrice: { $max: "$price" },
+        },
+      },
+    ]);
+
+    const priceRange = priceStats[0] || { minPrice: 0, maxPrice: 1000 };
 
     return NextResponse.json({
       products,
@@ -111,8 +138,8 @@ export async function GET(request: NextRequest) {
         categories: allCategories,
         brands: allBrands,
         priceRange: {
-          min: 0,
-          max: 1000, // You might want to calculate this dynamically
+          min: priceRange.minPrice,
+          max: priceRange.maxPrice,
         },
       },
     });
