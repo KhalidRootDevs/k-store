@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Slider } from "@/components/ui/slider"
-import { ChevronDown, ChevronUp, Filter, X } from "lucide-react"
-import type { Category, Brand } from "@/lib/product-data"
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Slider } from "@/components/ui/slider";
+import type { Brand, Category } from "@/lib/product-data";
+import { ChevronDown, ChevronUp, Filter, X } from "lucide-react";
+import { useState } from "react";
 
 interface ProductFiltersProps {
-  categories: Category[]
-  brands: Brand[]
-  selectedCategories: string[]
-  selectedBrands: string[]
-  priceRange: [number, number]
-  searchQuery: string
-  showFilters: boolean
-  activeFilterCount: number
-  onCategoryChange: (categoryId: string, checked: boolean) => void
-  onBrandChange: (brandId: string, checked: boolean) => void
-  onPriceChange: (value: number[]) => void
-  onSearchChange: (value: string) => void
-  onSearchSubmit: (e: React.FormEvent) => void
-  onResetFilters: () => void
-  onApplyFilters: () => void
-  onToggleFilters: () => void
-  onCloseFilters: () => void
+  categories: Category[];
+  brands: Brand[];
+  selectedCategories: string[];
+  selectedBrands: string[];
+  priceRange: [number, number];
+  searchQuery: string;
+  showFilters: boolean;
+  activeFilterCount: number;
+  onCategoryChange: (categoryId: string, checked: boolean) => void;
+  onBrandChange: (brandId: string, checked: boolean) => void;
+  onPriceChange: (value: number[]) => void;
+  onSearchChange: (value: string) => void;
+  onSearchSubmit: (e: React.FormEvent) => void;
+  onResetFilters: () => void;
+  onApplyFilters: () => void;
+  onToggleFilters: () => void;
+  onCloseFilters: () => void;
 }
 
 export function ProductFilters({
@@ -56,20 +56,24 @@ export function ProductFilters({
     brands: true,
     price: true,
     rating: true,
-  })
+  });
 
   const toggleFilterSection = (section: keyof typeof expandedFilters) => {
     setExpandedFilters((prev) => ({
       ...prev,
       [section]: !prev[section],
-    }))
-  }
+    }));
+  };
 
   return (
     <>
       {/* Mobile filter button */}
       <div className="md:hidden flex justify-between items-center mb-4">
-        <Button variant="outline" className="flex items-center gap-2" onClick={onToggleFilters}>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2"
+          onClick={onToggleFilters}
+        >
           <Filter className="h-4 w-4" />
           Filters
           {activeFilterCount > 0 && (
@@ -114,7 +118,11 @@ export function ProductFilters({
             />
           </div>
           <div className="p-4 border-t flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={onResetFilters}>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={onResetFilters}
+            >
               Reset
             </Button>
             <Button className="flex-1" onClick={onApplyFilters}>
@@ -152,29 +160,29 @@ export function ProductFilters({
         </div>
       </div>
     </>
-  )
+  );
 }
 
 interface FilterContentProps {
-  categories: Category[]
-  brands: Brand[]
-  selectedCategories: string[]
-  selectedBrands: string[]
-  priceRange: [number, number]
-  searchQuery: string
+  categories: Category[];
+  brands: Brand[];
+  selectedCategories: string[];
+  selectedBrands: string[];
+  priceRange: [number, number];
+  searchQuery: string;
   expandedFilters: {
-    categories: boolean
-    brands: boolean
-    price: boolean
-    rating: boolean
-  }
-  toggleFilterSection: (section: keyof typeof expandedFilters) => void
-  onCategoryChange: (categoryId: string, checked: boolean) => void
-  onBrandChange: (brandId: string, checked: boolean) => void
-  onPriceChange: (value: number[]) => void
-  onSearchChange: (value: string) => void
-  onSearchSubmit: (e: React.FormEvent) => void
-  isMobile: boolean
+    categories: boolean;
+    brands: boolean;
+    price: boolean;
+    rating: boolean;
+  };
+  toggleFilterSection: (section: keyof typeof expandedFilters) => void;
+  onCategoryChange: (categoryId: string, checked: boolean) => void;
+  onBrandChange: (brandId: string, checked: boolean) => void;
+  onPriceChange: (value: number[]) => void;
+  onSearchChange: (value: string) => void;
+  onSearchSubmit: (e: React.FormEvent) => void;
+  isMobile: boolean;
 }
 
 function FilterContent({
@@ -193,7 +201,7 @@ function FilterContent({
   onSearchSubmit,
   isMobile,
 }: FilterContentProps) {
-  const prefix = isMobile ? "mobile-" : ""
+  const prefix = isMobile ? "mobile-" : "";
 
   return (
     <div className="space-y-6">
@@ -235,7 +243,11 @@ function FilterContent({
           onClick={() => toggleFilterSection("categories")}
         >
           <h3 className="font-medium">Categories</h3>
-          {expandedFilters.categories ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          {expandedFilters.categories ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
         </div>
         {expandedFilters.categories && (
           <div className="mt-2 space-y-2">
@@ -243,11 +255,19 @@ function FilterContent({
               <div key={category.id} className="flex items-center space-x-2">
                 <Checkbox
                   id={`${prefix}category-${category.id}`}
-                  checked={selectedCategories.includes(category.id)}
-                  onCheckedChange={(checked) => onCategoryChange(category.id, checked as boolean)}
+                  checked={selectedCategories.includes(category.slug)}
+                  onCheckedChange={(checked) =>
+                    onCategoryChange(category.slug, checked as boolean)
+                  }
                 />
-                <Label htmlFor={`${prefix}category-${category.id}`} className="flex-1 cursor-pointer text-sm">
-                  {category.name} <span className="text-muted-foreground">({category.count})</span>
+                <Label
+                  htmlFor={`${prefix}category-${category.id}`}
+                  className="flex-1 cursor-pointer text-sm"
+                >
+                  {category.name}{" "}
+                  <span className="text-muted-foreground">
+                    ({category.count})
+                  </span>
                 </Label>
               </div>
             ))}
@@ -257,9 +277,16 @@ function FilterContent({
 
       {/* Brands */}
       <div>
-        <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleFilterSection("brands")}>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => toggleFilterSection("brands")}
+        >
           <h3 className="font-medium">Brands</h3>
-          {expandedFilters.brands ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          {expandedFilters.brands ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
         </div>
         {expandedFilters.brands && (
           <div className="mt-2 space-y-2">
@@ -268,10 +295,16 @@ function FilterContent({
                 <Checkbox
                   id={`${prefix}brand-${brand.id}`}
                   checked={selectedBrands.includes(brand.id)}
-                  onCheckedChange={(checked) => onBrandChange(brand.id, checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    onBrandChange(brand.id, checked as boolean)
+                  }
                 />
-                <Label htmlFor={`${prefix}brand-${brand.id}`} className="flex-1 cursor-pointer text-sm">
-                  {brand.name} <span className="text-muted-foreground">({brand.count})</span>
+                <Label
+                  htmlFor={`${prefix}brand-${brand.id}`}
+                  className="flex-1 cursor-pointer text-sm"
+                >
+                  {brand.name}{" "}
+                  <span className="text-muted-foreground">({brand.count})</span>
                 </Label>
               </div>
             ))}
@@ -281,14 +314,27 @@ function FilterContent({
 
       {/* Price Range */}
       <div>
-        <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleFilterSection("price")}>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => toggleFilterSection("price")}
+        >
           <h3 className="font-medium">Price Range</h3>
-          {expandedFilters.price ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          {expandedFilters.price ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
         </div>
         {expandedFilters.price && (
           <div className="mt-4 px-2">
             <div className="mb-4">
-              <Slider defaultValue={[0, 200]} value={priceRange} max={200} step={5} onValueChange={onPriceChange} />
+              <Slider
+                defaultValue={[0, 200]}
+                value={priceRange}
+                max={200}
+                step={5}
+                onValueChange={onPriceChange}
+              />
             </div>
             <div className="flex items-center justify-between">
               <span>${priceRange[0]}</span>
@@ -300,9 +346,16 @@ function FilterContent({
 
       {/* Rating */}
       <div>
-        <div className="flex items-center justify-between cursor-pointer" onClick={() => toggleFilterSection("rating")}>
+        <div
+          className="flex items-center justify-between cursor-pointer"
+          onClick={() => toggleFilterSection("rating")}
+        >
           <h3 className="font-medium">Rating</h3>
-          {expandedFilters.rating ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          {expandedFilters.rating ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
         </div>
         {expandedFilters.rating && (
           <div className="mt-2 space-y-2">
@@ -324,5 +377,5 @@ function FilterContent({
         )}
       </div>
     </div>
-  )
+  );
 }

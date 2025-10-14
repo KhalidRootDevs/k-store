@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Category } from "@/models/Category";
 import connectDB from "@/lib/database";
+import { Category } from "@/models/Category";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {

@@ -2,41 +2,12 @@
 
 import type React from "react";
 
-import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
-import { CartButton } from "@/components/cart-button";
 import { LoginButton } from "@/components/auth/login-button";
-import { WishlistDrawer } from "@/components/wishlist-drawer";
-import {
-  Menu,
-  X,
-  ShoppingBag,
-  Search,
-  Loader2,
-  Laptop,
-  ShirtIcon,
-  Home,
-  Briefcase,
-  Footprints,
-  Sparkles,
-  Dumbbell,
-  BookOpen,
-  Gamepad2,
-  Heart,
-  Car,
-  Dog,
-  Gem,
-  FileText,
-} from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
-import { usePathname, useRouter } from "next/navigation";
-import { allProducts } from "@/lib/product-data";
-import Image from "next/image";
+import { CartButton } from "@/components/cart-button";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useOnClickOutside } from "@/hooks/use-click-outside";
+import { Container } from "@/components/ui/container";
+import { Input } from "@/components/ui/input";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -46,7 +17,36 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { WishlistDrawer } from "@/components/wishlist-drawer";
+import { useOnClickOutside } from "@/hooks/use-click-outside";
+import { allProducts } from "@/lib/product-data";
 import { cn } from "@/lib/utils";
+import {
+  BookOpen,
+  Briefcase,
+  Car,
+  Dog,
+  Dumbbell,
+  FileText,
+  Footprints,
+  Gamepad2,
+  Gem,
+  Heart,
+  Home,
+  Laptop,
+  Loader2,
+  Menu,
+  Search,
+  ShirtIcon,
+  ShoppingBag,
+  Sparkles,
+  X,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 // Debounce function to limit how often a function can be called
 function useDebounce<T>(value: T, delay: number): T {
@@ -342,71 +342,40 @@ export function Header({ categoryTree }: HeaderProps) {
                     {/* Responsive mega menu - adjust columns based on screen size */}
                     <div className="w-[calc(100vw-2rem)] max-w-screen-lg mx-auto">
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 max-h-[80vh] overflow-y-auto">
-                        <div className="col-span-1">
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            Shop by Category
-                          </div>
-                          <div className="grid grid-cols-1 gap-2">
-                            {categoryGroups[0].items.map((category) => (
-                              <Link
-                                key={category.name}
-                                href={category.href}
-                                className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors py-1 px-2 rounded-md hover:bg-muted"
-                              >
-                                {categoryIcons[category.name] || (
-                                  <ShirtIcon className="h-4 w-4 mr-2 flex-shrink-0" />
+                        {categoryTree.map((category: any) => {
+                          return (
+                            <div className="col-span-1">
+                              <div className="mb-2 mt-4 text-lg font-medium">
+                                {category.name}
+                              </div>
+                              <div className="grid grid-cols-1 gap-2">
+                                {category.subCategories.length > 0 ? (
+                                  category.subCategories.map(
+                                    (subCategory: any) => (
+                                      <Link
+                                        key={subCategory.name}
+                                        href={`/products?categories=${subCategory.slug}`}
+                                        className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors py-1 px-2 rounded-md hover:bg-muted"
+                                      >
+                                        {/* {categoryIcons[category.name] || (
+                                        <ShirtIcon className="h-4 w-4 mr-2 flex-shrink-0" />
+                                      )} */}
+                                        <span className="truncate">
+                                          {subCategory.name}
+                                        </span>
+                                      </Link>
+                                    )
+                                  )
+                                ) : (
+                                  <></>
                                 )}
-                                <span className="truncate">
-                                  {category.name}
-                                </span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="col-span-1">
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            More Categories
-                          </div>
-                          <div className="grid grid-cols-1 gap-2">
-                            {categoryGroups[1].items.map((category) => (
-                              <Link
-                                key={category.name}
-                                href={category.href}
-                                className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors py-1 px-2 rounded-md hover:bg-muted"
-                              >
-                                {categoryIcons[category.name] || (
-                                  <ShirtIcon className="h-4 w-4 mr-2 flex-shrink-0" />
-                                )}
-                                <span className="truncate">
-                                  {category.name}
-                                </span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="col-span-1">
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            Featured Collections
-                          </div>
-                          <div className="grid grid-cols-1 gap-2">
-                            {categoryGroups[2].items.map((category) => (
-                              <Link
-                                key={category.name}
-                                href={category.href}
-                                className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors py-1 px-2 rounded-md hover:bg-muted"
-                              >
-                                <span className="truncate">
-                                  {category.name}
-                                </span>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
+                              </div>
+                            </div>
+                          );
+                        })}
 
                         {/* Featured section - hide on smaller screens */}
-                        <div className="col-span-1 bg-muted rounded-lg p-4 hidden lg:block">
+                        {/* <div className="col-span-1 bg-muted rounded-lg p-4 hidden lg:block">
                           <div className="mb-2 text-lg font-medium">
                             Featured
                           </div>
@@ -444,7 +413,7 @@ export function Header({ categoryTree }: HeaderProps) {
                               View all categories →
                             </Link>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </NavigationMenuContent>
