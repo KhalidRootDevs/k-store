@@ -13,6 +13,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
@@ -31,6 +38,7 @@ const categorySchema = z.object({
   description: z.string().optional(),
   featured: z.boolean().default(false),
   active: z.boolean().default(true),
+  parentId: z.string().optional(),
 });
 
 export type CategoryFormValues = z.infer<typeof categorySchema>;
@@ -43,6 +51,7 @@ interface Category {
   featured: boolean;
   active: boolean;
   slug: string;
+  parentId?: string | { _id: string; name: string };
   createdAt: string;
   updatedAt: string;
 }
@@ -61,6 +70,8 @@ export function CategoryForm({
   const [image, setImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [parentCategories, setParentCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
   const {
     register,
@@ -76,20 +87,60 @@ export function CategoryForm({
       description: "",
       featured: false,
       active: true,
+      parentId: "none",
     },
   });
 
   const featured = watch("featured");
   const active = watch("active");
+  const parentId = watch("parentId");
 
-  // Initialize form with category data when editing
+  const fetchParentCategories = async () => {
+    try {
+      const response = await fetch("/api/admin/categories?limit=100", {
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const categories =
+          isEditing && category
+            ? data.categories.filter(
+                (cat: Category) => cat._id !== category._id
+              )
+            : data.categories;
+        setParentCategories(categories || []);
+      } else {
+        throw new Error("Failed to fetch categories");
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load parent categories.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  };
+
   useEffect(() => {
+    fetchParentCategories();
+
     if (category && isEditing) {
+      const parentIdValue = category.parentId
+        ? typeof category.parentId === "string"
+          ? category.parentId
+          : category.parentId._id
+        : "none";
+
       reset({
         name: category.name,
         description: category.description || "",
         featured: category.featured,
         active: category.active,
+        parentId: parentIdValue,
       });
       setImage(category.image);
     }
@@ -98,7 +149,6 @@ export function CategoryForm({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith("image/")) {
         toast({
           title: "Invalid file type",
@@ -108,7 +158,6 @@ export function CategoryForm({
         return;
       }
 
-      // Validate file size (2MB)
       if (file.size > 2 * 1024 * 1024) {
         toast({
           title: "File too large",
@@ -146,8 +195,8 @@ export function CategoryForm({
       formData.append("description", data.description || "");
       formData.append("featured", data.featured.toString());
       formData.append("active", data.active.toString());
+      formData.append("parentId", data.parentId || "none");
 
-      // Only append image if a new one was selected
       if (imageFile) {
         formData.append("image", imageFile);
       }
@@ -175,14 +224,12 @@ export function CategoryForm({
           } successfully.`,
         });
 
-        // Reset form if creating new
         if (!isEditing) {
           reset();
           setImage(null);
           setImageFile(null);
         }
 
-        // Call success callback
         if (onSuccess) {
           onSuccess();
         }
@@ -257,6 +304,38 @@ export function CategoryForm({
                 )}
               </div>
               <div className="space-y-2">
+                <Label htmlFor="parentId">Parent Category</Label>
+                <Select
+                  value={parentId}
+                  onValueChange={(value) => setValue("parentId", value)}
+                  disabled={isLoadingCategories}
+                >
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={
+                        isLoadingCategories
+                          ? "Loading categories..."
+                          : "Select parent category (optional)"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None (Top Level)</SelectItem>
+                    {parentCategories
+                      .filter((cat) => !cat.parentId)
+                      .map((cat) => (
+                        <SelectItem key={cat._id} value={cat._id}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-muted-foreground">
+                  Select a parent category to create a sub-category. Leave as
+                  "None" for a top-level category.
+                </p>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
                   id="description"
@@ -308,7 +387,7 @@ export function CategoryForm({
                 <div className="border rounded-md w-full aspect-square relative overflow-hidden bg-muted">
                   {image ? (
                     <Image
-                      src={image}
+                      src={image || "/placeholder.svg"}
                       alt="Category preview"
                       fill
                       className="object-cover"

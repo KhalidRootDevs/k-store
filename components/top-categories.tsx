@@ -13,10 +13,10 @@ interface Category {
   active: boolean;
 }
 
-async function getTopCategories(): Promise<Category[]> {
+async function getFeaturedCategories(): Promise<Category[]> {
   try {
     const response = await fetch(
-      `${process.env.APP_URL}/api/categories?topCategories=true&limit=6`,
+      `${process.env.APP_URL}/api/categories?featured=true&active=true&parentId=null&includeSubCategories=true&limit=8`,
       {
         next: {
           revalidate: 3600, // Revalidate every hour
@@ -32,13 +32,13 @@ async function getTopCategories(): Promise<Category[]> {
     const data = await response.json();
     return data.categories || [];
   } catch (error) {
-    console.error("Error fetching top categories:", error);
+    console.error("Error fetching featured categories:", error);
     return [];
   }
 }
 
 export async function TopCategories() {
-  const categories = await getTopCategories();
+  const categories = await getFeaturedCategories();
 
   // Fallback to default categories if API fails or returns empty
   const displayCategories =
