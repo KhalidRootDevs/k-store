@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.0.0",
     "@hookform/resolvers": "latest",
     "@radix-ui/react-accordion": "latest",
     "@radix-ui/react-alert-dialog": "latest",
