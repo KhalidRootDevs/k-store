@@ -72,7 +72,12 @@ export async function PUT(request: NextRequest) {
     // Remove sensitive data from response
     const safeSettings = JSON.parse(JSON.stringify(settings));
 
+    // Handle payment sensitive fields
     if (safeSettings.payment?.paymentMethods?.stripe) {
+      safeSettings.payment.paymentMethods.stripe.apiKey = updatedSettings
+        .payment?.paymentMethods?.stripe?.apiKey
+        ? "[UPDATED]"
+        : "[HIDDEN]";
       safeSettings.payment.paymentMethods.stripe.secretKey = updatedSettings
         .payment?.paymentMethods?.stripe?.secretKey
         ? "[UPDATED]"
@@ -80,21 +85,43 @@ export async function PUT(request: NextRequest) {
     }
 
     if (safeSettings.payment?.paymentMethods?.paypal) {
+      safeSettings.payment.paymentMethods.paypal.clientId = updatedSettings
+        .payment?.paymentMethods?.paypal?.clientId
+        ? "[UPDATED]"
+        : "[HIDDEN]";
       safeSettings.payment.paymentMethods.paypal.secret = updatedSettings
         .payment?.paymentMethods?.paypal?.secret
         ? "[UPDATED]"
         : "[HIDDEN]";
     }
 
+    // Handle email sensitive fields
     if (safeSettings.email?.provider?.smtp) {
+      safeSettings.email.provider.smtp.username = updatedSettings.email
+        ?.provider?.smtp?.username
+        ? "[UPDATED]"
+        : "[HIDDEN]";
       safeSettings.email.provider.smtp.password = updatedSettings.email
         ?.provider?.smtp?.password
         ? "[UPDATED]"
         : "[HIDDEN]";
     }
 
+    // Handle API sensitive fields
     if (safeSettings.advanced?.api) {
       safeSettings.advanced.api.apiKey = updatedSettings.advanced?.api?.apiKey
+        ? "[UPDATED]"
+        : "[HIDDEN]";
+    }
+
+    // Handle Cloudinary sensitive fields
+    if (safeSettings.advanced?.cloudinary) {
+      safeSettings.advanced.cloudinary.apiKey = updatedSettings.advanced
+        ?.cloudinary?.apiKey
+        ? "[UPDATED]"
+        : "[HIDDEN]";
+      safeSettings.advanced.cloudinary.apiSecret = updatedSettings.advanced
+        ?.cloudinary?.apiSecret
         ? "[UPDATED]"
         : "[HIDDEN]";
     }
@@ -120,90 +147,112 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// Helper function to deeply merge settings while preserving sensitive data
+// Enhanced deepMergeSettings function to handle sensitive fields properly
 function deepMergeSettings(existing: any, updated: any): any {
   const result = JSON.parse(JSON.stringify(existing));
 
-  for (const key in updated) {
-    if (
-      updated[key] &&
-      typeof updated[key] === "object" &&
-      !Array.isArray(updated[key])
-    ) {
-      // Handle sensitive fields specially
-      if (key === "payment" && updated.payment?.paymentMethods) {
-        if (updated.payment.paymentMethods.stripe) {
-          // Only update stripe secret key if provided
-          if (
-            updated.payment.paymentMethods.stripe.secretKey &&
-            updated.payment.paymentMethods.stripe.secretKey !== "[HIDDEN]"
-          ) {
-            result.payment.paymentMethods.stripe.secretKey =
-              updated.payment.paymentMethods.stripe.secretKey;
-          }
-          if (updated.payment.paymentMethods.stripe.apiKey) {
-            result.payment.paymentMethods.stripe.apiKey =
-              updated.payment.paymentMethods.stripe.apiKey;
-          }
-        }
-
-        if (updated.payment.paymentMethods.paypal) {
-          // Only update paypal secret if provided
-          if (
-            updated.payment.paymentMethods.paypal.secret &&
-            updated.payment.paymentMethods.paypal.secret !== "[HIDDEN]"
-          ) {
-            result.payment.paymentMethods.paypal.secret =
-              updated.payment.paymentMethods.paypal.secret;
-          }
-          if (updated.payment.paymentMethods.paypal.clientId) {
-            result.payment.paymentMethods.paypal.clientId =
-              updated.payment.paymentMethods.paypal.clientId;
-          }
-          result.payment.paymentMethods.paypal.enabled =
-            updated.payment.paymentMethods.paypal.enabled;
-        }
-
-        result.payment.paymentMethods.creditCards =
-          updated.payment.paymentMethods.creditCards;
-        result.payment.paymentMethods.cashOnDelivery =
-          updated.payment.paymentMethods.cashOnDelivery;
-      } else if (key === "email" && updated.email?.provider?.smtp) {
-        // Only update SMTP password if provided
-        if (
-          updated.email.provider.smtp.password &&
-          updated.email.provider.smtp.password !== "[HIDDEN]"
-        ) {
-          result.email.provider.smtp.password =
-            updated.email.provider.smtp.password;
-        }
-        result.email.provider.smtp.host = updated.email.provider.smtp.host;
-        result.email.provider.smtp.port = updated.email.provider.smtp.port;
-        result.email.provider.smtp.security =
-          updated.email.provider.smtp.security;
-        result.email.provider.smtp.username =
-          updated.email.provider.smtp.username;
-        result.email.provider.service = updated.email.provider.service;
-      } else if (key === "advanced" && updated.advanced?.api) {
-        // Only update API key if provided
-        if (
-          updated.advanced.api.apiKey &&
-          updated.advanced.api.apiKey !== "[HIDDEN]"
-        ) {
-          result.advanced.api.apiKey = updated.advanced.api.apiKey;
-        }
-        result.advanced.api.webhookUrl = updated.advanced.api.webhookUrl;
-        result.advanced.api.webhooksEnabled =
-          updated.advanced.api.webhooksEnabled;
+  // Helper function to merge objects recursively
+  function mergeDeep(target: any, source: any) {
+    for (const key in source) {
+      if (
+        source[key] &&
+        typeof source[key] === "object" &&
+        !Array.isArray(source[key])
+      ) {
+        if (!target[key]) target[key] = {};
+        mergeDeep(target[key], source[key]);
       } else {
-        // Recursively merge other objects
-        result[key] = deepMergeSettings(result[key] || {}, updated[key]);
+        // Handle sensitive fields - only update if new value is provided
+        if (isSensitiveField(key, target, source)) {
+          if (source[key] && source[key] !== "") {
+            target[key] = source[key];
+          }
+          // If source value is empty, preserve existing value
+        } else {
+          target[key] = source[key];
+        }
       }
-    } else {
-      // Update primitive values
-      result[key] = updated[key];
     }
   }
 
+  mergeDeep(result, updated);
   return result;
+}
+
+// Function to identify sensitive fields that shouldn't be overwritten with empty values
+function isSensitiveField(key: string, target: any, source: any): boolean {
+  const sensitiveFields = [
+    "apiKey",
+    "secretKey",
+    "secret",
+    "clientId",
+    "password",
+    "apiSecret",
+  ];
+
+  // Check if this is a sensitive field in common structures
+  if (sensitiveFields.includes(key)) {
+    return true;
+  }
+
+  // Additional context-aware checks
+  const path = getObjectPath(target, source);
+
+  // Cloudinary sensitive fields
+  if (
+    path.includes("cloudinary") &&
+    (key === "apiKey" || key === "apiSecret")
+  ) {
+    return true;
+  }
+
+  // Stripe sensitive fields
+  if (path.includes("stripe") && (key === "apiKey" || key === "secretKey")) {
+    return true;
+  }
+
+  // PayPal sensitive fields
+  if (path.includes("paypal") && (key === "clientId" || key === "secret")) {
+    return true;
+  }
+
+  // SMTP sensitive fields
+  if (path.includes("smtp") && (key === "username" || key === "password")) {
+    return true;
+  }
+
+  // API sensitive fields
+  if (path.includes("api") && key === "apiKey") {
+    return true;
+  }
+
+  return false;
+}
+
+// Helper function to get object path for context-aware sensitive field detection
+function getObjectPath(target: any, source: any): string {
+  // This is a simplified implementation - you might want to enhance this
+  // based on your specific object structure
+  if (target?.advanced?.cloudinary && source?.advanced?.cloudinary) {
+    return "advanced.cloudinary";
+  }
+  if (
+    target?.payment?.paymentMethods?.stripe &&
+    source?.payment?.paymentMethods?.stripe
+  ) {
+    return "payment.paymentMethods.stripe";
+  }
+  if (
+    target?.payment?.paymentMethods?.paypal &&
+    source?.payment?.paymentMethods?.paypal
+  ) {
+    return "payment.paymentMethods.paypal";
+  }
+  if (target?.email?.provider?.smtp && source?.email?.provider?.smtp) {
+    return "email.provider.smtp";
+  }
+  if (target?.advanced?.api && source?.advanced?.api) {
+    return "advanced.api";
+  }
+  return "";
 }

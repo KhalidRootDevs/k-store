@@ -1,6 +1,126 @@
 // models/Settings.ts
 import mongoose, { Document, Schema } from "mongoose";
 
+export interface ISettings extends Document {
+  general: {
+    storeInfo: {
+      storeName: string;
+      storeEmail: string;
+      storePhone: string;
+      storeAddress: string;
+    };
+    seo: {
+      metaTitle: string;
+      metaDescription: string;
+      metaKeywords: string;
+    };
+    socialMedia: {
+      facebook: string;
+      instagram: string;
+      twitter: string;
+      youtube: string;
+    };
+  };
+  payment: {
+    paymentMethods: {
+      creditCards: boolean;
+      stripe: {
+        apiKey: string;
+        secretKey: string;
+      };
+      paypal: {
+        enabled: boolean;
+        clientId: string;
+        secret: string;
+      };
+      cashOnDelivery: boolean;
+    };
+    currency: {
+      defaultCurrency: "usd" | "eur" | "gbp" | "cad" | "aud";
+      currencyFormat: "symbol" | "code" | "symbol-code";
+    };
+    tax: {
+      enabled: boolean;
+      taxRate: number;
+      pricesIncludeTax: boolean;
+    };
+  };
+  shipping: {
+    methods: {
+      freeShipping: {
+        enabled: boolean;
+        minimumAmount: number;
+      };
+      flatRate: {
+        enabled: boolean;
+        cost: number;
+      };
+      expressShipping: {
+        enabled: boolean;
+        cost: number;
+      };
+    };
+    options: {
+      shippingCalculator: boolean;
+      internationalShipping: boolean;
+      shippingOrigin: string;
+    };
+  };
+  email: {
+    provider: {
+      service: "smtp" | "sendgrid" | "mailchimp" | "aws-ses";
+      smtp: {
+        host: string;
+        port: number;
+        security: "none" | "ssl" | "tls";
+        username: string;
+        password: string;
+      };
+    };
+    notifications: {
+      orderConfirmation: boolean;
+      shippingConfirmation: boolean;
+      orderCanceled: boolean;
+      customerAccount: boolean;
+      passwordReset: boolean;
+      abandonedCart: boolean;
+    };
+  };
+  cms: {
+    termsAndConditions: string;
+    privacyPolicy: string;
+    returnPolicy: string;
+    aboutUs: string;
+    faq: string;
+  };
+  advanced: {
+    analytics: {
+      googleAnalyticsId: string;
+      facebookPixelId: string;
+      enabled: boolean;
+    };
+    api: {
+      apiKey: string;
+      webhookUrl: string;
+      webhooksEnabled: boolean;
+    };
+    cloudinary: ICloudinaryConfig; // Added Cloudinary interface
+    performance: {
+      pageCaching: boolean;
+      cacheDuration: number;
+      imageOptimization: boolean;
+      minifyAssets: boolean;
+    };
+    maintenance: {
+      enabled: boolean;
+      message: string;
+      allowAdminAccess: boolean;
+    };
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Sub-schemas for nested objects
 const storeInfoSchema = new Schema({
   storeName: {
@@ -311,6 +431,36 @@ const apiSchema = new Schema({
   },
 });
 
+const cloudinarySchema = new Schema({
+  cloudName: {
+    type: String,
+    required: [true, "Cloudinary cloud name is required"],
+    trim: true,
+  },
+  apiKey: {
+    type: String,
+    required: [true, "Cloudinary API key is required"],
+    trim: true,
+  },
+  apiSecret: {
+    type: String,
+    required: [true, "Cloudinary API secret is required"],
+    trim: true,
+  },
+  uploadPreset: {
+    type: String,
+    default: "",
+  },
+  secure: {
+    type: Boolean,
+    default: true,
+  },
+  folder: {
+    type: String,
+    default: "ecommerce",
+  },
+});
+
 const performanceSchema = new Schema({
   pageCaching: {
     type: Boolean,
@@ -372,6 +522,7 @@ const settingsSchema = new Schema(
     advanced: {
       analytics: analyticsSchema,
       api: apiSchema,
+      cloudinary: cloudinarySchema, // Added Cloudinary configuration
       performance: performanceSchema,
       maintenance: maintenanceSchema,
     },
@@ -390,123 +541,13 @@ settingsSchema.statics.getSettings = async function () {
   return settings;
 };
 
-export interface ISettings extends Document {
-  general: {
-    storeInfo: {
-      storeName: string;
-      storeEmail: string;
-      storePhone: string;
-      storeAddress: string;
-    };
-    seo: {
-      metaTitle: string;
-      metaDescription: string;
-      metaKeywords: string;
-    };
-    socialMedia: {
-      facebook: string;
-      instagram: string;
-      twitter: string;
-      youtube: string;
-    };
-  };
-  payment: {
-    paymentMethods: {
-      creditCards: boolean;
-      stripe: {
-        apiKey: string;
-        secretKey: string;
-      };
-      paypal: {
-        enabled: boolean;
-        clientId: string;
-        secret: string;
-      };
-      cashOnDelivery: boolean;
-    };
-    currency: {
-      defaultCurrency: "usd" | "eur" | "gbp" | "cad" | "aud";
-      currencyFormat: "symbol" | "code" | "symbol-code";
-    };
-    tax: {
-      enabled: boolean;
-      taxRate: number;
-      pricesIncludeTax: boolean;
-    };
-  };
-  shipping: {
-    methods: {
-      freeShipping: {
-        enabled: boolean;
-        minimumAmount: number;
-      };
-      flatRate: {
-        enabled: boolean;
-        cost: number;
-      };
-      expressShipping: {
-        enabled: boolean;
-        cost: number;
-      };
-    };
-    options: {
-      shippingCalculator: boolean;
-      internationalShipping: boolean;
-      shippingOrigin: string;
-    };
-  };
-  email: {
-    provider: {
-      service: "smtp" | "sendgrid" | "mailchimp" | "aws-ses";
-      smtp: {
-        host: string;
-        port: number;
-        security: "none" | "ssl" | "tls";
-        username: string;
-        password: string;
-      };
-    };
-    notifications: {
-      orderConfirmation: boolean;
-      shippingConfirmation: boolean;
-      orderCanceled: boolean;
-      customerAccount: boolean;
-      passwordReset: boolean;
-      abandonedCart: boolean;
-    };
-  };
-  cms: {
-    termsAndConditions: string;
-    privacyPolicy: string;
-    returnPolicy: string;
-    aboutUs: string;
-    faq: string;
-  };
-  advanced: {
-    analytics: {
-      googleAnalyticsId: string;
-      facebookPixelId: string;
-      enabled: boolean;
-    };
-    api: {
-      apiKey: string;
-      webhookUrl: string;
-      webhooksEnabled: boolean;
-    };
-    performance: {
-      pageCaching: boolean;
-      cacheDuration: number;
-      imageOptimization: boolean;
-      minifyAssets: boolean;
-    };
-    maintenance: {
-      enabled: boolean;
-      message: string;
-      allowAdminAccess: boolean;
-    };
-  };
-  createdAt: Date;
-  updatedAt: Date;
+export interface ICloudinaryConfig {
+  cloudName: string;
+  apiKey: string;
+  apiSecret: string;
+  uploadPreset: string;
+  secure: boolean;
+  folder: string;
 }
 
 export const Settings =
