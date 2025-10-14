@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { Category } from "@/models/Category";
 import { verifyToken } from "@/lib/auth";
@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     const featured = formData.get("featured") === "true";
     const active = formData.get("active") === "true";
     const imageFile = formData.get("image") as Blob | null;
+    const parentId = formData.get("parentId") as string | null;
 
     // Validate required fields
     if (!name || !imageFile) {
@@ -29,6 +30,16 @@ export async function POST(request: NextRequest) {
         { error: "Category name and image are required" },
         { status: 400 }
       );
+    }
+
+    if (parentId && parentId !== "none") {
+      const parentCategory = await Category.findById(parentId);
+      if (!parentCategory) {
+        return NextResponse.json(
+          { error: "Parent category not found" },
+          { status: 404 }
+        );
+      }
     }
 
     // Check if category name already exists
@@ -64,6 +75,7 @@ export async function POST(request: NextRequest) {
       featured,
       active,
       slug,
+      parentId: parentId && parentId !== "none" ? parentId : null,
     });
 
     return NextResponse.json(
@@ -77,6 +89,7 @@ export async function POST(request: NextRequest) {
           featured: category.featured,
           active: category.active,
           slug: category.slug,
+          parentId: category.parentId,
           createdAt: category.createdAt,
           updatedAt: category.updatedAt,
         },
@@ -110,11 +123,12 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+    const page = Number.parseInt(searchParams.get("page") || "1");
+    const limit = Number.parseInt(searchParams.get("limit") || "10");
     const search = searchParams.get("search") || "";
     const featured = searchParams.get("featured");
     const active = searchParams.get("active");
+    const parentId = searchParams.get("parentId");
 
     // Build query
     const query: any = {};
@@ -138,6 +152,14 @@ export async function GET(request: NextRequest) {
       query.active = active === "true";
     }
 
+    if (parentId !== null && parentId !== undefined) {
+      if (parentId === "null" || parentId === "none") {
+        query.parentId = null;
+      } else {
+        query.parentId = parentId;
+      }
+    }
+
     const skip = (page - 1) * limit;
 
     // Get categories with pagination
@@ -145,6 +167,7 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
+      .populate("parentId", "name slug")
       .select("-__v");
 
     const total = await Category.countDocuments(query);

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { Category } from "@/models/Category";
 import { verifyToken } from "@/lib/auth";
-import { uploadToCloudinary, deleteFromCloudinary } from "@/lib/cloudinary";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import connectDB from "@/lib/database";
 
 export async function GET(
@@ -52,6 +52,7 @@ export async function PUT(
     const featured = formData.get("featured") === "true";
     const active = formData.get("active") === "true";
     const imageFile = formData.get("image") as Blob | null;
+    const parentId = formData.get("parentId") as string | null;
 
     const category = await Category.findById(params.id);
     if (!category) {
@@ -61,7 +62,33 @@ export async function PUT(
       );
     }
 
-    // Check if category name already exists (excluding current category)
+    if (parentId && parentId !== "none") {
+      if (parentId === params.id) {
+        return NextResponse.json(
+          { error: "A category cannot be its own parent" },
+          { status: 400 }
+        );
+      }
+
+      const parentCategory = await Category.findById(parentId);
+      if (!parentCategory) {
+        return NextResponse.json(
+          { error: "Parent category not found" },
+          { status: 404 }
+        );
+      }
+
+      if (parentCategory.parentId?.toString() === params.id) {
+        return NextResponse.json(
+          {
+            error:
+              "Circular reference detected: parent category cannot be a child of this category",
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     if (name && name !== category.name) {
       const existingCategory = await Category.findOne({
         name,
@@ -78,14 +105,10 @@ export async function PUT(
 
     let imageUrl = category.image;
 
-    // Upload new image if provided
     if (imageFile) {
       try {
         const uploadResult = await uploadToCloudinary(imageFile);
         imageUrl = uploadResult.secure_url;
-
-        // Optionally delete old image from Cloudinary
-        // You might want to extract public_id from the old image URL
       } catch (uploadError) {
         console.error("Image upload error:", uploadError);
         return NextResponse.json(
@@ -95,7 +118,6 @@ export async function PUT(
       }
     }
 
-    // Update category
     const updatedCategory = await Category.findByIdAndUpdate(
       params.id,
       {
@@ -104,6 +126,7 @@ export async function PUT(
         image: imageUrl,
         featured,
         active,
+        parentId: parentId && parentId !== "none" ? parentId : null,
       },
       { new: true, runValidators: true }
     );
@@ -149,11 +172,7 @@ export async function DELETE(
       );
     }
 
-    // Delete category
     await Category.findByIdAndDelete(params.id);
-
-    // Optionally delete image from Cloudinary
-    // You might want to extract public_id from the image URL and delete it
 
     return NextResponse.json({
       message: "Category deleted successfully",

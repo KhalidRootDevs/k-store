@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { type Document, type Model, Schema } from "mongoose";
 
 export interface ICategory extends Document {
   name: string;
@@ -7,6 +7,7 @@ export interface ICategory extends Document {
   featured: boolean;
   active: boolean;
   slug: string;
+  parentId?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -40,20 +41,33 @@ const categorySchema = new Schema<ICategory>(
     slug: {
       type: String,
       required: true,
-      // Remove unique: true here and define index below
       lowercase: true,
       trim: true,
+    },
+    parentId: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      default: null,
     },
   },
   {
     timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
+
+// Virtual for sub-categories
+categorySchema.virtual("subCategories", {
+  ref: "Category",
+  localField: "_id",
+  foreignField: "parentId",
+});
 
 // Generate slug from name before saving
 categorySchema.pre<ICategory>("save", async function (next) {
   if (this.isModified("name")) {
-    let baseSlug = this.name
+    const baseSlug = this.name
       .toLowerCase()
       .replace(/[^a-z0-9 -]/g, "")
       .replace(/\s+/g, "-")
@@ -84,7 +98,7 @@ categorySchema.statics.generateSlug = async function (
   name: string,
   excludeId?: string
 ): Promise<string> {
-  let baseSlug = name
+  const baseSlug = name
     .toLowerCase()
     .replace(/[^a-z0-9 -]/g, "")
     .replace(/\s+/g, "-")
@@ -109,8 +123,9 @@ categorySchema.statics.generateSlug = async function (
 };
 
 // Define all indexes explicitly
-categorySchema.index({ slug: 1 }, { unique: true }); // Explicit unique index
-categorySchema.index({ featured: 1, active: 1 }); // Compound index
+categorySchema.index({ slug: 1 }, { unique: true });
+categorySchema.index({ featured: 1, active: 1 });
+categorySchema.index({ parentId: 1 });
 
 export const Category: Model<ICategory> =
   mongoose.models.Category ||

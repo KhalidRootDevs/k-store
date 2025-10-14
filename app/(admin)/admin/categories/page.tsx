@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -44,6 +46,7 @@ interface Category {
   featured: boolean;
   active: boolean;
   slug: string;
+  parentId?: { _id: string; name: string } | null;
   products?: number;
   createdAt: string;
   updatedAt: string;
@@ -76,7 +79,7 @@ export default function CategoriesPage() {
   });
 
   // Fetch categories from API
-  const fetchCategories = async (page: number = 1) => {
+  const fetchCategories = async (page = 1) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
@@ -242,7 +245,7 @@ export default function CategoriesPage() {
       1,
       pagination.page - Math.floor(maxVisiblePages / 2)
     );
-    let endPage = Math.min(
+    const endPage = Math.min(
       pagination.totalPages,
       startPage + maxVisiblePages - 1
     );
@@ -278,7 +281,7 @@ export default function CategoriesPage() {
         <CardHeader>
           <CardTitle>Category Management</CardTitle>
           <CardDescription>
-            View and manage all product categories.
+            View and manage all product categories and sub-categories.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -382,7 +385,7 @@ export default function CategoriesPage() {
                 {hasActiveFilters && (
                   <Button
                     variant="outline"
-                    className="mt-2"
+                    className="mt-2 bg-transparent"
                     onClick={clearFilters}
                   >
                     Clear filters
@@ -396,6 +399,9 @@ export default function CategoriesPage() {
                     <TableRow>
                       <TableHead className="w-[80px]">Image</TableHead>
                       <TableHead>Name</TableHead>
+                      <TableHead className="hidden lg:table-cell">
+                        Parent Category
+                      </TableHead>
                       <TableHead className="hidden md:table-cell">
                         Description
                       </TableHead>
@@ -421,7 +427,23 @@ export default function CategoriesPage() {
                           </div>
                         </TableCell>
                         <TableCell className="font-medium">
+                          {category.parentId && (
+                            <span className="text-muted-foreground mr-2">
+                              └─
+                            </span>
+                          )}
                           {category.name}
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell">
+                          {category.parentId ? (
+                            <Badge variant="outline">
+                              {category.parentId.name}
+                            </Badge>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">
+                              Top Level
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell className="hidden md:table-cell max-w-[300px] truncate">
                           {category.description || "No description"}

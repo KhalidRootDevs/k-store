@@ -1,6 +1,6 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -90,6 +90,7 @@ interface Category {
   _id: string;
   name: string;
   slug: string;
+  parentId?: { _id: string; name: string } | null;
 }
 
 interface Product {
@@ -585,11 +586,33 @@ export function ProductForm({
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category._id} value={category._id}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
+                        {categories
+                          .filter((cat) => !cat.parentId)
+                          .map((parentCategory) => (
+                            <React.Fragment key={parentCategory._id}>
+                              <SelectItem value={parentCategory._id}>
+                                {parentCategory.name}
+                              </SelectItem>
+                              {categories
+                                .filter(
+                                  (cat) =>
+                                    cat.parentId &&
+                                    (typeof cat.parentId === "string"
+                                      ? cat.parentId === parentCategory._id
+                                      : cat.parentId._id === parentCategory._id)
+                                )
+                                .map((subCategory) => (
+                                  <SelectItem
+                                    key={subCategory._id}
+                                    value={subCategory._id}
+                                  >
+                                    <span className="ml-4">
+                                      └─ {subCategory.name}
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                            </React.Fragment>
+                          ))}
                       </SelectContent>
                     </Select>
                     {errors.categoryId && (

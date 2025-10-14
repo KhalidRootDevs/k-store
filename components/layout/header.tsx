@@ -151,7 +151,26 @@ const featuredCategories = [
   },
 ];
 
-export function Header() {
+interface Category {
+  _id: string;
+  name: string;
+  image: string;
+  description: string;
+  slug: string;
+  featured: boolean;
+  active: boolean;
+  parentId?: string | null;
+  subCategories?: Category[];
+  level?: number;
+}
+
+interface HeaderProps {
+  categoryTree: Category[];
+}
+
+export function Header({ categoryTree }: HeaderProps) {
+  // Show the categoryTree on the dropdown
+
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<typeof allProducts>([]);
