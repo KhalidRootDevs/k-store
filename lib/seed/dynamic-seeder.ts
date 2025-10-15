@@ -1,4 +1,3 @@
-
 import { faker } from '@faker-js/faker';
 import mongoose from "mongoose";
 import { Category } from "@/models/Category";

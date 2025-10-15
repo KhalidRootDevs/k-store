@@ -1,7 +1,7 @@
 "use client";
 
+import { ProductForm } from "@/components/forms/product-form";
 import { useRouter } from "next/navigation";
-import { ProductForm } from "../_components/product-form";
 
 export default function NewProductPage() {
   const router = useRouter();

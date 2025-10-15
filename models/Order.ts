@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { type Document, type Model, Schema } from "mongoose";
 
 export type OrderStatus =
   | "pending"
@@ -37,7 +37,10 @@ export interface IOrderItem {
   price: number;
   quantity: number;
   image: string;
-  variant?: string;
+  variant?: {
+    sku?: string;
+    attributes: Record<string, string>; // Dynamic attributes like { color: "Red", size: "M" }
+  };
   productId?: mongoose.Types.ObjectId;
   sku?: string;
 }
@@ -168,8 +171,14 @@ const orderItemSchema = new Schema<IOrderItem>({
     required: [true, "Item image is required"],
   },
   variant: {
-    type: String,
-    trim: true,
+    sku: {
+      type: String,
+      trim: true,
+    },
+    attributes: {
+      type: Schema.Types.Mixed, // Stores JSON object like { color: "Red", size: "M" }
+      default: {},
+    },
   },
   productId: {
     type: Schema.Types.ObjectId,
@@ -338,24 +347,47 @@ const orderSchema = new Schema<IOrder>(
   }
 );
 
-// Generate order number before saving
+// Consolidated order number generation pre-save hook
 orderSchema.pre<IOrder>("save", async function (next) {
   if (this.isNew && !this.orderNumber) {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const random = Math.random().toString(36).substr(2, 6).toUpperCase();
+    let orderNumber: string;
+    let attempts = 0;
+    const maxAttempts = 5;
 
-    this.orderNumber = `ORD-${year}${month}${day}-${random}`;
+    do {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, "0");
+      const day = date.getDate().toString().padStart(2, "0");
+      const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+      orderNumber = `ORD-${year}${month}${day}-${random}`;
+      attempts++;
+
+      // Check if order number already exists
+      const existingOrder = await mongoose.models.Order?.findOne({
+        orderNumber,
+      });
+      if (!existingOrder) {
+        this.orderNumber = orderNumber;
+        break;
+      }
+
+      if (attempts >= maxAttempts) {
+        // Fallback: use timestamp to ensure uniqueness
+        const timestamp = Date.now().toString(36);
+        this.orderNumber = `ORD-${year}${month}${day}-${timestamp}`;
+        break;
+      }
+    } while (attempts < maxAttempts);
   }
   next();
 });
 
 // Auto-add timeline events when status changes
-orderSchema.pre("save", function (next) {
+orderSchema.pre<IOrder>("save", function (next) {
   if (this.isModified("status") && !this.isNew) {
-    const statusDescriptions = {
+    const statusDescriptions: Record<OrderStatus, string> = {
       pending: "Order was placed by customer",
       processing: "Order is being processed",
       shipped: `Order has been shipped via ${this.shippingMethod}`,
@@ -376,7 +408,7 @@ orderSchema.pre("save", function (next) {
 });
 
 // Auto-add payment confirmed timeline event
-orderSchema.pre("save", function (next) {
+orderSchema.pre<IOrder>("save", function (next) {
   if (
     this.isModified("paymentStatus") &&
     this.paymentStatus === "paid" &&
@@ -392,6 +424,18 @@ orderSchema.pre("save", function (next) {
         description: "Payment was confirmed",
       });
     }
+  }
+  next();
+});
+
+// Auto-add order placed timeline event for new orders
+orderSchema.pre<IOrder>("save", function (next) {
+  if (this.isNew) {
+    this.timeline.push({
+      status: "order_placed",
+      date: new Date(),
+      description: "Order was placed by customer",
+    });
   }
   next();
 });
@@ -414,7 +458,7 @@ orderSchema.statics.getOrderStats = async function () {
     statusCounts: statusCounts.reduce((acc, curr) => {
       acc[curr._id] = curr.count;
       return acc;
-    }, {}),
+    }, {} as Record<string, number>),
   };
 };
 
@@ -463,8 +507,7 @@ orderSchema.virtual("itemCount").get(function () {
   return this.items.reduce((total, item) => total + item.quantity, 0);
 });
 
-// Index for efficient queries
-orderSchema.index({ orderNumber: 1 });
+// Index definitions - only define once here
 orderSchema.index({ "customer.id": 1 });
 orderSchema.index({ "customer.email": 1 });
 orderSchema.index({ status: 1 });
@@ -472,6 +515,13 @@ orderSchema.index({ paymentStatus: 1 });
 orderSchema.index({ date: -1 });
 orderSchema.index({ "timeline.date": -1 });
 orderSchema.index({ trackingNumber: 1 });
+orderSchema.index({ createdAt: -1 });
+orderSchema.index({ updatedAt: -1 });
+
+// Compound indexes for common queries
+orderSchema.index({ "customer.id": 1, createdAt: -1 });
+orderSchema.index({ status: 1, createdAt: -1 });
+orderSchema.index({ paymentStatus: 1, createdAt: -1 });
 
 export const Order: Model<IOrder> =
   mongoose.models.Order || mongoose.model<IOrder>("Order", orderSchema);

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@faker-js/faker':
-        specifier: ^10.0.0
-        version: 10.0.0
+        specifier: latest
+        version: 10.1.0
       '@hookform/resolvers':
         specifier: latest
         version: 5.2.2(react-hook-form@7.65.0(react@18.3.1))
@@ -108,13 +108,13 @@ importers:
         specifier: ^10.4.20
         version: 10.4.21(postcss@8.5.6)
       bcryptjs:
-        specifier: ^3.0.2
+        specifier: latest
         version: 3.0.2
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
       cloudinary:
-        specifier: ^2.7.0
+        specifier: latest
         version: 2.7.0
       clsx:
         specifier: ^2.1.1
@@ -135,7 +135,7 @@ importers:
         specifier: latest
         version: 1.4.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       jsonwebtoken:
-        specifier: ^9.0.2
+        specifier: latest
         version: 9.0.2
       jspdf:
         specifier: latest
@@ -147,7 +147,7 @@ importers:
         specifier: ^0.454.0
         version: 0.454.0(react@18.3.1)
       mongoose:
-        specifier: ^8.19.1
+        specifier: latest
         version: 8.19.1
       next:
         specifier: 14.2.16
@@ -230,8 +230,8 @@ packages:
   '@date-fns/tz@1.4.1':
     resolution: {integrity: sha512-P5LUNhtbj6YfI3iJjw5EL9eUAG6OitD0W3fWQcpQjDRc/QIsL0tRNuO1PcDvPccWL1fSTXXdE1ds+l95DV/OFA==}
 
-  '@faker-js/faker@10.0.0':
-    resolution: {integrity: sha512-UollFEUkVXutsaP+Vndjxar40Gs5JL2HeLcl8xO1QAjJgOdhc3OmBFWyEylS+RddWaaBiAzH+5/17PLQJwDiLw==}
+  '@faker-js/faker@10.1.0':
+    resolution: {integrity: sha512-C3mrr3b5dRVlKPJdfrAXS8+dq+rq8Qm5SNRazca0JKgw1HQERFmrVb0towvMmw5uu8hHKNiQasMaR/tydf3Zsg==}
     engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
 
   '@floating-ui/core@1.7.3':
@@ -2157,7 +2157,7 @@ snapshots:
 
   '@date-fns/tz@1.4.1': {}
 
-  '@faker-js/faker@10.0.0': {}
+  '@faker-js/faker@10.1.0': {}
 
   '@floating-ui/core@1.7.3':
     dependencies:
