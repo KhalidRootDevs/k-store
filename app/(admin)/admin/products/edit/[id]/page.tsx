@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { ProductForm } from "@/components/forms/product-form";
 import { Loader2 } from "lucide-react";
-import { ProductForm } from "../../_components/product-form";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface EditProductPageProps {
   params: {

@@ -1,40 +1,48 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
-import { ArrowLeft, Loader2, Upload } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Container } from "@/components/ui/container"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const bannerSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters" }),
-  description: z.string().min(10, { message: "Description must be at least 10 characters" }),
+  description: z
+    .string()
+    .min(10, { message: "Description must be at least 10 characters" }),
   link: z.string().url({ message: "Please enter a valid URL" }),
   buttonText: z.string().min(1, { message: "Button text is required" }),
   startDate: z.string().min(1, { message: "Start date is required" }),
   endDate: z.string().min(1, { message: "End date is required" }),
-  active: z.boolean().default(true),
-})
+  active: z.boolean().default(true).optional(),
+});
 
-type BannerFormValues = z.infer<typeof bannerSchema>
+type BannerFormValues = z.infer<typeof bannerSchema>;
 
 export default function NewBannerPage() {
-  const router = useRouter()
-  const [image, setImage] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [image, setImage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
@@ -48,21 +56,23 @@ export default function NewBannerPage() {
       link: "",
       buttonText: "Shop Now",
       startDate: new Date().toISOString().split("T")[0],
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
       active: true,
     },
-  })
+  });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader()
+      const reader = new FileReader();
       reader.onload = (e) => {
-        setImage(e.target?.result as string)
-      }
-      reader.readAsDataURL(file)
+        setImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const onSubmit = async (data: BannerFormValues) => {
     if (!image) {
@@ -70,22 +80,22 @@ export default function NewBannerPage() {
         title: "Image required",
         description: "Please upload a banner image.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     toast({
       title: "Banner created",
       description: "Your banner has been created successfully.",
-    })
+    });
 
-    router.push("/admin/banners")
-  }
+    router.push("/admin/banners");
+  };
 
   return (
     <Container>
@@ -99,7 +109,9 @@ export default function NewBannerPage() {
           </Link>
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Create Banner</h2>
-            <p className="text-muted-foreground">Add a new promotional banner to your store.</p>
+            <p className="text-muted-foreground">
+              Add a new promotional banner to your store.
+            </p>
           </div>
         </div>
 
@@ -108,15 +120,25 @@ export default function NewBannerPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Banner Content</CardTitle>
-                <CardDescription>Enter the content for your promotional banner.</CardDescription>
+                <CardDescription>
+                  Enter the content for your promotional banner.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">
                     Banner Title <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="title" placeholder="e.g., Summer Collection" {...register("title")} />
-                  {errors.title && <p className="text-sm text-red-500">{errors.title.message}</p>}
+                  <Input
+                    id="title"
+                    placeholder="e.g., Summer Collection"
+                    {...register("title")}
+                  />
+                  {errors.title && (
+                    <p className="text-sm text-red-500">
+                      {errors.title.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -129,7 +151,11 @@ export default function NewBannerPage() {
                     rows={3}
                     {...register("description")}
                   />
-                  {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
+                  {errors.description && (
+                    <p className="text-sm text-red-500">
+                      {errors.description.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -141,15 +167,27 @@ export default function NewBannerPage() {
                     placeholder="e.g., https://yourstore.com/products?category=summer"
                     {...register("link")}
                   />
-                  {errors.link && <p className="text-sm text-red-500">{errors.link.message}</p>}
+                  {errors.link && (
+                    <p className="text-sm text-red-500">
+                      {errors.link.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="buttonText">
                     Button Text <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="buttonText" placeholder="e.g., Shop Now" {...register("buttonText")} />
-                  {errors.buttonText && <p className="text-sm text-red-500">{errors.buttonText.message}</p>}
+                  <Input
+                    id="buttonText"
+                    placeholder="e.g., Shop Now"
+                    {...register("buttonText")}
+                  />
+                  {errors.buttonText && (
+                    <p className="text-sm text-red-500">
+                      {errors.buttonText.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -157,8 +195,16 @@ export default function NewBannerPage() {
                     <Label htmlFor="startDate">
                       Start Date <span className="text-red-500">*</span>
                     </Label>
-                    <Input id="startDate" type="date" {...register("startDate")} />
-                    {errors.startDate && <p className="text-sm text-red-500">{errors.startDate.message}</p>}
+                    <Input
+                      id="startDate"
+                      type="date"
+                      {...register("startDate")}
+                    />
+                    {errors.startDate && (
+                      <p className="text-sm text-red-500">
+                        {errors.startDate.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -166,14 +212,20 @@ export default function NewBannerPage() {
                       End Date <span className="text-red-500">*</span>
                     </Label>
                     <Input id="endDate" type="date" {...register("endDate")} />
-                    {errors.endDate && <p className="text-sm text-red-500">{errors.endDate.message}</p>}
+                    {errors.endDate && (
+                      <p className="text-sm text-red-500">
+                        {errors.endDate.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-2">
                   <div className="space-y-0.5">
                     <Label htmlFor="active">Active</Label>
-                    <p className="text-sm text-muted-foreground">Display this banner on your store.</p>
+                    <p className="text-sm text-muted-foreground">
+                      Display this banner on your store.
+                    </p>
                   </div>
                   <Switch id="active" {...register("active")} />
                 </div>
@@ -183,12 +235,19 @@ export default function NewBannerPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Banner Image</CardTitle>
-                <CardDescription>Upload an image for your banner.</CardDescription>
+                <CardDescription>
+                  Upload an image for your banner.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="border rounded-md aspect-[2/1] relative overflow-hidden bg-muted">
                   {image ? (
-                    <Image src={image || "/placeholder.svg"} alt="Banner preview" fill className="object-cover" />
+                    <Image
+                      src={image || "/placeholder.svg"}
+                      alt="Banner preview"
+                      fill
+                      className="object-cover"
+                    />
                   ) : (
                     <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
                       <Upload className="h-10 w-10 mb-2" />
@@ -201,9 +260,15 @@ export default function NewBannerPage() {
                   <Label htmlFor="image">
                     Upload Image <span className="text-red-500">*</span>
                   </Label>
-                  <Input id="image" type="file" accept="image/*" onChange={handleImageChange} />
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
                   <p className="text-sm text-muted-foreground">
-                    Recommended size: 1200x600px. Max file size: 2MB. Supported formats: JPG, PNG, WebP.
+                    Recommended size: 1200x600px. Max file size: 2MB. Supported
+                    formats: JPG, PNG, WebP.
                   </p>
                 </div>
 
@@ -213,11 +278,20 @@ export default function NewBannerPage() {
                     <div className="relative h-[150px] rounded-md overflow-hidden">
                       {image ? (
                         <>
-                          <Image src={image || "/placeholder.svg"} alt="Banner preview" fill className="object-cover" />
+                          <Image
+                            src={image || "/placeholder.svg"}
+                            alt="Banner preview"
+                            fill
+                            className="object-cover"
+                          />
                           <div className="absolute inset-0 bg-black/40 flex items-center">
                             <div className="container px-4">
-                              <h3 className="text-xl font-bold text-white mb-2">Your Banner Title</h3>
-                              <p className="text-sm text-white/90 mb-4">Your banner description will appear here.</p>
+                              <h3 className="text-xl font-bold text-white mb-2">
+                                Your Banner Title
+                              </h3>
+                              <p className="text-sm text-white/90 mb-4">
+                                Your banner description will appear here.
+                              </p>
                               <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium">
                                 Button Text
                               </button>
@@ -254,5 +328,5 @@ export default function NewBannerPage() {
         </form>
       </div>
     </Container>
-  )
+  );
 }

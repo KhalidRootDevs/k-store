@@ -25,13 +25,13 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Loader2, Plus, Trash2, Upload, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 const productSchema = z.object({
   name: z
@@ -58,8 +58,8 @@ const productSchema = z.object({
   width: z.coerce.number().positive().optional().nullable(),
   height: z.coerce.number().positive().optional().nullable(),
   brand: z.string().optional(),
-  active: z.boolean().default(true),
-  featured: z.boolean().default(false),
+  active: z.boolean().default(true).optional(),
+  featured: z.boolean().default(true).optional(),
   variants: z
     .array(
       z.object({
@@ -1148,11 +1148,18 @@ export function ProductForm({
                         )}
                       </div>
 
-                      {errors.variants?.[index]?.attributes && (
-                        <p className="text-sm text-red-500">
-                          {errors.variants[index]?.attributes?.message}
-                        </p>
-                      )}
+                      {(() => {
+                        const attrError = errors.variants?.[index]?.attributes;
+                        const message =
+                          attrError &&
+                          typeof attrError === "object" &&
+                          "message" in attrError
+                            ? (attrError as any).message
+                            : undefined;
+                        return message ? (
+                          <p className="text-sm text-red-500">{message}</p>
+                        ) : null;
+                      })()}
                     </div>
                   );
                 })}

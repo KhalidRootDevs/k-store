@@ -1,7 +1,5 @@
 "use client";
 
-import type React from "react";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,22 +21,23 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Loader2, Upload } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 const categorySchema = z.object({
   name: z
     .string()
     .min(2, { message: "Category name must be at least 2 characters" }),
   description: z.string().optional(),
-  featured: z.boolean().default(false),
-  active: z.boolean().default(true),
-  parentId: z.string().optional(),
+  featured: z.boolean().default(false).optional(),
+  active: z.boolean().default(true).optional(),
+  parentId: z.string().default("none").optional(),
 });
 
 export type CategoryFormValues = z.infer<typeof categorySchema>;
@@ -193,8 +192,11 @@ export function CategoryForm({
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("description", data.description || "");
-      formData.append("featured", data.featured.toString());
-      formData.append("active", data.active.toString());
+      formData.append(
+        "featured",
+        data.featured ? data.featured.toString() : "false"
+      );
+      formData.append("active", data.active ? data.active.toString() : "false");
       formData.append("parentId", data.parentId || "none");
 
       if (imageFile) {
