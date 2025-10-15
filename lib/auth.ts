@@ -11,6 +11,7 @@ if (!JWT_SECRET) {
 export interface JWTPayload {
   userId: string;
   email: string;
+  role: string;
 }
 
 export function generateToken(user: IUser): string {
