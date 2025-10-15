@@ -3,6 +3,9 @@ import { Order } from "@/models/Order";
 import { Product } from "@/models/Product";
 import { verifyToken } from "@/lib/auth";
 import connectDB from "@/lib/database";
+import { User } from "@/models/User";
+import { Mongoose } from "mongoose";
+import bcrypt from "bcryptjs";
 
 /**
  * POST /api/orders
@@ -13,12 +16,20 @@ export async function POST(request: NextRequest) {
     await connectDB();
 
     const token = request.cookies.get("token")?.value;
-    if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    let userId;
+    let userEmail;
+    let isGuest = false;
+
+    // Check if user is authenticated
+    if (token) {
+      const decoded = verifyToken(token);
+      userId = decoded.userId;
+      userEmail = decoded.email;
     }
 
-    const decoded = verifyToken(token);
     const body = await request.json();
+
+    console.log("body", body);
 
     const {
       items,
@@ -28,6 +39,10 @@ export async function POST(request: NextRequest) {
       cardDetails,
       shippingMethod,
       notes,
+      // Guest user specific fields
+      customer,
+
+      createAccount = true, // Option to create account for guest
     } = body;
 
     // Validate required fields
@@ -46,6 +61,70 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       );
+    }
+
+    // Handle guest user
+    if (!userId) {
+      if (!customer?.email) {
+        return NextResponse.json(
+          { error: "Email is required for guest checkout" },
+          { status: 400 }
+        );
+      }
+
+      // Check if user already exists with this email
+      let existingUser = await User.findOne({
+        email: customer?.email.toLowerCase(),
+      });
+
+      if (existingUser) {
+        // Use existing user
+        userId = existingUser._id;
+        userEmail = existingUser.email;
+        isGuest = false;
+      } else if (createAccount) {
+        // Create new user account for guest
+        const password = Math.random().toString(36).slice(-8); // Generate random password
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        const newUser = new User({
+          name: shippingAddress.fullName,
+          email: customer?.email.toLowerCase(),
+          password: hashedPassword,
+          role: "user",
+          emailVerified: false,
+          phone: shippingAddress.phone,
+          addresses: [
+            {
+              type: "shipping",
+              fullName: shippingAddress.fullName,
+              address: shippingAddress.address,
+              city: shippingAddress.city,
+              state: shippingAddress.state,
+              zipCode: shippingAddress.zipCode,
+              country: shippingAddress.country,
+              phone: shippingAddress.phone,
+              isDefault: true,
+            },
+          ],
+          guestAccount: true, // Mark as guest account that was auto-created
+        });
+
+        await newUser.save();
+        userId = newUser._id;
+        userEmail = newUser.email;
+        isGuest = true;
+
+        // TODO: Send welcome email with password
+        // await sendWelcomeEmail(guestEmail, shippingAddress.fullName, password);
+
+        console.log(`🎉 Created guest account for: ${customer?.email}`);
+      } else {
+        // Create order without user account (true guest checkout)
+        userId = new Mongoose.Types.ObjectId(); // Generate a temporary ID
+        userEmail = customer?.email;
+        isGuest = true;
+      }
     }
 
     // Validate stock availability and calculate totals
@@ -108,12 +187,12 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Calculate tax and shipping (customize based on your business logic)
+    // Calculate tax and shipping
     const tax = subtotal * 0.1; // 10% tax
     const shipping = shippingMethod === "express" ? 15 : 5;
     const total = subtotal + tax + shipping;
 
-    // Generate order number manually to ensure it's set
+    // Generate order number
     const generateOrderNumber = () => {
       const date = new Date();
       const year = date.getFullYear();
@@ -123,13 +202,13 @@ export async function POST(request: NextRequest) {
       return `ORD-${year}${month}${day}-${random}`;
     };
 
-    // Create order with explicit orderNumber
+    // Create order data
     const orderData = {
       orderNumber: generateOrderNumber(),
       customer: {
-        id: decoded.userId,
+        id: userId,
         name: shippingAddress.fullName,
-        email: decoded.email,
+        email: userEmail,
         phone: shippingAddress.phone,
         address: shippingAddress.address,
       },
@@ -144,6 +223,7 @@ export async function POST(request: NextRequest) {
       shippingAddress,
       billingAddress: billingAddress || shippingAddress,
       notes,
+      guestOrder: isGuest, // Mark if this is a guest order
       timeline: [
         {
           status: "order_placed",
@@ -180,18 +260,27 @@ export async function POST(request: NextRequest) {
       await product.save();
     }
 
-    const populatedOrder = await Order.findById(order._id).populate(
-      "customer.id",
-      "name email"
-    );
+    // Populate order for response
+    const populatedOrder = await Order.findById(order._id)
+      .populate("customer.id", "name email")
+      .lean();
 
-    return NextResponse.json(
-      {
-        message: "Order created successfully",
-        order: populatedOrder,
-      },
-      { status: 201 }
-    );
+    // Prepare response
+    const responseData: any = {
+      message: "Order created successfully",
+      order: populatedOrder,
+    };
+
+    // Add guest account info if account was created
+    if (isGuest && createAccount) {
+      responseData.guestAccountCreated = true;
+      responseData.message =
+        "Order created successfully. Account has been created for you.";
+      // In a real implementation, you would send the email here
+      // responseData.emailSent = true;
+    }
+
+    return NextResponse.json(responseData, { status: 201 });
   } catch (error: any) {
     console.error("Create order error:", error);
 

@@ -12,8 +12,14 @@ export type OrderStatus =
   | "cancelled"
   | "refunded";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
+export type PaymentMethod =
+  | "credit_card"
+  | "debit_card"
+  | "paypal"
+  | "bank_transfer"
+  | "cash_on_delivery";
 
-export interface IOrder {
+export interface IOrderReference {
   orderId: mongoose.Types.ObjectId;
   orderNumber: string;
   date: Date;
@@ -21,6 +27,21 @@ export interface IOrder {
   status: OrderStatus;
   items: number; // Total quantity of items
   paymentStatus: PaymentStatus;
+  paymentMethod: PaymentMethod;
+}
+
+export interface IAddress {
+  type: "shipping" | "billing";
+  fullName: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  phone: string;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface INote {
@@ -39,12 +60,13 @@ export interface IUser extends Document {
   role: UserRole;
   status: UserStatus;
   dateOfBirth?: Date;
-  addresses: mongoose.Types.ObjectId[];
-  orders: IOrder[];
+  addresses: IAddress[];
+  orders: IOrderReference[];
   notes: INote[];
   lastLogin?: Date;
   emailVerified: boolean;
   phoneVerified: boolean;
+  guestAccount: boolean; // New field for guest accounts
   preferences: {
     newsletter: boolean;
     marketing: boolean;
@@ -55,7 +77,7 @@ export interface IUser extends Document {
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
-const orderSchema = new Schema<IOrder>({
+const orderReferenceSchema = new Schema<IOrderReference>({
   orderId: {
     type: Schema.Types.ObjectId,
     ref: "Order",
@@ -100,7 +122,69 @@ const orderSchema = new Schema<IOrder>({
     required: true,
     default: "pending",
   },
+  paymentMethod: {
+    type: String,
+    enum: [
+      "credit_card",
+      "debit_card",
+      "paypal",
+      "bank_transfer",
+      "cash_on_delivery",
+    ],
+    required: true,
+  },
 });
+
+const addressSchema = new Schema<IAddress>(
+  {
+    type: {
+      type: String,
+      enum: ["shipping", "billing"],
+      required: true,
+    },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    address: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    city: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    state: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    zipCode: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    country: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const noteSchema = new Schema<INote>({
   content: {
@@ -177,13 +261,8 @@ const userSchema = new Schema<IUser>(
     dateOfBirth: {
       type: Date,
     },
-    addresses: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Address",
-      },
-    ],
-    orders: [orderSchema],
+    addresses: [addressSchema],
+    orders: [orderReferenceSchema],
     notes: [noteSchema],
     lastLogin: {
       type: Date,
@@ -193,6 +272,10 @@ const userSchema = new Schema<IUser>(
       default: false,
     },
     phoneVerified: {
+      type: Boolean,
+      default: false,
+    },
+    guestAccount: {
       type: Boolean,
       default: false,
     },
@@ -259,6 +342,7 @@ userSchema.methods.toJSON = function () {
 userSchema.statics.getUserStats = async function () {
   const totalUsers = await this.countDocuments();
   const activeUsers = await this.countDocuments({ status: "active" });
+  const guestUsers = await this.countDocuments({ guestAccount: true });
   const newUsers = await this.countDocuments({
     createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }, // Last 30 days
   });
@@ -266,17 +350,65 @@ userSchema.statics.getUserStats = async function () {
   return {
     totalUsers,
     activeUsers,
+    guestUsers,
     newUsers,
     inactiveUsers: totalUsers - activeUsers,
   };
 };
 
-// Instance method to add order
+// Instance method to add order reference
 userSchema.methods.addOrder = function (
-  orderData: Omit<IOrder, "orderId"> & { orderId: mongoose.Types.ObjectId }
+  orderId: mongoose.Types.ObjectId,
+  orderNumber: string,
+  total: number,
+  items: number,
+  paymentMethod: PaymentMethod,
+  paymentStatus: PaymentStatus = "pending",
+  status: OrderStatus = "pending"
 ) {
-  this.orders.push(orderData);
+  this.orders.push({
+    orderId,
+    orderNumber,
+    date: new Date(),
+    total,
+    items,
+    paymentMethod,
+    paymentStatus,
+    status,
+  });
   return this.save();
+};
+
+// Instance method to add address
+userSchema.methods.addAddress = function (
+  addressData: Omit<IAddress, "createdAt" | "updatedAt">
+) {
+  // If this is the first address or marked as default, set it as default
+  if (this.addresses.length === 0 || addressData.isDefault) {
+    // Remove default from other addresses
+    this.addresses.forEach((addr) => {
+      addr.isDefault = false;
+    });
+  }
+
+  this.addresses.push({
+    ...addressData,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  return this.save();
+};
+
+// Instance method to set default address
+userSchema.methods.setDefaultAddress = function (addressIndex: number) {
+  if (addressIndex >= 0 && addressIndex < this.addresses.length) {
+    this.addresses.forEach((addr, index) => {
+      addr.isDefault = index === addressIndex;
+    });
+    return this.save();
+  }
+  throw new Error("Invalid address index");
 };
 
 // Instance method to add note
@@ -293,12 +425,59 @@ userSchema.methods.addNote = function (
   return this.save();
 };
 
+// Static method to find or create guest user
+userSchema.statics.findOrCreateGuest = async function (
+  email: string,
+  name: string,
+  phone?: string
+) {
+  let user = await this.findOne({ email: email.toLowerCase() });
+
+  if (!user) {
+    const password = Math.random().toString(36).slice(-8); // Generate random password
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    user = new this({
+      name,
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      phone,
+      guestAccount: true,
+      emailVerified: false,
+      status: "active",
+    });
+
+    await user.save();
+
+    // Return user with plain password for email sending (will be removed by toJSON)
+    (user as any).plainPassword = password;
+  }
+
+  return user;
+};
+
+// Static method to convert guest to regular user
+userSchema.statics.convertGuestToRegular = async function (
+  userId: mongoose.Types.ObjectId
+) {
+  return this.findByIdAndUpdate(
+    userId,
+    {
+      guestAccount: false,
+      status: "active",
+    },
+    { new: true }
+  );
+};
+
 // Index for efficient queries
-// Removed duplicate email index - the 'unique: true' in the email field already creates an index
+userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ status: 1 });
 userSchema.index({ role: 1 });
+userSchema.index({ guestAccount: 1 });
 userSchema.index({ "orders.date": -1 });
 userSchema.index({ createdAt: -1 });
+userSchema.index({ "addresses.isDefault": 1 });
 
 export const User: Model<IUser> =
   mongoose.models.User || mongoose.model<IUser>("User", userSchema);
