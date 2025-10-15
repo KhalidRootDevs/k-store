@@ -1,6 +1,7 @@
 "use client";
 
 import { useCart } from "@/context/cart-context";
+import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
-import { CheckCircle2, AlertCircle, CreditCard } from "lucide-react";
+import { CheckCircle2, AlertCircle, CreditCard, Plus } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -23,7 +24,6 @@ import { getStripe } from "@/lib/stripe";
 import { StripePaymentForm } from "@/components/checkout/stripe-payment-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Updated schema to match Order model
 const checkoutSchema = z.object({
   contactInfo: z.object({
     fullName: z.string().min(2, { message: "Full name is required" }),
@@ -35,17 +35,17 @@ const checkoutSchema = z.object({
     address: z.string().min(5, { message: "Address is required" }),
     city: z.string().min(2, { message: "City is required" }),
     state: z.string().min(2, { message: "State is required" }),
-    zipCode: z.string().min(5, { message: "ZIP code is required" }),
+    zipCode: z.string().min(4, { message: "ZIP code is required" }),
     country: z.string().min(2, { message: "Country is required" }),
     phone: z.string().min(5, { message: "Phone number is required" }),
   }),
   billingAddress: z.object({
-    fullName: z.string().min(2, { message: "Full name is required" }),
-    address: z.string().min(5, { message: "Address is required" }),
-    city: z.string().min(2, { message: "City is required" }),
-    state: z.string().min(2, { message: "State is required" }),
-    zipCode: z.string().min(5, { message: "ZIP code is required" }),
-    country: z.string().min(2, { message: "Country is required" }),
+    fullName: z.string().optional(),
+    address: z.string().optional(),
+    city: z.string().optional(),
+    state: z.string().optional(),
+    zipCode: z.string().optional(),
+    country: z.string().optional(),
   }),
   paymentMethod: z.enum([
     "credit_card",
@@ -58,6 +58,19 @@ const checkoutSchema = z.object({
 });
 
 type CheckoutFormValues = z.infer<typeof checkoutSchema>;
+
+interface Address {
+  _id: string;
+  label: string;
+  fullName: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  phone: string;
+  isDefault: boolean;
+}
 
 // Shipping method options
 const shippingMethods = [
@@ -83,6 +96,7 @@ const shippingMethods = [
 
 export default function CheckoutPage() {
   const { items, subtotal, shipping, tax, total, clearCart } = useCart();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
@@ -96,6 +110,11 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
+  const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [useNewAddress, setUseNewAddress] = useState(false);
+  const [loadingAddresses, setLoadingAddresses] = useState(false);
+
   useEffect(() => {
     setIsMounted(true);
     checkStripeConfiguration();
@@ -103,7 +122,69 @@ export default function CheckoutPage() {
     if (items.length === 0) {
       router.push("/cart");
     }
-  }, [items.length, router]);
+
+    if (user) {
+      fetchSavedAddresses();
+    }
+  }, [items.length, router, user]);
+
+  const fetchSavedAddresses = async () => {
+    try {
+      setLoadingAddresses(true);
+      const response = await fetch("/api/addresses");
+      if (response.ok) {
+        const data = await response.json();
+        setSavedAddresses(data.addresses || []);
+
+        // Auto-select default address if available
+        const defaultAddress = data.addresses?.find(
+          (addr: Address) => addr.isDefault
+        );
+        if (defaultAddress && !useNewAddress) {
+          setSelectedAddressId(defaultAddress._id);
+          populateAddressFields(defaultAddress);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    } finally {
+      setLoadingAddresses(false);
+    }
+  };
+
+  const populateAddressFields = (address: Address) => {
+    setValue("shippingAddress.fullName", address.fullName);
+    setValue("shippingAddress.address", address.address);
+    setValue("shippingAddress.city", address.city);
+    setValue("shippingAddress.state", address.state);
+    setValue("shippingAddress.zipCode", address.zipCode);
+    setValue("shippingAddress.country", address.country);
+    setValue("shippingAddress.phone", address.phone);
+  };
+
+  const handleAddressSelection = (addressId: string) => {
+    if (addressId === "new") {
+      setUseNewAddress(true);
+      setSelectedAddressId("");
+      // Clear form fields
+      setValue("shippingAddress.fullName", "");
+      setValue("shippingAddress.address", "");
+      setValue("shippingAddress.city", "");
+      setValue("shippingAddress.state", "");
+      setValue("shippingAddress.zipCode", "");
+      setValue("shippingAddress.country", "");
+      setValue("shippingAddress.phone", "");
+    } else {
+      setUseNewAddress(false);
+      setSelectedAddressId(addressId);
+      const selectedAddress = savedAddresses.find(
+        (addr) => addr._id === addressId
+      );
+      if (selectedAddress) {
+        populateAddressFields(selectedAddress);
+      }
+    }
+  };
 
   const checkStripeConfiguration = async () => {
     try {
@@ -169,7 +250,6 @@ export default function CheckoutPage() {
   const shippingMethod = watch("shippingMethod");
   const shippingAddress = watch("shippingAddress");
 
-  // Update billing address when sameAsShipping changes
   useEffect(() => {
     if (sameAsShipping) {
       setValue("billingAddress.fullName", shippingAddress.fullName);
@@ -320,9 +400,27 @@ export default function CheckoutPage() {
         (method) => method.id === data.shippingMethod
       );
 
+      const billingAddressData = sameAsShipping
+        ? {
+            fullName: data.shippingAddress.fullName,
+            address: data.shippingAddress.address,
+            city: data.shippingAddress.city,
+            state: data.shippingAddress.state,
+            zipCode: data.shippingAddress.zipCode,
+            country: data.shippingAddress.country,
+          }
+        : {
+            fullName: data.billingAddress.fullName || "",
+            address: data.billingAddress.address || "",
+            city: data.billingAddress.city || "",
+            state: data.billingAddress.state || "",
+            zipCode: data.billingAddress.zipCode || "",
+            country: data.billingAddress.country || "",
+          };
+
       const orderData = {
         customer: {
-          id: "661c9a5e8d1a2b3c4e5f6a7b", // You'll need to get the actual user ID from your auth system
+          id: user?.id || "guest",
           name: data.contactInfo.fullName,
           email: data.contactInfo.email,
           phone: data.contactInfo.phone,
@@ -337,16 +435,7 @@ export default function CheckoutPage() {
           country: data.shippingAddress.country,
           phone: data.shippingAddress.phone,
         },
-        billingAddress: sameAsShipping
-          ? undefined
-          : {
-              fullName: data.billingAddress.fullName,
-              address: data.billingAddress.address,
-              city: data.billingAddress.city,
-              state: data.billingAddress.state,
-              zipCode: data.billingAddress.zipCode,
-              country: data.billingAddress.country,
-            },
+        billingAddress: billingAddressData,
         items: orderItems,
         paymentMethod: data.paymentMethod,
         paymentStatus:
@@ -561,115 +650,169 @@ export default function CheckoutPage() {
                 <CardTitle>Shipping Address</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="shippingFullName">
-                    Full Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="shippingFullName"
-                    placeholder="John Doe"
-                    {...register("shippingAddress.fullName")}
-                  />
-                  {errors.shippingAddress?.fullName && (
-                    <p className="text-sm text-red-500">
-                      {errors.shippingAddress.fullName.message}
-                    </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="shippingAddress">
-                    Address <span className="text-red-500">*</span>
-                  </Label>
-                  <Textarea
-                    id="shippingAddress"
-                    placeholder="123 Main St, Apt 4B"
-                    {...register("shippingAddress.address")}
-                  />
-                  {errors.shippingAddress?.address && (
-                    <p className="text-sm text-red-500">
-                      {errors.shippingAddress.address.message}
-                    </p>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="shippingCity">
-                      City <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="shippingCity"
-                      placeholder="New York"
-                      {...register("shippingAddress.city")}
-                    />
-                    {errors.shippingAddress?.city && (
-                      <p className="text-sm text-red-500">
-                        {errors.shippingAddress.city.message}
-                      </p>
-                    )}
+                {user && savedAddresses.length > 0 && (
+                  <div className="space-y-3">
+                    <Label>Select Address</Label>
+                    <RadioGroup
+                      value={useNewAddress ? "new" : selectedAddressId}
+                      onValueChange={handleAddressSelection}
+                      className="space-y-2"
+                    >
+                      {savedAddresses.map((address) => (
+                        <div
+                          key={address._id}
+                          className="flex items-start space-x-2 border rounded-md p-3"
+                        >
+                          <RadioGroupItem
+                            value={address._id}
+                            id={address._id}
+                          />
+                          <Label
+                            htmlFor={address._id}
+                            className="flex-1 cursor-pointer"
+                          >
+                            <div className="font-medium">{address.label}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {address.fullName}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {address.address}, {address.city}, {address.state}{" "}
+                              {address.zipCode}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {address.phone}
+                            </div>
+                          </Label>
+                        </div>
+                      ))}
+                      <div className="flex items-center space-x-2 border rounded-md p-3 border-dashed">
+                        <RadioGroupItem value="new" id="new" />
+                        <Label
+                          htmlFor="new"
+                          className="flex-1 cursor-pointer flex items-center"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Use a new address
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                    <Separator className="my-4" />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="shippingState">
-                      State <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="shippingState"
-                      placeholder="NY"
-                      {...register("shippingAddress.state")}
-                    />
-                    {errors.shippingAddress?.state && (
-                      <p className="text-sm text-red-500">
-                        {errors.shippingAddress.state.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="shippingZipCode">
-                      ZIP Code <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="shippingZipCode"
-                      placeholder="10001"
-                      {...register("shippingAddress.zipCode")}
-                    />
-                    {errors.shippingAddress?.zipCode && (
-                      <p className="text-sm text-red-500">
-                        {errors.shippingAddress.zipCode.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="shippingCountry">
-                      Country <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="shippingCountry"
-                      placeholder="United States"
-                      {...register("shippingAddress.country")}
-                    />
-                    {errors.shippingAddress?.country && (
-                      <p className="text-sm text-red-500">
-                        {errors.shippingAddress.country.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="shippingPhone">
-                      Phone <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="shippingPhone"
-                      placeholder="+1 (123) 456-7890"
-                      {...register("shippingAddress.phone")}
-                    />
-                    {errors.shippingAddress?.phone && (
-                      <p className="text-sm text-red-500">
-                        {errors.shippingAddress.phone.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
+                )}
+
+                {(!user || useNewAddress || savedAddresses.length === 0) && (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="shippingFullName">
+                        Full Name <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="shippingFullName"
+                        placeholder="John Doe"
+                        {...register("shippingAddress.fullName")}
+                      />
+                      {errors.shippingAddress?.fullName && (
+                        <p className="text-sm text-red-500">
+                          {errors.shippingAddress.fullName.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="shippingAddress">
+                        Address <span className="text-red-500">*</span>
+                      </Label>
+                      <Textarea
+                        id="shippingAddress"
+                        placeholder="123 Main St, Apt 4B"
+                        {...register("shippingAddress.address")}
+                      />
+                      {errors.shippingAddress?.address && (
+                        <p className="text-sm text-red-500">
+                          {errors.shippingAddress.address.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="shippingCity">
+                          City <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="shippingCity"
+                          placeholder="New York"
+                          {...register("shippingAddress.city")}
+                        />
+                        {errors.shippingAddress?.city && (
+                          <p className="text-sm text-red-500">
+                            {errors.shippingAddress.city.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="shippingState">
+                          State <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="shippingState"
+                          placeholder="NY"
+                          {...register("shippingAddress.state")}
+                        />
+                        {errors.shippingAddress?.state && (
+                          <p className="text-sm text-red-500">
+                            {errors.shippingAddress.state.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="shippingZipCode">
+                          ZIP Code <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="shippingZipCode"
+                          placeholder="10001"
+                          {...register("shippingAddress.zipCode")}
+                        />
+                        {errors.shippingAddress?.zipCode && (
+                          <p className="text-sm text-red-500">
+                            {errors.shippingAddress.zipCode.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="shippingCountry">
+                          Country <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="shippingCountry"
+                          placeholder="United States"
+                          {...register("shippingAddress.country")}
+                        />
+                        {errors.shippingAddress?.country && (
+                          <p className="text-sm text-red-500">
+                            {errors.shippingAddress.country.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="shippingPhone">
+                          Phone <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="shippingPhone"
+                          placeholder="+1 (123) 456-7890"
+                          {...register("shippingAddress.phone")}
+                        />
+                        {errors.shippingAddress?.phone && (
+                          <p className="text-sm text-red-500">
+                            {errors.shippingAddress.phone.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
 
