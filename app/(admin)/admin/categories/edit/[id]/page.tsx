@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { CategoryForm } from "@/components/forms/category-form";
 import { Loader2 } from "lucide-react";
-import { CategoryForm } from "../../_components/category-form";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface EditCategoryPageProps {
   params: {
