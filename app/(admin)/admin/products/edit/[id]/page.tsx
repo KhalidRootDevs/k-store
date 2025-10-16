@@ -1,6 +1,6 @@
 "use client";
 
-import { ProductForm } from "@/components/forms/product-form";
+import { ProductForm } from "@/components/forms/product/product-form";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
