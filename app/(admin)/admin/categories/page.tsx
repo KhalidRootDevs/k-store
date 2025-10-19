@@ -2,6 +2,7 @@
 
 import type React from "react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,24 +20,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { toast } from "@/components/ui/use-toast";
+import { routes } from "@/lib/routes";
 import {
-  Edit,
-  Plus,
-  Search,
-  Trash2,
-  Loader2,
-  Filter,
-  X,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Edit,
+  Filter,
+  Loader2,
+  Plus,
+  Search,
+  Trash2,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
 
 interface Category {
   _id: string;
@@ -269,7 +270,7 @@ export default function CategoriesPage() {
             Manage product categories for your store.
           </p>
         </div>
-        <Link href="/admin/categories/new">
+        <Link href={routes.privateRoutes.admin.category.create}>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Add Category

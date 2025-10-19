@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { Category } from "@/models/Category";
 import { verifyToken } from "@/lib/auth";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import connectDB from "@/lib/database";
+import { Category } from "@/models/Category";
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
       return NextResponse.json(
-        { error: "Category name already exists" },
+        { error: "Category name already exists!" },
         { status: 409 }
       );
     }
