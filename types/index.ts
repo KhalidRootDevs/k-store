@@ -27,4 +27,3 @@ export interface CreateAddressRequest {
 }
 
 export interface UpdateAddressRequest extends Partial<CreateAddressRequest> {}
-
