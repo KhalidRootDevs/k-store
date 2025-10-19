@@ -9,6 +9,7 @@ import { toast } from "@/components/ui/use-toast"
 import { routes } from "@/lib/routes"
 import { Plus } from "lucide-react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 
 interface Category {
@@ -35,13 +36,9 @@ interface PaginationInfo {
 }
 
 export default function CategoriesPage() {
+  const searchParams = useSearchParams()
   const [categories, setCategories] = useState<Category[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filters, setFilters] = useState({
-    featured: "all",
-    status: "all",
-  })
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 10,
@@ -53,6 +50,11 @@ export default function CategoriesPage() {
   const [deleteModal, setDeleteModal] = useState(false)
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null)
 
+  const searchTerm = searchParams.get("search") || ""
+  const featuredFilter = searchParams.get("featured") || "all"
+  const statusFilter = searchParams.get("status") || "all"
+  const currentPage = Number(searchParams.get("page")) || 1
+
   // Fetch categories from API
   const fetchCategories = async (page = 1) => {
     setIsLoading(true)
@@ -60,14 +62,19 @@ export default function CategoriesPage() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: pagination.limit.toString(),
-        ...(searchTerm && { search: searchTerm }),
-        ...(filters.featured !== "all" && {
-          featured: filters.featured === "featured" ? "true" : "false",
-        }),
-        ...(filters.status !== "all" && {
-          active: filters.status === "active" ? "true" : "false",
-        }),
       })
+
+      if (searchTerm) {
+        params.append("search", searchTerm)
+      }
+
+      if (featuredFilter !== "all") {
+        params.append("featured", featuredFilter === "featured" ? "true" : "false")
+      }
+
+      if (statusFilter !== "all") {
+        params.append("active", statusFilter === "active" ? "true" : "false")
+      }
 
       const response = await fetch(`/api/admin/categories?${params}`, {
         credentials: "include",
@@ -101,10 +108,9 @@ export default function CategoriesPage() {
     }
   }
 
-  // Initial load and when filters change
   useEffect(() => {
-    fetchCategories(1)
-  }, [searchTerm, filters.featured, filters.status])
+    fetchCategories(currentPage)
+  }, [searchTerm, featuredFilter, statusFilter, currentPage])
 
   const handleDeleteCategory = async (categoryId: string | null) => {
     try {
