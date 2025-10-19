@@ -2,6 +2,7 @@
 
 import type React from "react";
 
+import DeleteModal from "@/components/custom/delete-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -78,6 +79,8 @@ export default function CategoriesPage() {
     hasNext: false,
     hasPrev: false,
   });
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null);
 
   // Fetch categories from API
   const fetchCategories = async (page = 1) => {
@@ -143,35 +146,25 @@ export default function CategoriesPage() {
     }
   };
 
-  const handleDeleteCategory = async (
-    categoryId: string,
-    categoryName: string
-  ) => {
-    if (
-      !confirm(
-        `Are you sure you want to delete "${categoryName}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
-
+  const handleDeleteCategory = async (categoryId: string | null) => {
     try {
+      if (categoryId === null) return;
+
       const response = await fetch(`/api/admin/categories/${categoryId}`, {
         method: "DELETE",
         credentials: "include",
       });
 
       if (response.ok) {
-        toast({
-          title: "Category deleted",
-          description: `Category "${categoryName}" has been deleted successfully.`,
-        });
         // Refresh the categories list - go to first page if current page becomes empty
         if (categories.length === 1 && pagination.page > 1) {
           fetchCategories(pagination.page - 1);
         } else {
           fetchCategories(pagination.page);
         }
+
+        setDeleteCategoryId(null);
+        setDeleteModal(false);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete category");
@@ -497,12 +490,10 @@ export default function CategoriesPage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() =>
-                                handleDeleteCategory(
-                                  category._id,
-                                  category.name
-                                )
-                              }
+                              onClick={() => {
+                                setDeleteModal(true);
+                                setDeleteCategoryId(category._id);
+                              }}
                             >
                               <Trash2 className="h-4 w-4" />
                               <span className="sr-only">Delete</span>
@@ -580,6 +571,12 @@ export default function CategoriesPage() {
           </div>
         </CardContent>
       </Card>
+
+      <DeleteModal
+        open={deleteModal}
+        setOpen={setDeleteModal}
+        action={() => handleDeleteCategory(deleteCategoryId)}
+      />
     </div>
   );
 }

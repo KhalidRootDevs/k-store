@@ -2,7 +2,6 @@
 
 import { CategoryForm } from "@/components/forms/category-form";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface EditCategoryPageProps {
@@ -12,7 +11,6 @@ interface EditCategoryPageProps {
 }
 
 export default function EditCategoryPage({ params }: EditCategoryPageProps) {
-  const router = useRouter();
   const [category, setCategory] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,11 +41,6 @@ export default function EditCategoryPage({ params }: EditCategoryPageProps) {
     fetchCategory();
   }, [params.id]);
 
-  const handleSuccess = () => {
-    // Redirect to categories list after successful update
-    router.push("/admin/categories");
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -69,11 +62,5 @@ export default function EditCategoryPage({ params }: EditCategoryPageProps) {
     );
   }
 
-  return (
-    <CategoryForm
-      category={category}
-      isEditing={true}
-      onSuccess={handleSuccess}
-    />
-  );
+  return <CategoryForm category={category} isEditing={true} />;
 }
