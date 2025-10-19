@@ -68,11 +68,11 @@ export default function CategoriesPage() {
         params.append("search", searchTerm)
       }
 
-      if (featuredFilter !== "all") {
+      if (featuredFilter && featuredFilter !== "all") {
         params.append("featured", featuredFilter === "featured" ? "true" : "false")
       }
 
-      if (statusFilter !== "all") {
+      if (statusFilter && statusFilter !== "all") {
         params.append("active", statusFilter === "active" ? "true" : "false")
       }
 
