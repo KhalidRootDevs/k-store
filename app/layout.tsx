@@ -1,15 +1,15 @@
-import type React from "react";
-import { CartProvider } from "@/context/cart-context";
-import { AuthProvider } from "@/context/auth-context";
-import { ModalProvider } from "@/context/modal-context";
-import { WishlistProvider } from "@/context/wishlist-context";
-import { RecentlyViewedProvider } from "@/context/recently-viewed-context";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
 import { LoginModal } from "@/components/auth/login-modal";
+import { ThemeProvider } from "@/components/theme-provider";
+import { AuthProvider } from "@/context/auth-context";
+import { CartProvider } from "@/context/cart-context";
+import { ModalProvider } from "@/context/modal-context";
+import { RecentlyViewedProvider } from "@/context/recently-viewed-context";
+import { WishlistProvider } from "@/context/wishlist-context";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import type React from "react";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -41,7 +41,7 @@ export default function RootLayout({
                   <CartProvider>
                     {children}
                     <LoginModal />
-                    <Toaster />
+                    <Toaster position="top-right" />
                   </CartProvider>
                 </RecentlyViewedProvider>
               </WishlistProvider>

@@ -20,20 +20,44 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
+import { routes } from "@/lib/routes";
+import objectToFormData from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2, Upload } from "lucide-react";
-import Image from "next/image";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import type React from "react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
+import DropzoneSingle from "../custom/img-dropzone-single";
 
 const categorySchema = z.object({
   name: z
     .string()
-    .min(2, { message: "Category name must be at least 2 characters" }),
+    .refine((val) => val.trim().length > 0, {
+      message: "Required!",
+    })
+    .refine((val) => val.trim().length >= 2, {
+      message: "Category name must be at least 2 characters!",
+    }),
+  image: z
+    .union([
+      z
+        .instanceof(File, { message: "Required!" })
+        .refine((file) => file.size > 0, {
+          message: "Image file cannot be empty!",
+        })
+        .refine(
+          (file) =>
+            ["image/jpeg", "image/png", "image/webp"].includes(file.type),
+          { message: "Only JPEG, PNG, or WEBP images are allowed!" }
+        ),
+      z.string(),
+    ])
+    .refine((val) => val !== null && val !== undefined && val !== "", {
+      message: "Required!",
+    }),
   description: z.string().optional(),
   featured: z.boolean().default(false).optional(),
   active: z.boolean().default(true).optional(),
@@ -58,19 +82,28 @@ interface Category {
 interface CategoryFormProps {
   category?: Category | null;
   isEditing?: boolean;
-  onSuccess?: () => void;
 }
 
 export function CategoryForm({
   category,
   isEditing = false,
-  onSuccess,
 }: CategoryFormProps) {
-  const [image, setImage] = useState<string | null>(null);
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [parentCategories, setParentCategories] = useState<Category[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+
+  const methods = useForm<CategoryFormValues>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: "",
+      image: undefined,
+      description: "",
+      featured: false,
+      active: true,
+      parentId: "none",
+    },
+  });
 
   const {
     register,
@@ -79,16 +112,7 @@ export function CategoryForm({
     reset,
     setValue,
     watch,
-  } = useForm<CategoryFormValues>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      featured: false,
-      active: true,
-      parentId: "none",
-    },
-  });
+  } = methods;
 
   const featured = watch("featured");
   const active = watch("active");
@@ -114,11 +138,6 @@ export function CategoryForm({
       }
     } catch (error) {
       console.error("Error fetching categories:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load parent categories.",
-        variant: "destructive",
-      });
     } finally {
       setIsLoadingCategories(false);
     }
@@ -139,68 +158,22 @@ export function CategoryForm({
         description: category.description || "",
         featured: category.featured,
         active: category.active,
+        image: category.image,
         parentId: parentIdValue,
       });
-      setImage(category.image);
     }
   }, [category, isEditing, reset]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        toast({
-          title: "Invalid file type",
-          description: "Please upload an image file.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (file.size > 2 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please upload an image smaller than 2MB.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setImageFile(file);
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const onSubmit = async (data: CategoryFormValues) => {
-    if (!imageFile && !image) {
-      toast({
-        title: "Image required",
-        description: "Please upload a category image.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("description", data.description || "");
-      formData.append(
-        "featured",
-        data.featured ? data.featured.toString() : "false"
-      );
-      formData.append("active", data.active ? data.active.toString() : "false");
-      formData.append("parentId", data.parentId || "none");
+      let formData;
 
-      if (imageFile) {
-        formData.append("image", imageFile);
+      if (data.image instanceof File) {
+        formData = objectToFormData(data);
+      } else {
+        formData = objectToFormData(data, ["image"]);
       }
 
       const url =
@@ -212,6 +185,7 @@ export function CategoryForm({
 
       const response = await fetch(url, {
         method,
+
         body: formData,
         credentials: "include",
       });
@@ -219,22 +193,12 @@ export function CategoryForm({
       if (response.ok) {
         const result = await response.json();
 
-        toast({
-          title: isEditing ? "Category updated" : "Category created",
-          description: `Category "${data.name}" has been ${
-            isEditing ? "updated" : "created"
-          } successfully.`,
-        });
+        toast.success(
+          `Category has been ${isEditing ? "updated" : "created"} successfully!`
+        );
 
-        if (!isEditing) {
-          reset();
-          setImage(null);
-          setImageFile(null);
-        }
-
-        if (onSuccess) {
-          onSuccess();
-        }
+        reset();
+        router.push(routes.privateRoutes.admin.category.home);
       } else {
         const errorData = await response.json();
         throw new Error(
@@ -247,15 +211,8 @@ export function CategoryForm({
         `Error ${isEditing ? "updating" : "creating"} category:`,
         error
       );
-      toast({
-        title: "Error",
-        description:
-          error.message ||
-          `Failed to ${
-            isEditing ? "update" : "create"
-          } category. Please try again.`,
-        variant: "destructive",
-      });
+
+      toast.error(error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -270,7 +227,7 @@ export function CategoryForm({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link href="/admin/categories">
+        <Link href={routes.privateRoutes.admin.category.home}>
           <Button variant="outline" size="icon">
             <ArrowLeft className="h-4 w-4" />
             <span className="sr-only">Back</span>
@@ -282,165 +239,134 @@ export function CategoryForm({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <CardTitle>Category Details</CardTitle>
-              <CardDescription>
-                Basic information about the category.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">
-                  Category Name <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="name"
-                  placeholder="e.g., Electronics, Clothing, etc."
-                  {...register("name")}
-                />
-                {errors.name && (
-                  <p className="text-sm text-red-500">{errors.name.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="parentId">Parent Category</Label>
-                <Select
-                  value={parentId}
-                  onValueChange={(value) => setValue("parentId", value)}
-                  disabled={isLoadingCategories}
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        isLoadingCategories
-                          ? "Loading categories..."
-                          : "Select parent category (optional)"
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None (Top Level)</SelectItem>
-                    {parentCategories
-                      .filter((cat) => !cat.parentId)
-                      .map((cat) => (
-                        <SelectItem key={cat._id} value={cat._id}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  Select a parent category to create a sub-category. Leave as
-                  "None" for a top-level category.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe this category..."
-                  rows={4}
-                  {...register("description")}
-                />
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="featured">Featured Category</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Display this category prominently on the home page.
-                    </p>
-                  </div>
-                  <Switch
-                    id="featured"
-                    checked={featured}
-                    onCheckedChange={(checked) => setValue("featured", checked)}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="active">Active</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Make this category visible to customers.
-                    </p>
-                  </div>
-                  <Switch
-                    id="active"
-                    checked={active}
-                    onCheckedChange={(checked) => setValue("active", checked)}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="md:col-span-1">
-            <CardHeader>
-              <CardTitle>Category Image</CardTitle>
-              <CardDescription>
-                Upload an image to represent this category.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col items-center justify-center gap-4">
-                <div className="border rounded-md w-full aspect-square relative overflow-hidden bg-muted">
-                  {image ? (
-                    <Image
-                      src={image || "/placeholder.svg"}
-                      alt="Category preview"
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                      <Upload className="h-10 w-10 mb-2" />
-                      <p>No image uploaded</p>
-                    </div>
-                  )}
-                </div>
-                <div className="w-full">
-                  <Label htmlFor="image" className="mb-2 block">
-                    Upload Image{" "}
-                    {!isEditing && <span className="text-red-500">*</span>}
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+            <Card className="md:col-span-1">
+              <CardHeader>
+                <CardTitle>Category Details</CardTitle>
+                <CardDescription>
+                  Basic information about the category.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">
+                    Category Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
+                    id="name"
+                    placeholder="e.g., Electronics, Clothing, etc."
+                    {...register("name")}
                   />
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Recommended size: 800x800px. Max file size: 2MB.
-                    {isEditing && " Leave empty to keep current image."}
-                  </p>
-                  {!imageFile && !image && !isEditing && (
-                    <p className="text-sm text-red-500 mt-1">
-                      Category image is required
+                  {errors.name && (
+                    <p className="text-sm text-red-500">
+                      {errors.name.message}
                     </p>
                   )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                <div className="space-y-2">
+                  <Label htmlFor="parentId">Parent Category</Label>
+                  <Select
+                    value={parentId}
+                    onValueChange={(value) => setValue("parentId", value)}
+                    disabled={isLoadingCategories}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          isLoadingCategories
+                            ? "Loading categories..."
+                            : "Select parent category (optional)"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None (Top Level)</SelectItem>
+                      {parentCategories
+                        .filter((cat) => !cat.parentId)
+                        .map((cat) => (
+                          <SelectItem key={cat._id} value={cat._id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-muted-foreground">
+                    Select a parent category to create a sub-category. Leave as
+                    "None" for a top-level category.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe this category..."
+                    rows={4}
+                    {...register("description")}
+                  />
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="featured">Featured Category</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Display this category prominently on the home page.
+                      </p>
+                    </div>
+                    <Switch
+                      id="featured"
+                      checked={featured}
+                      onCheckedChange={(checked) =>
+                        setValue("featured", checked)
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="active">Active</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Make this category visible to customers.
+                      </p>
+                    </div>
+                    <Switch
+                      id="active"
+                      checked={active}
+                      onCheckedChange={(checked) => setValue("active", checked)}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-        <Card className="mt-6">
-          <CardFooter className="flex justify-between border-t p-6">
-            <Button variant="outline" asChild>
-              <Link href="/admin/categories">Cancel</Link>
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {submitButtonText}
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
+            <Card className="md:col-span-1">
+              <CardHeader>
+                <CardTitle>Category Image</CardTitle>
+                <CardDescription>
+                  Upload an image to represent this category.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <DropzoneSingle name="image" />
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="mt-6">
+            <CardFooter className="flex justify-between border-t p-6">
+              <Button variant="outline" asChild>
+                <Link href="/admin/categories">Cancel</Link>
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {submitButtonText}
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+      </FormProvider>
     </div>
   );
 }
