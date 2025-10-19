@@ -1,18 +1,22 @@
 import { Button } from "@/components/ui/button";
-import { useCallback, useState } from "react";
+import { Upload } from "lucide-react";
+import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useFormContext } from "react-hook-form";
+import toast from "react-hot-toast";
 import { Icons } from "../icons";
 
 const DropzoneSingle = ({ name }: { name: string }) => {
-  const [isSizeError, setIsSizeError] = useState(false);
-  const { watch, setValue } = useFormContext();
+  const {
+    watch,
+    setValue,
+    formState: { errors },
+  } = useFormContext();
+
   const image = watch(name);
 
   const onDrop = useCallback(
     (acceptedFiles: File[], fileRejections: any) => {
-      setIsSizeError(false);
-
       if (fileRejections.length > 0) {
         const sizeError = fileRejections.some((rejection: any) =>
           rejection.errors.some(
@@ -21,7 +25,7 @@ const DropzoneSingle = ({ name }: { name: string }) => {
         );
 
         if (sizeError) {
-          setIsSizeError(true);
+          toast.error("Image size exceeds the max limit!");
           setValue(name, "");
         }
 
@@ -34,25 +38,27 @@ const DropzoneSingle = ({ name }: { name: string }) => {
         preview: URL.createObjectURL(file),
       });
 
-      setValue(name, fileWithPreview);
+      setValue(name, fileWithPreview, {
+        shouldValidate: true,
+      });
     },
     [name, setValue]
   );
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: { "image/*": [".jpeg", ".jpg", ".png"] },
-    maxSize: 1024 * 1000, // 1MB
+    maxSize: 1024 * 5000, // 5MB
     onDrop,
   });
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="">
       <input {...getInputProps()} />
 
-      <div className="relative flex flex-col items-center">
+      <div className="relative flex flex-col">
         <div
           {...getRootProps()}
-          className={`flex h-40 w-40 cursor-pointer items-center justify-center overflow-hidden rounded-full
+          className={`flex h-60 cursor-pointer items-center justify-center overflow-hidden w-full
         bg-white shadow-sm transition duration-200 hover:border-gray-500
         ${image ? "" : "border-2 border-dashed border-gray-300"}`}
         >
@@ -61,7 +67,7 @@ const DropzoneSingle = ({ name }: { name: string }) => {
               <img
                 src={image?.preview || image}
                 alt="Uploaded"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
               <Button
                 type="button"
@@ -70,7 +76,9 @@ const DropzoneSingle = ({ name }: { name: string }) => {
                 className="absolute -top-2 right-1.5 z-10 rounded-full "
                 onClick={(e) => {
                   e.stopPropagation();
-                  setValue(name, "");
+                  setValue(name, "", {
+                    shouldValidate: true,
+                  });
                 }}
               >
                 <Icons.delete className="h-6 w-5 text-white" />
@@ -78,16 +86,22 @@ const DropzoneSingle = ({ name }: { name: string }) => {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-black shadow-md">
-                <span className="text-2xl font-bold text-white">+</span>
+              <div className="flex items-center justify-center flex-col gap-2">
+                <Upload className="mr-1" />
+                <span className="text-lg font-bold">
+                  Drag and drop or browse to upload file!
+                </span>
+                <span className="text-sm">
+                  Supports JPG, PNG, JPEG (Max. 5MB file)
+                </span>
               </div>
             </div>
           )}
         </div>
 
-        {isSizeError && (
-          <p className="mt-2 w-52 text-center text-sm font-semibold text-red-600">
-            The image size exceeds the max limit (1MB).
+        {errors[name] && (
+          <p className="text-sm text-red-500 mt-2">
+            {errors[name].message as string}
           </p>
         )}
       </div>

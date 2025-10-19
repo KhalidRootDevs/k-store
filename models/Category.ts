@@ -12,7 +12,11 @@ export interface ICategory extends Document {
   updatedAt: Date;
 }
 
-const categorySchema = new Schema<ICategory>(
+export interface ICategoryModel extends Model<ICategory> {
+  generateSlug(name: string, excludeId?: string): Promise<string>;
+}
+
+const categorySchema = new Schema<ICategory, ICategoryModel>(
   {
     name: {
       type: String,
@@ -127,6 +131,6 @@ categorySchema.index({ slug: 1 }, { unique: true });
 categorySchema.index({ featured: 1, active: 1 });
 categorySchema.index({ parentId: 1 });
 
-export const Category: Model<ICategory> =
-  mongoose.models.Category ||
-  mongoose.model<ICategory>("Category", categorySchema);
+export const Category =
+  (mongoose.models.Category as ICategoryModel) ||
+  mongoose.model<ICategory, ICategoryModel>("Category", categorySchema);

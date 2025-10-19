@@ -1,8 +1,8 @@
 "use client";
 
-import type React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import type React from "react";
 
 import {
   Sidebar,
@@ -22,22 +22,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 
+import { useAuth } from "@/context/auth-context";
 import {
   BarChart3,
   Box,
+  DollarSign,
   Home,
   LayoutDashboard,
+  Loader2,
   LogOut,
+  MessageSquare,
   Package,
   Settings,
   ShoppingBag,
   Users,
-  FileText,
-  MessageSquare,
-  DollarSign,
-  Loader2,
 } from "lucide-react";
-import { useAuth } from "@/context/auth-context";
 import { useEffect } from "react";
 
 // 🧭 Sidebar configuration (single source of truth)
@@ -158,8 +157,6 @@ export default function AdminLayout({
       }
     }
   }, [user, isLoading, isAdmin, router]);
-
-  console.log("user", user);
 
   // Don't render anything if no user or not admin
   if (!user || !isAdmin) {
