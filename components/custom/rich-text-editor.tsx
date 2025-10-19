@@ -25,69 +25,110 @@ import {
 
 const ImportSunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
+  loading: () => (
+    <div className="h-48 w-full animate-pulse rounded-md border bg-muted" />
+  ),
 });
 
-function RichTextEditor({ name }: { name: string }) {
+type RichTextEditorProps = {
+  name: string;
+  disabled?: boolean;
+  placeholder?: string;
+  height?: string;
+};
+
+function RichTextEditor({
+  name,
+  disabled = false,
+  placeholder = "Enter your text here",
+  height = "300",
+}: RichTextEditorProps) {
   const form = useFormContext();
   const [editorValue, setEditorValue] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+
+    // Set initial value from form
+    const initialValue = form.getValues(name);
+    if (initialValue) {
+      setEditorValue(initialValue);
+    }
+
+    // Watch for form changes
     const subscription = form.watch((value) => {
-      if (value[name]) {
+      if (value[name] !== undefined && value[name] !== editorValue) {
         setEditorValue(value[name] || "");
       }
     });
 
-    setEditorValue(form.getValues(name) || "");
-
     return () => subscription.unsubscribe();
-  }, [form, name]);
+  }, [form, name, editorValue]);
 
   const handleChange = (content: string) => {
-    form.setValue(name, content, { shouldValidate: true });
+    setEditorValue(content);
+    form.setValue(name, content, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
+  const handleBlur = () => {
+    form.trigger(name);
+  };
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!isMounted) {
+    return (
+      <div className="h-48 w-full animate-pulse rounded-md border bg-muted" />
+    );
+  }
+
   return (
-    <ImportSunEditor
-      {...form}
-      setContents={editorValue}
-      onChange={handleChange}
-      height="300"
-      lang="en"
-      setOptions={{
-        showPathLabel: false,
-        placeholder: "Enter your text here",
-        plugins: [
-          align,
-          font,
-          fontColor,
-          fontSize,
-          formatBlock,
-          hiliteColor,
-          horizontalRule,
-          lineHeight,
-          list,
-          paragraphStyle,
-          table,
-          template,
-          textStyle,
-          image,
-          link,
-          video,
-        ],
-        buttonList: [
-          ["undo", "redo"],
-          ["removeFormat"],
-          ["fontSize"],
-          ["bold", "italic", "underline", "fontColor", "hiliteColor"],
-          // ["fontColor", "hiliteColor"],
-          // '/', // Line break
-          ["align", "lineHeight", "horizontalRule", "list"],
-          // ["table", "link", "image", "video"],
-          ["fullScreen"],
-        ],
-      }}
-    />
+    <div className={disabled ? "opacity-60 cursor-not-allowed" : ""}>
+      <ImportSunEditor
+        setContents={editorValue}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        height={height}
+        lang="en"
+        readOnly={disabled}
+        setOptions={{
+          showPathLabel: false,
+          placeholder: placeholder,
+          plugins: [
+            align,
+            font,
+            fontColor,
+            fontSize,
+            formatBlock,
+            hiliteColor,
+            horizontalRule,
+            lineHeight,
+            list,
+            paragraphStyle,
+            table,
+            template,
+            textStyle,
+            image,
+            link,
+            video,
+          ],
+          buttonList: [
+            ["undo", "redo"],
+            ["removeFormat"],
+            ["font", "fontSize"],
+            ["bold", "italic", "underline", "fontColor", "hiliteColor"],
+            ["align", "lineHeight", "horizontalRule", "list"],
+            ["table", "link", "image", "video"],
+            ["fullScreen"],
+          ],
+          resizingBar: !disabled,
+        }}
+      />
+    </div>
   );
 }
 

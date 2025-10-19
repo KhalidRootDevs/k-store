@@ -9,17 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { routes } from "@/lib/routes";
 import objectToFormData from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,42 +18,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { z } from "zod";
-import DropzoneSingle from "../custom/img-dropzone-single";
 
-const categorySchema = z.object({
-  name: z
-    .string()
-    .refine((val) => val.trim().length > 0, {
-      message: "Required!",
-    })
-    .refine((val) => val.trim().length >= 2, {
-      message: "Category name must be at least 2 characters!",
-    }),
-  image: z
-    .union([
-      z
-        .instanceof(File, { message: "Required!" })
-        .refine((file) => file.size > 0, {
-          message: "Image file cannot be empty!",
-        })
-        .refine(
-          (file) =>
-            ["image/jpeg", "image/png", "image/webp"].includes(file.type),
-          { message: "Only JPEG, PNG, or WEBP images are allowed!" }
-        ),
-      z.string(),
-    ])
-    .refine((val) => val !== null && val !== undefined && val !== "", {
-      message: "Required!",
-    }),
-  description: z.string().optional(),
-  featured: z.boolean().default(false).optional(),
-  active: z.boolean().default(true).optional(),
-  parentId: z.string().default("none").optional(),
-});
-
-export type CategoryFormValues = z.infer<typeof categorySchema>;
+import InputField from "../custom/input";
+import { CategoryFormValues, categorySchema } from "@/lib/validations";
 
 interface Category {
   _id: string;
@@ -105,18 +61,7 @@ export function CategoryForm({
     },
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    setValue,
-    watch,
-  } = methods;
-
-  const featured = watch("featured");
-  const active = watch("active");
-  const parentId = watch("parentId");
+  const { handleSubmit, reset } = methods;
 
   const fetchParentCategories = async () => {
     try {
@@ -185,7 +130,6 @@ export function CategoryForm({
 
       const response = await fetch(url, {
         method,
-
         body: formData,
         credentials: "include",
       });
@@ -224,6 +168,17 @@ export function CategoryForm({
     : "Add a new category to organize your products.";
   const submitButtonText = isEditing ? "Update Category" : "Create Category";
 
+  // Prepare options for parent category select
+  const parentCategoryOptions = [
+    { value: "none", label: "None (Top Level)" },
+    ...parentCategories
+      .filter((cat) => !cat.parentId)
+      .map((cat) => ({
+        value: cat._id,
+        label: cat.name,
+      })),
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -250,91 +205,66 @@ export function CategoryForm({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">
-                    Category Name <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="name"
-                    placeholder="e.g., Electronics, Clothing, etc."
-                    {...register("name")}
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-red-500">
-                      {errors.name.message}
+                {/* Name Field */}
+                <InputField
+                  name="name"
+                  type="text"
+                  label="Category Name"
+                  placeholder="e.g., Electronics, Clothing, etc."
+                  required
+                />
+
+                {/* Parent Category Field */}
+                <InputField
+                  name="parentId"
+                  type="select"
+                  label="Parent Category"
+                  placeholder={
+                    isLoadingCategories
+                      ? "Loading categories..."
+                      : "Select parent category (optional)"
+                  }
+                  options={parentCategoryOptions}
+                  disabled={isLoadingCategories}
+                />
+                <p className="text-sm text-muted-foreground -mt-2">
+                  Select a parent category to create a sub-category. Leave as
+                  "None" for a top-level category.
+                </p>
+
+                {/* Description Field */}
+                <InputField
+                  name="description"
+                  type="textarea"
+                  label="Description"
+                  placeholder="Describe this category..."
+                  rowCount={4}
+                />
+
+                {/* Featured Switch */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <label htmlFor="featured" className="text-sm font-medium">
+                      Featured Category
+                    </label>
+                    <p className="text-sm text-muted-foreground">
+                      Display this category prominently on the home page.
                     </p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="parentId">Parent Category</Label>
-                  <Select
-                    value={parentId}
-                    onValueChange={(value) => setValue("parentId", value)}
-                    disabled={isLoadingCategories}
-                  >
-                    <SelectTrigger>
-                      <SelectValue
-                        placeholder={
-                          isLoadingCategories
-                            ? "Loading categories..."
-                            : "Select parent category (optional)"
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None (Top Level)</SelectItem>
-                      {parentCategories
-                        .filter((cat) => !cat.parentId)
-                        .map((cat) => (
-                          <SelectItem key={cat._id} value={cat._id}>
-                            {cat.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-sm text-muted-foreground">
-                    Select a parent category to create a sub-category. Leave as
-                    "None" for a top-level category.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Describe this category..."
-                    rows={4}
-                    {...register("description")}
-                  />
-                </div>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="featured">Featured Category</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Display this category prominently on the home page.
-                      </p>
-                    </div>
-                    <Switch
-                      id="featured"
-                      checked={featured}
-                      onCheckedChange={(checked) =>
-                        setValue("featured", checked)
-                      }
-                    />
                   </div>
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-0.5">
-                      <Label htmlFor="active">Active</Label>
-                      <p className="text-sm text-muted-foreground">
-                        Make this category visible to customers.
-                      </p>
-                    </div>
-                    <Switch
-                      id="active"
-                      checked={active}
-                      onCheckedChange={(checked) => setValue("active", checked)}
-                    />
+                  <InputField name="featured" type="switch" />
+                </div>
+
+                {/* Active Switch */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <label htmlFor="active" className="text-sm font-medium">
+                      Active
+                    </label>
+                    <p className="text-sm text-muted-foreground">
+                      Make this category visible to customers.
+                    </p>
                   </div>
+                  <InputField name="active" type="switch" />
                 </div>
               </CardContent>
             </Card>
@@ -347,13 +277,13 @@ export function CategoryForm({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <DropzoneSingle name="image" />
+                <InputField name="image" type="image" />
               </CardContent>
             </Card>
           </div>
 
           <Card className="mt-6">
-            <CardFooter className="flex justify-between border-t p-6">
+            <CardFooter className="flex justify-between p-6">
               <Button variant="outline" asChild>
                 <Link href="/admin/categories">Cancel</Link>
               </Button>
