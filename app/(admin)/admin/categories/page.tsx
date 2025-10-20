@@ -61,7 +61,7 @@ export default function CategoriesPage() {
   const featuredFilter = searchParams.get("featured") || "all";
   const statusFilter = searchParams.get("status") || "all";
   const currentPage = Number(searchParams.get("page")) || 1;
-  const currentPageSize = Number(searchParams.get("pageSize")) || 30;
+  const currentPageSize = Number(searchParams.get("pageSize")) || 10;
 
   // Fetch categories from API
   const fetchCategories = async (page = 1, pageSize = 30) => {
@@ -72,20 +72,22 @@ export default function CategoriesPage() {
         pageSize: pageSize.toString(),
       });
 
+      console.log("Fetching categories with params:", params.toString());
+
       if (searchTerm) {
         params.append("search", searchTerm);
       }
 
-      console.log("[v0] Featured filter value:", featuredFilter);
+      console.log("Featured filter value:", featuredFilter);
 
       // Fix featured filter - convert to boolean values
       if (featuredFilter && featuredFilter !== "all") {
         if (featuredFilter === "featured") {
           params.append("featured", "true");
-          console.log("[v0] Appending featured=true to params");
+          console.log("Appending featured=true to params");
         } else if (featuredFilter === "not-featured") {
           params.append("featured", "false");
-          console.log("[v0] Appending featured=false to params");
+          console.log("Appending featured=false to params");
         }
       }
 
@@ -93,7 +95,7 @@ export default function CategoriesPage() {
         params.append("active", statusFilter === "active" ? "true" : "false");
       }
 
-      console.log("[v0] Final API URL:", `/api/admin/categories?${params}`);
+      console.log("Final API URL:", `/api/admin/categories?${params}`);
 
       const response = await fetch(`/api/admin/categories?${params}`, {
         credentials: "include",
@@ -101,7 +103,7 @@ export default function CategoriesPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("[v0] API Response data:", data);
+        console.log("API Response data:", data);
         setCategories(data.categories || []);
         setPagination(
           data.pagination || {
