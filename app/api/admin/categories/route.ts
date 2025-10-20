@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
 
     // Get categories with pagination
     const categories = await Category.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ order: 1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate("parentId", "name slug")

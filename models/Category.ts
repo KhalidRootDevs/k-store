@@ -1,19 +1,20 @@
-import mongoose, { type Document, type Model, Schema } from "mongoose";
+import mongoose, { type Document, type Model, Schema } from "mongoose"
 
 export interface ICategory extends Document {
-  name: string;
-  description?: string;
-  image: string;
-  featured: boolean;
-  active: boolean;
-  slug: string;
-  parentId?: mongoose.Types.ObjectId;
-  createdAt: Date;
-  updatedAt: Date;
+  name: string
+  description?: string
+  image: string
+  featured: boolean
+  active: boolean
+  slug: string
+  parentId?: mongoose.Types.ObjectId
+  order: number
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface ICategoryModel extends Model<ICategory> {
-  generateSlug(name: string, excludeId?: string): Promise<string>;
+  generateSlug(name: string, excludeId?: string): Promise<string>
 }
 
 const categorySchema = new Schema<ICategory, ICategoryModel>(
@@ -53,20 +54,24 @@ const categorySchema = new Schema<ICategory, ICategoryModel>(
       ref: "Category",
       default: null,
     },
+    order: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
-);
+  },
+)
 
 // Virtual for sub-categories
 categorySchema.virtual("subCategories", {
   ref: "Category",
   localField: "_id",
   foreignField: "parentId",
-});
+})
 
 // Generate slug from name before saving
 categorySchema.pre<ICategory>("save", async function (next) {
@@ -76,61 +81,58 @@ categorySchema.pre<ICategory>("save", async function (next) {
       .replace(/[^a-z0-9 -]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
-      .trim();
+      .trim()
 
-    let slug = baseSlug;
-    let counter = 1;
+    let slug = baseSlug
+    let counter = 1
 
     while (true) {
       const existingCategory = await mongoose.models.Category?.findOne({
         slug,
-      });
+      })
       if (!existingCategory || existingCategory._id.equals(this._id)) {
-        break;
+        break
       }
-      slug = `${baseSlug}-${counter}`;
-      counter++;
+      slug = `${baseSlug}-${counter}`
+      counter++
     }
 
-    this.slug = slug;
+    this.slug = slug
   }
-  next();
-});
+  next()
+})
 
 // Static method for slug generation
-categorySchema.statics.generateSlug = async function (
-  name: string,
-  excludeId?: string
-): Promise<string> {
+categorySchema.statics.generateSlug = async function (name: string, excludeId?: string): Promise<string> {
   const baseSlug = name
     .toLowerCase()
     .replace(/[^a-z0-9 -]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
-    .trim();
+    .trim()
 
-  let slug = baseSlug;
-  let counter = 1;
+  let slug = baseSlug
+  let counter = 1
 
-  const query: any = { slug };
+  const query: any = { slug }
   if (excludeId) {
-    query._id = { $ne: excludeId };
+    query._id = { $ne: excludeId }
   }
 
   while (await this.findOne(query)) {
-    slug = `${baseSlug}-${counter}`;
-    query.slug = slug;
-    counter++;
+    slug = `${baseSlug}-${counter}`
+    query.slug = slug
+    counter++
   }
 
-  return slug;
-};
+  return slug
+}
 
 // Define all indexes explicitly
-categorySchema.index({ slug: 1 }, { unique: true });
-categorySchema.index({ featured: 1, active: 1 });
-categorySchema.index({ parentId: 1 });
+categorySchema.index({ slug: 1 }, { unique: true })
+categorySchema.index({ featured: 1, active: 1 })
+categorySchema.index({ parentId: 1 })
+categorySchema.index({ order: 1 })
 
 export const Category =
-  (mongoose.models.Category as ICategoryModel) ||
-  mongoose.model<ICategory, ICategoryModel>("Category", categorySchema);
+  (mongoose.models.Category as ICategoryModel) || mongoose.model<ICategory, ICategoryModel>("Category", categorySchema)

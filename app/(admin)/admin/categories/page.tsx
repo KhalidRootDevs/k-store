@@ -22,6 +22,7 @@ interface Category {
   slug: string
   parentId?: { _id: string; name: string } | null
   products?: number
+  order: number
   createdAt: string
   updatedAt: string
 }
@@ -182,6 +183,43 @@ export default function CategoriesPage() {
     }
   }
 
+  const handleReorder = async (newData: Category[]) => {
+    try {
+      // Extract category IDs in the new order
+      const categoryIds = newData.map((category) => category._id)
+
+      const response = await fetch("/api/admin/categories/reorder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ categoryIds }),
+        credentials: "include",
+      })
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Categories reordered successfully.",
+        })
+        // Update local state with new order
+        setCategories(newData)
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to reorder categories")
+      }
+    } catch (error: any) {
+      console.error("Error reordering categories:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to reorder categories. Please try again.",
+        variant: "destructive",
+      })
+      // Revert to original order on error
+      fetchCategories(pagination.page)
+    }
+  }
+
   const columns = createCategoryColumns((id) => {
     setDeleteCategoryId(id)
     setDeleteModal(true)
@@ -234,6 +272,8 @@ export default function CategoriesPage() {
               pageSize: pagination.limit,
             }}
             loading={isLoading}
+            enableRowOrdering={true}
+            dragEnd={handleReorder}
           />
         </CardContent>
       </Card>
