@@ -1,15 +1,13 @@
-'use client';
+"use client";
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from '@/components/ui/popover';
-import { Separator } from '@/components/ui/separator';
-import type { Column } from '@tanstack/react-table';
-import { ChevronsUpDown } from 'lucide-react';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { Column } from "@tanstack/react-table";
 
 interface DataTableSingleSelectFilterProps<TData> {
   column?: Column<TData, string>;
@@ -29,62 +27,33 @@ export function DataTableSingleSelectFilter<TData>({
   options,
   value,
   onChange,
-  onColumnFilterChange
+  onColumnFilterChange,
 }: DataTableSingleSelectFilterProps<TData>) {
-  const selectedValue = value;
-
-  const handleSelect = (val: string) => {
-    onChange(val);
-    onColumnFilterChange?.(val);
+  const handleValueChange = (newValue: string) => {
+    onChange(newValue);
+    onColumnFilterChange?.(newValue);
   };
 
-  const selectedLabel = options.find((opt) => opt.value === selectedValue)
-    ?.label;
-
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-10 border-dashed">
-          <ChevronsUpDown className="mr-2 h-4 w-4" />
-          {title}
-          {selectedValue && (
-            <>
-              <Separator orientation="vertical" className="mx-2 h-4" />
-              <Badge
-                variant="secondary"
-                className="rounded-sm px-1 font-normal"
-              >
-                {selectedLabel}
-              </Badge>
-            </>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
-        <div className="flex flex-col">
+    <div className="flex items-center gap-2">
+      <label
+        htmlFor={`${title?.toLowerCase()}-filter`}
+        className="text-sm whitespace-nowrap"
+      >
+        {title}:
+      </label>
+      <Select value={value} onValueChange={handleValueChange}>
+        <SelectTrigger className="w-[180px] h-9">
+          <SelectValue placeholder={title} />
+        </SelectTrigger>
+        <SelectContent>
           {options.map((option) => (
-            <Button
-              key={option.value}
-              variant={option.value === selectedValue ? 'secondary' : 'ghost'}
-              size="sm"
-              className="justify-start rounded-none border-b last:border-b-0"
-              onClick={() => handleSelect(option.value)}
-            >
+            <SelectItem key={option.value} value={option.value}>
               {option.label}
-            </Button>
+            </SelectItem>
           ))}
-          {selectedValue && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-1 justify-center"
-              onClick={() => handleSelect('')}
-            >
-              Clear
-            </Button>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

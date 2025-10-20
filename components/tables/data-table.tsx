@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   flexRender,
@@ -12,8 +12,8 @@ import {
   type Row,
   type RowData,
   type SortingState,
-  type VisibilityState
-} from '@tanstack/react-table';
+  type VisibilityState,
+} from "@tanstack/react-table";
 
 import {
   closestCenter,
@@ -23,32 +23,32 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-  type DragStartEvent
-} from '@dnd-kit/core';
+  type DragStartEvent,
+} from "@dnd-kit/core";
 
 import {
   arrayMove,
   SortableContext,
   useSortable,
-  verticalListSortingStrategy
-} from '@dnd-kit/sortable';
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
-import { Skeleton } from '@/components/ui/skeleton';
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+  TableRow,
+} from "@/components/ui/table";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Button } from '../ui/button';
-import { DataTablePagination } from './data-table-pagination';
-import { DataTableToolbar } from './data-table-toolbar';
+import { Button } from "../ui/button";
+import { DataTablePagination } from "./data-table-pagination";
+import { DataTableToolbar } from "./data-table-toolbar";
 
 interface FilterOption {
   value: string;
@@ -59,7 +59,10 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   search?: boolean;
-  filters?: Record<string, FilterOption[]>;
+  filters?: Array<{
+    name: string;
+    options: FilterOption[];
+  }>;
   searchableFields?: string[];
   paginationData?: {
     total: number;
@@ -85,8 +88,8 @@ interface DataTableProps<TData, TValue> {
 }
 
 interface DragHandleProps {
-  listeners: ReturnType<typeof useSortable>['listeners'];
-  attributes: ReturnType<typeof useSortable>['attributes'];
+  listeners: ReturnType<typeof useSortable>["listeners"];
+  attributes: ReturnType<typeof useSortable>["attributes"];
 }
 
 interface SortableRowProps<TData extends RowData> {
@@ -110,7 +113,7 @@ function DragHandle({ listeners, attributes }: DragHandleProps) {
 
 const SortableRow = React.memo(function SortableRow<TData extends RowData>({
   row,
-  isDragging
+  isDragging,
 }: SortableRowProps<TData>) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: row.id });
@@ -120,8 +123,8 @@ const SortableRow = React.memo(function SortableRow<TData extends RowData>({
       transform: CSS.Transform.toString(transform),
       transition,
       opacity: isDragging ? 0.5 : 1,
-      position: 'relative' as const,
-      zIndex: isDragging ? 1 : 0
+      position: "relative" as const,
+      zIndex: isDragging ? 1 : 0,
     }),
     [transform, transition, isDragging]
   );
@@ -131,11 +134,11 @@ const SortableRow = React.memo(function SortableRow<TData extends RowData>({
       ref={setNodeRef}
       style={style}
       data-state={
-        (row.getIsSelected() && 'selected') ||
-        (isDragging && 'dragging') ||
+        (row.getIsSelected() && "selected") ||
+        (isDragging && "dragging") ||
         undefined
       }
-      className={isDragging ? 'bg-muted' : ''}
+      className={isDragging ? "bg-muted" : ""}
     >
       {row.getVisibleCells().map((cell) => (
         <TableCell key={cell.id}>
@@ -180,7 +183,7 @@ export function DataTable<TData, TValue>({
 
   searchPlaceholder,
 
-  children
+  children,
 }: DataTableProps<TData, TValue>) {
   const dataRef = React.useRef(initialData);
   const paginationDataRef = React.useRef(paginationData);
@@ -192,9 +195,9 @@ export function DataTable<TData, TValue>({
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({
     pageIndex: paginationData?.page ? paginationData.page - 1 : 0,
-    pageSize: paginationData?.pageSize || 10
+    pageSize: paginationData?.pageSize || 10,
   });
-  const [globalFilter, setGlobalFilter] = useState('');
+  const [globalFilter, setGlobalFilter] = useState("");
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -211,7 +214,7 @@ export function DataTable<TData, TValue>({
       if (paginationData !== paginationDataRef.current) {
         setPagination({
           pageIndex: paginationData?.page ? paginationData.page - 1 : 0,
-          pageSize: paginationData?.pageSize || 10
+          pageSize: paginationData?.pageSize || 10,
         });
         paginationDataRef.current = paginationData;
       }
@@ -234,7 +237,7 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       pagination,
-      globalFilter
+      globalFilter,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -248,12 +251,12 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: true,
-    pageCount: pageCount
+    pageCount: pageCount,
   });
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 3 }
+      activationConstraint: { distance: 3 },
     })
   );
 
@@ -406,7 +409,7 @@ export function DataTable<TData, TValue>({
                 : currentRows.map((row) => (
                     <TableRow
                       key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
+                      data-state={row.getIsSelected() && "selected"}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
