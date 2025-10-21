@@ -22,6 +22,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/context/auth-context";
 
 interface Address {
@@ -41,9 +51,12 @@ export default function AddressesPage() {
   const { user } = useAuth();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [addressToDelete, setAddressToDelete] = useState<Address | null>(null);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
     label: "",
     fullName: "",
@@ -169,15 +182,22 @@ export default function AddressesPage() {
     }
   };
 
-  const handleDeleteAddress = async (id: string) => {
+  const handleDeleteAddress = async () => {
+    if (!addressToDelete) return;
+
+    setIsDeleting(true);
     try {
-      const response = await fetch(`/api/addresses/${id}`, {
+      const response = await fetch(`/api/addresses/${addressToDelete._id}`, {
         method: "DELETE",
         credentials: "include",
       });
 
       if (response.ok) {
-        setAddresses((prev) => prev.filter((addr) => addr._id !== id));
+        setAddresses((prev) =>
+          prev.filter((addr) => addr._id !== addressToDelete._id)
+        );
+        setIsDeleteDialogOpen(false);
+        setAddressToDelete(null);
         toast({
           title: "Address deleted",
           description: "The address has been removed.",
@@ -194,7 +214,14 @@ export default function AddressesPage() {
           error.message || "Failed to delete address. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const openDeleteDialog = (address: Address) => {
+    setAddressToDelete(address);
+    setIsDeleteDialogOpen(true);
   };
 
   const handleSetDefault = async (id: string) => {
@@ -535,7 +562,7 @@ export default function AddressesPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDeleteAddress(address._id)}
+                      onClick={() => openDeleteDialog(address)}
                       className="text-destructive"
                     >
                       <Trash2 className="h-3 w-3" />
@@ -556,6 +583,50 @@ export default function AddressesPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Address</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the{" "}
+              <span className="font-semibold capitalize">
+                {addressToDelete?.label}
+              </span>{" "}
+              address? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsDeleteDialogOpen(false);
+                setAddressToDelete(null);
+              }}
+              disabled={isDeleting}
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAddress}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                "Delete Address"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
