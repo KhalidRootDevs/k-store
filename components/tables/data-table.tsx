@@ -55,6 +55,18 @@ interface FilterOption {
   label: string;
 }
 
+interface SwitchFilter {
+  name: string;
+  value: boolean;
+}
+
+interface RangeFilter {
+  name: string;
+  label: string;
+  placeholder: string;
+  type: "number";
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -63,6 +75,8 @@ interface DataTableProps<TData, TValue> {
     name: string;
     options: FilterOption[];
   }>;
+  rangeFilters?: RangeFilter[];
+  switchFilters?: SwitchFilter[];
   searchableFields?: string[];
   paginationData?: {
     total: number;
@@ -177,6 +191,8 @@ export function DataTable<TData, TValue>({
   search = false,
   paginationData,
   filters,
+  rangeFilters,
+  switchFilters,
   enableRowOrdering = false,
   dragEnd,
   loading = false,
@@ -350,6 +366,8 @@ export function DataTable<TData, TValue>({
         table={table}
         search={search}
         filters={filters}
+        rangeFilters={rangeFilters}
+        switchFilters={switchFilters}
         searchPlaceholder={searchPlaceholder}
       >
         {children}

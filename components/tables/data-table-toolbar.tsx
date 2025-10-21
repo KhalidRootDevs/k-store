@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import type { Table } from "@tanstack/react-table";
 import { Search, X, Filter } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,6 +15,18 @@ interface FilterOption {
   label: string;
 }
 
+interface RangeFilter {
+  name: string;
+  label: string;
+  placeholder: string;
+  type: "number";
+}
+
+interface SwitchFilter {
+  name: string;
+  value: boolean;
+}
+
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   search: boolean;
@@ -23,6 +36,8 @@ interface DataTableToolbarProps<TData> {
     name: string;
     options: FilterOption[];
   }>;
+  rangeFilters?: RangeFilter[];
+  switchFilters?: SwitchFilter[];
   data?: TData[];
 }
 
@@ -32,6 +47,8 @@ export function DataTableToolbar<TData>({
   children,
   searchPlaceholder,
   filters = [],
+  rangeFilters = [],
+  switchFilters = [],
   data = [],
 }: DataTableToolbarProps<TData>) {
   const router = useRouter();
@@ -42,7 +59,7 @@ export function DataTableToolbar<TData>({
     searchParams.get("search") || ""
   );
 
-  // Dynamic filter values state
+  // Dynamic filter values state (string | boolean stored as string)
   const [filterValues, setFilterValues] = useState<Record<string, string>>(
     () => {
       const initial: Record<string, string> = {};
@@ -50,11 +67,18 @@ export function DataTableToolbar<TData>({
         const value = searchParams.get(filter.name);
         if (value) initial[filter.name] = value;
       });
+      rangeFilters.forEach((filter) => {
+        const value = searchParams.get(filter.name);
+        if (value) initial[filter.name] = value;
+      });
+      switchFilters.forEach((filter) => {
+        const value = searchParams.get(filter.name);
+        if (value) initial[filter.name] = value;
+      });
       return initial;
     }
   );
 
-  // Update URL with current search and filter values
   const updateURL = () => {
     const params = new URLSearchParams();
 
@@ -67,16 +91,13 @@ export function DataTableToolbar<TData>({
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     updateURL();
   };
 
-  // Handle individual search input clear
   const handleClearSearch = () => {
     setSearchTerm("");
-    // If search was previously applied, update URL immediately
     if (searchParams.get("search")) {
       const params = new URLSearchParams(searchParams);
       params.delete("search");
@@ -84,12 +105,13 @@ export function DataTableToolbar<TData>({
     }
   };
 
-  // Update URL whenever filterValues change
-  const handleFilterChange = (key: string, value: string) => {
-    const newFilterValues = { ...filterValues, [key]: value };
+  const handleFilterChange = (key: string, value: string | boolean) => {
+    const newFilterValues = {
+      ...filterValues,
+      [key]: typeof value === "boolean" ? String(value) : value,
+    };
     setFilterValues(newFilterValues);
 
-    // Update URL immediately for filter changes
     const params = new URLSearchParams();
 
     if (searchTerm) params.set("search", searchTerm);
@@ -105,12 +127,10 @@ export function DataTableToolbar<TData>({
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  // Reset all filters and search
   const handleReset = () => {
     setSearchTerm("");
     table.resetColumnFilters();
     setFilterValues({});
-    // Immediately update URL after reset
     router.replace("?", { scroll: false });
   };
 
@@ -153,7 +173,6 @@ export function DataTableToolbar<TData>({
           )}
         </form>
 
-        {/* View Options and Children */}
         <div className="flex items-center gap-2">
           {children && <div className="mr-2">{children}</div>}
           <DataTableViewOptions table={table} />
@@ -161,13 +180,16 @@ export function DataTableToolbar<TData>({
       </div>
 
       {/* Filter Options Row */}
-      {filters.length > 0 && (
+      {(filters.length > 0 ||
+        rangeFilters.length > 0 ||
+        switchFilters.length > 0) && (
         <div className="flex flex-wrap gap-4">
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Filters:</span>
           </div>
 
+          {/* Select Filters */}
           {filters.map((filter) => (
             <DataTableSingleSelectFilter
               key={filter.name}
@@ -181,6 +203,35 @@ export function DataTableToolbar<TData>({
                 table.getColumn(filter.name)?.setFilterValue(value || undefined)
               }
             />
+          ))}
+
+          {/* Range Filters */}
+          {rangeFilters.map((filter) => (
+            <div key={filter.name} className="flex items-center gap-2">
+              <label className="text-sm font-medium">{filter.label}:</label>
+              <Input
+                type="number"
+                placeholder={filter.placeholder}
+                className="h-9 w-24"
+                value={filterValues[filter.name] || ""}
+                onChange={(e) =>
+                  handleFilterChange(filter.name, e.target.value)
+                }
+              />
+            </div>
+          ))}
+
+          {/* Switch Filters */}
+          {switchFilters.map((filter) => (
+            <div key={filter.name} className="flex items-center gap-2">
+              <label className="text-sm font-medium">{filter.name}</label>
+              <Switch
+                checked={filterValues[filter.name] === "true"}
+                onCheckedChange={(checked: boolean) =>
+                  handleFilterChange(filter.name, checked)
+                }
+              />
+            </div>
           ))}
         </div>
       )}
