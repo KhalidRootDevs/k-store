@@ -79,6 +79,10 @@ export default function ProductsPage() {
   const categoryFilter = searchParams.get("category") || "all"
   const statusFilter = searchParams.get("status") || "all"
   const featuredFilter = searchParams.get("featured") || "all"
+  const newArrivalFilter = searchParams.get("newArrival") || "all"
+  const bestSellingFilter = searchParams.get("bestSelling") || "all"
+  const topRatedFilter = searchParams.get("topRated") || "all"
+  const saleFilter = searchParams.get("sale") || "all"
   const minPrice = searchParams.get("minPrice") || ""
   const maxPrice = searchParams.get("maxPrice") || ""
   const currentPage = Number.parseInt(searchParams.get("page") || "1")
@@ -142,6 +146,22 @@ export default function ProductsPage() {
           }
         }
 
+        if (newArrivalFilter === "true") {
+          params.append("newArrival", "true")
+        }
+
+        if (bestSellingFilter === "true") {
+          params.append("bestSelling", "true")
+        }
+
+        if (topRatedFilter === "true") {
+          params.append("topRated", "true")
+        }
+
+        if (saleFilter === "true") {
+          params.append("sale", "true")
+        }
+
         if (minPrice) params.append("minPrice", minPrice)
         if (maxPrice) params.append("maxPrice", maxPrice)
 
@@ -177,7 +197,18 @@ export default function ProductsPage() {
         isFetchingRef.current = false
       }
     },
-    [searchTerm, categoryFilter, statusFilter, featuredFilter, minPrice, maxPrice],
+    [
+      searchTerm,
+      categoryFilter,
+      statusFilter,
+      featuredFilter,
+      newArrivalFilter,
+      bestSellingFilter,
+      topRatedFilter,
+      saleFilter,
+      minPrice,
+      maxPrice,
+    ],
   )
 
   useEffect(() => {
@@ -274,6 +305,34 @@ export default function ProductsPage() {
         { value: "all", label: "All" },
         { value: "featured", label: "Featured" },
         { value: "not-featured", label: "Not Featured" },
+      ],
+    },
+    {
+      name: "newArrival",
+      options: [
+        { value: "all", label: "All" },
+        { value: "true", label: "New Arrivals (Last 30 Days)" },
+      ],
+    },
+    {
+      name: "bestSelling",
+      options: [
+        { value: "all", label: "All" },
+        { value: "true", label: "Best Selling" },
+      ],
+    },
+    {
+      name: "topRated",
+      options: [
+        { value: "all", label: "All" },
+        { value: "true", label: "Top Rated (4+ Stars)" },
+      ],
+    },
+    {
+      name: "sale",
+      options: [
+        { value: "all", label: "All" },
+        { value: "true", label: "On Sale" },
       ],
     },
   ]
