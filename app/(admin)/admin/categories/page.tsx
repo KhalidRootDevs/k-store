@@ -78,9 +78,10 @@ export default function CategoriesPage() {
         }
 
         if (featuredFilter && featuredFilter !== "all") {
-          if (featuredFilter === "featured") {
+          // Handle both the filter option values and direct boolean string values
+          if (featuredFilter === "featured" || featuredFilter === "true") {
             params.append("featured", "true")
-          } else if (featuredFilter === "not-featured") {
+          } else if (featuredFilter === "not-featured" || featuredFilter === "false") {
             params.append("featured", "false")
           }
         }
