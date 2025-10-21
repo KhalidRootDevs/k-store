@@ -891,7 +891,11 @@ export default function OrderDetailsPage() {
                           <div className="absolute w-3 h-3 bg-primary rounded-full -left-[6.5px]"></div>
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
-                              <Badge className={getStatusColor(event.status)}>
+                              <Badge
+                                className={`${getStatusColor(
+                                  event.status
+                                )} px-2 py-1 text-xs capitalize`}
+                              >
                                 {getStatusText(event.status)}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
