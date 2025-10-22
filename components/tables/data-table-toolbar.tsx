@@ -29,6 +29,7 @@ interface DataTableToolbarProps<TData> {
   searchPlaceholder?: string;
   filters?: Array<{
     name: string;
+    label: string;
     options: FilterOption[];
   }>;
   data?: TData[];
@@ -322,7 +323,7 @@ export function DataTableToolbar<TData>({
                           {uniqueFilters.map((filter) => (
                             <div key={filter.name} className="space-y-2">
                               <label className="text-sm font-medium capitalize">
-                                {filter.name.replace(/_/g, " ")}
+                                {filter.label.replace(/_/g, " ")}
                               </label>
                               <DataTableSingleSelectFilter
                                 title={

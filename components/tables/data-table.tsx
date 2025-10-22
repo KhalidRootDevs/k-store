@@ -61,6 +61,7 @@ interface DataTableProps<TData, TValue> {
   search?: boolean;
   filters?: Array<{
     name: string;
+    label: string;
     options: FilterOption[];
   }>;
   searchableFields?: string[];

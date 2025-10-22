@@ -287,6 +287,7 @@ export default function ProductsPage() {
   const filterOptions = [
     {
       name: "category",
+      label: "Category",
       options: [
         { value: "all", label: "All Categories" },
         ...categories.map((cat) => ({ value: cat._id, label: cat.name })),
@@ -294,6 +295,7 @@ export default function ProductsPage() {
     },
     {
       name: "status",
+      label: "Status",
       options: [
         { value: "all", label: "All Status" },
         { value: "active", label: "Active" },
@@ -302,6 +304,7 @@ export default function ProductsPage() {
     },
     {
       name: "featured",
+      label: "Featured",
       options: [
         { value: "all", label: "All" },
         { value: "featured", label: "Featured" },

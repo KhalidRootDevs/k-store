@@ -167,6 +167,7 @@ export default function OrdersPage() {
 
   const filterOptions = [
     {
+      label: "Status",
       name: "status",
       options: [
         { value: "all", label: "All Status" },
@@ -179,6 +180,7 @@ export default function OrdersPage() {
       ],
     },
     {
+      label: "Payment Status",
       name: "paymentStatus",
       options: [
         { value: "all", label: "All Payments" },
