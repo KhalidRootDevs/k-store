@@ -222,6 +222,7 @@ export default function OrdersPage() {
           <DataTable
             columns={columns}
             data={orders}
+            search={true}
             searchPlaceholder="Search orders..."
             filters={filterOptions}
             loading={isLoading}
