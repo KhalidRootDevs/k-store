@@ -15,6 +15,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useSearchParams, useRouter } from "next/navigation";
 import { DataTable } from "@/components/tables/data-table";
 import { createProductColumns } from "@/components/tables/product/column";
+import { Product } from "@/models/Product";
 
 interface Category {
   _id: string;
@@ -352,6 +353,7 @@ export default function ProductsPage() {
           <DataTable
             columns={columns}
             data={products}
+            search={true}
             searchPlaceholder="Search products..."
             filters={filterOptions}
             loading={isLoading}

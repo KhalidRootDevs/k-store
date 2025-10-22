@@ -238,6 +238,7 @@ export default function UsersPage() {
           <DataTable
             columns={columns}
             data={users}
+            search={true}
             searchPlaceholder="Search users..."
             filters={filterOptions}
             loading={isLoading}
