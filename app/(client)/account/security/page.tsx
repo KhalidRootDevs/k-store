@@ -7,8 +7,13 @@ import { Label } from "@/components/ui/label"
 import { Lock, Mail, Shield } from "lucide-react"
 import { useState } from "react"
 import { toast } from "@/components/ui/use-toast"
+import { useAuth } from "@/context/auth-context"
 
 export default function SecurityPage() {
+  const { checkAuth } = useAuth()
+  const [isLoadingPassword, setIsLoadingPassword] = useState(false)
+  const [isLoadingEmail, setIsLoadingEmail] = useState(false)
+
   const [passwordData, setPasswordData] = useState({
     current: "",
     new: "",
@@ -20,7 +25,16 @@ export default function SecurityPage() {
     password: "",
   })
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
+    if (!passwordData.current || !passwordData.new || !passwordData.confirm) {
+      toast({
+        title: "Error",
+        description: "Please fill in all password fields",
+        variant: "destructive",
+      })
+      return
+    }
+
     if (passwordData.new !== passwordData.confirm) {
       toast({
         title: "Error",
@@ -30,19 +44,115 @@ export default function SecurityPage() {
       return
     }
 
-    toast({
-      title: "Password updated",
-      description: "Your password has been changed successfully.",
-    })
-    setPasswordData({ current: "", new: "", confirm: "" })
+    if (passwordData.new.length < 6) {
+      toast({
+        title: "Error",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoadingPassword(true)
+    try {
+      const response = await fetch("/api/user/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          currentPassword: passwordData.current,
+          newPassword: passwordData.new,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Your password has been changed successfully.",
+        })
+        setPasswordData({ current: "", new: "", confirm: "" })
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to change password",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoadingPassword(false)
+    }
   }
 
-  const handleEmailChange = () => {
-    toast({
-      title: "Verification email sent",
-      description: "Please check your new email address to verify the change.",
-    })
-    setEmailData({ newEmail: "", password: "" })
+  const handleEmailChange = async () => {
+    if (!emailData.newEmail || !emailData.password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
+    if (!emailRegex.test(emailData.newEmail)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoadingEmail(true)
+    try {
+      const response = await fetch("/api/user/change-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          newEmail: emailData.newEmail,
+          password: emailData.password,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Your email has been updated successfully.",
+        })
+        setEmailData({ newEmail: "", password: "" })
+        // Refresh auth context to update user data
+        await checkAuth()
+      } else {
+        toast({
+          title: "Error",
+          description: data.error || "Failed to change email",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoadingEmail(false)
+    }
   }
 
   return (
@@ -63,6 +173,7 @@ export default function SecurityPage() {
                 value={passwordData.current}
                 onChange={(e) => setPasswordData({ ...passwordData, current: e.target.value })}
                 className="pl-9"
+                disabled={isLoadingPassword}
               />
             </div>
           </div>
@@ -77,9 +188,10 @@ export default function SecurityPage() {
                 value={passwordData.new}
                 onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
                 className="pl-9"
+                disabled={isLoadingPassword}
               />
             </div>
-            <p className="text-xs text-muted-foreground">Must be at least 8 characters long</p>
+            <p className="text-xs text-muted-foreground">Must be at least 6 characters long</p>
           </div>
 
           <div className="space-y-2">
@@ -92,12 +204,13 @@ export default function SecurityPage() {
                 value={passwordData.confirm}
                 onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
                 className="pl-9"
+                disabled={isLoadingPassword}
               />
             </div>
           </div>
 
-          <Button onClick={handlePasswordChange} className="w-full">
-            Update Password
+          <Button onClick={handlePasswordChange} className="w-full" disabled={isLoadingPassword}>
+            {isLoadingPassword ? "Updating..." : "Update Password"}
           </Button>
         </CardContent>
       </Card>
@@ -118,6 +231,7 @@ export default function SecurityPage() {
                 value={emailData.newEmail}
                 onChange={(e) => setEmailData({ ...emailData, newEmail: e.target.value })}
                 className="pl-9"
+                disabled={isLoadingEmail}
               />
             </div>
           </div>
@@ -132,12 +246,13 @@ export default function SecurityPage() {
                 value={emailData.password}
                 onChange={(e) => setEmailData({ ...emailData, password: e.target.value })}
                 className="pl-9"
+                disabled={isLoadingEmail}
               />
             </div>
           </div>
 
-          <Button onClick={handleEmailChange} className="w-full">
-            Update Email
+          <Button onClick={handleEmailChange} className="w-full" disabled={isLoadingEmail}>
+            {isLoadingEmail ? "Updating..." : "Update Email"}
           </Button>
         </CardContent>
       </Card>
