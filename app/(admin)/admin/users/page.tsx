@@ -190,6 +190,7 @@ export default function UsersPage() {
   const filterOptions = [
     {
       name: "status",
+      label: "Status",
       options: [
         { value: "all", label: "All Status" },
         { value: "active", label: "Active" },
@@ -200,6 +201,7 @@ export default function UsersPage() {
     },
     {
       name: "role",
+      label: "Role",
       options: [
         { value: "all", label: "All Roles" },
         { value: "user", label: "User" },

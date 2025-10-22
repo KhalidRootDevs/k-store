@@ -43,7 +43,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { ArrowDownUp } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "../ui/button";
@@ -106,7 +106,7 @@ function DragHandle({ listeners, attributes }: DragHandleProps) {
       {...attributes}
     >
       <Button size="icon" variant="outline" className="mr-2">
-        <GripVertical className="h-4 w-4" aria-hidden="true" />
+        <ArrowDownUp className="h-4 w-4 text-gray-800 " aria-hidden="true" />
       </Button>
     </div>
   );
@@ -165,7 +165,7 @@ const DragOverlayRow = React.memo(function DragOverlayRow<
       ))}
       <TableCell className="w-4">
         <Button size="icon" variant="outline" className="mr-2">
-          <GripVertical className="h-4 w-4" aria-hidden="true" />
+          <ArrowDownUp className="h-4 w-4 text-gray-800 " aria-hidden="true" />
         </Button>
       </TableCell>
     </TableRow>
@@ -427,8 +427,8 @@ export function DataTable<TData, TValue>({
                             variant="outline"
                             className="mr-2"
                           >
-                            <GripVertical
-                              className="h-4 w-4"
+                            <ArrowDownUp
+                              className="h-4 w-4 text-gray-800 "
                               aria-hidden="true"
                             />
                           </Button>
