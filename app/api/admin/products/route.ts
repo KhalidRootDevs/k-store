@@ -3,6 +3,7 @@ import { Product } from "@/models/Product"
 import { verifyToken } from "@/lib/auth"
 import { uploadToCloudinary } from "@/lib/cloudinary"
 import connectDB from "@/lib/database"
+import mongoose from "mongoose"
 
 /**
  * POST /api/products
@@ -183,9 +184,11 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    // Category filter
     if (category && category !== "all") {
-      query.categoryId = category
+      // Validate if category is a valid ObjectId
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        query.categoryId = new mongoose.Types.ObjectId(category)
+      }
     }
 
     // Featured filter
