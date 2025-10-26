@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { ErrorMessage } from "@hookform/error-message";
 import { format } from "date-fns";
 import { Calendar, Clock, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { memo, useState } from "react";
 import Flatpickr from "react-flatpickr";
 import { Controller, useFormContext } from "react-hook-form";
 import ReactSelect from "react-select";
@@ -31,6 +31,8 @@ type Props = {
   options?: { value: string; label: string; type?: string }[];
   className?: string;
   readOnly?: boolean;
+  disabled?: boolean;
+  required?: boolean;
   rowCount?: number;
   type:
     | "text"
@@ -51,7 +53,7 @@ type Props = {
   flatpickrOptions?: any;
 };
 
-export default function InputField(props: Props) {
+function InputField(props: Props) {
   const {
     name,
     type,
@@ -60,6 +62,8 @@ export default function InputField(props: Props) {
     options,
     className,
     readOnly,
+    disabled,
+    required,
     flatpickrOptions = {},
     rowCount = 2,
   } = props;
@@ -70,9 +74,18 @@ export default function InputField(props: Props) {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  // Combined disabled state
+  const isFieldDisabled = disabled || isSubmitting;
+  const isFieldReadOnly = readOnly || isSubmitting;
+
   return (
     <div className={cn("flex flex-col gap-3", className)}>
-      {label && <Label htmlFor={name}>{label}</Label>}
+      {label && (
+        <Label htmlFor={name}>
+          {label}
+          {required && <span className="text-destructive ml-1">*</span>}
+        </Label>
+      )}
 
       <Controller
         control={control}
@@ -95,12 +108,12 @@ export default function InputField(props: Props) {
                               )
                             )
                       }
-                      id={label}
+                      id={`${name}-${value}`}
                       value={value}
-                      disabled={isSubmitting}
+                      disabled={isFieldDisabled}
                     />
                     <label
-                      htmlFor={label}
+                      htmlFor={`${name}-${value}`}
                       className="flex cursor-pointer flex-col text-sm"
                     >
                       {label}
@@ -118,15 +131,15 @@ export default function InputField(props: Props) {
             </div>
           ) : type === "switch" ? (
             <div className="flex items-center gap-3">
+              <Label htmlFor={name}>
+                {field.value ? "Active" : "Inactive"}
+              </Label>
               <Switch
                 checked={!!field.value}
                 onCheckedChange={(val) => field.onChange(val)}
                 id={name}
-                disabled={isSubmitting}
+                disabled={isFieldDisabled}
               />
-              <Label htmlFor={name}>
-                {field.value ? "Active" : "Inactive"}
-              </Label>
             </div>
           ) : type === "datetime" ? (
             <div className="relative">
@@ -143,7 +156,7 @@ export default function InputField(props: Props) {
                   ...flatpickrOptions,
                 }}
                 className="flex h-9 w-full rounded-md border px-3 py-1 pr-10 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={isSubmitting}
+                disabled={isFieldDisabled}
               />
               <Calendar
                 size={18}
@@ -168,7 +181,7 @@ export default function InputField(props: Props) {
                   ...flatpickrOptions,
                 }}
                 className="flex h-10 w-full rounded-md border px-3 py-1 pr-10 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={isSubmitting}
+                disabled={isFieldDisabled}
               />
               <Clock
                 size={18}
@@ -177,21 +190,20 @@ export default function InputField(props: Props) {
             </div>
           ) : type === "textarea" ? (
             <Textarea
-              disabled={isSubmitting}
+              disabled={isFieldDisabled}
               {...field}
               id={name}
               placeholder={placeholder}
               rows={rowCount}
             />
           ) : type === "rich-text" ? (
-            <RichTextEditor name={name} />
+            <RichTextEditor name={name} disabled={isFieldDisabled} />
           ) : type.includes("react-select") ? (
             <ReactSelect
               classNames={{
                 option: () => "text-base font-normal",
                 singleValue: () => "text-sm font-normal",
                 placeholder: () => "text-sm font-normal",
-
                 menu: () => "text-sm",
               }}
               theme={(theme) => ({
@@ -248,15 +260,15 @@ export default function InputField(props: Props) {
                   ? field.onChange((selected as any[]).map((s) => s.value))
                   : field.onChange((selected as any)?.value ?? "")
               }
-              isDisabled={isSubmitting}
+              isDisabled={isFieldDisabled}
             />
           ) : type === "image" ? (
-            <DropzoneSingle name={name} />
+            <DropzoneSingle name={name} disabled={isFieldDisabled} />
           ) : type === "file" ? (
-            <DropzoneSingleFile name={name} />
+            <DropzoneSingleFile name={name} disabled={isFieldDisabled} />
           ) : type === "select" && options ? (
             <Select
-              disabled={isSubmitting}
+              disabled={isFieldDisabled}
               onValueChange={(val) => val && field.onChange(val)}
               value={field.value}
             >
@@ -276,19 +288,22 @@ export default function InputField(props: Props) {
               <Input
                 {...field}
                 className={`pr-10 ${
-                  readOnly ? "cursor-not-allowed bg-muted" : "bg-background"
+                  isFieldReadOnly
+                    ? "cursor-not-allowed bg-muted"
+                    : "bg-background"
                 }`}
-                disabled={isSubmitting}
+                disabled={isFieldDisabled}
                 type={showPassword ? "text" : "password"}
                 id={name}
                 placeholder={placeholder}
-                readOnly={readOnly}
+                readOnly={isFieldReadOnly}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
                 tabIndex={-1}
+                disabled={isFieldDisabled}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -297,13 +312,15 @@ export default function InputField(props: Props) {
             <Input
               {...field}
               className={`${
-                readOnly ? "cursor-not-allowed bg-muted" : "bg-background"
+                isFieldReadOnly
+                  ? "cursor-not-allowed bg-muted"
+                  : "bg-background"
               }`}
-              disabled={isSubmitting}
+              disabled={isFieldDisabled}
               type={type}
               id={name}
               placeholder={placeholder}
-              readOnly={readOnly}
+              readOnly={isFieldReadOnly}
               onWheel={(e) =>
                 type === "number" && (e.target as HTMLInputElement)?.blur()
               }
@@ -322,3 +339,5 @@ export default function InputField(props: Props) {
     </div>
   );
 }
+
+export default memo(InputField);

@@ -1,9 +1,8 @@
 "use client";
 
-import type React from "react";
-
 import DeleteModal from "@/components/custom/delete-modal";
-import { Badge } from "@/components/ui/badge";
+import { DataTable } from "@/components/tables/data-table";
+import { createCategoryColumns } from "@/components/tables/category/column";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,33 +11,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
 import { routes } from "@/lib/routes";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Edit,
-  Filter,
-  Loader2,
-  Plus,
-  Search,
-  Trash2,
-  X,
-} from "lucide-react";
-import Image from "next/image";
+import { Plus } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface Category {
   _id: string;
@@ -50,6 +28,7 @@ interface Category {
   slug: string;
   parentId?: { _id: string; name: string } | null;
   products?: number;
+  order: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -64,16 +43,12 @@ interface PaginationInfo {
 }
 
 export default function CategoriesPage() {
+  const searchParams = useSearchParams();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filters, setFilters] = useState({
-    featured: "all",
-    status: "all",
-  });
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
-    limit: 10,
+    limit: 30,
     total: 0,
     totalPages: 0,
     hasNext: false,
@@ -82,69 +57,86 @@ export default function CategoriesPage() {
   const [deleteModal, setDeleteModal] = useState(false);
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null);
 
-  // Fetch categories from API
-  const fetchCategories = async (page = 1) => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pagination.limit.toString(),
-        ...(searchTerm && { search: searchTerm }),
-        ...(filters.featured !== "all" && {
-          featured: filters.featured === "featured" ? "true" : "false",
-        }),
-        ...(filters.status !== "all" && {
-          active: filters.status === "active" ? "true" : "false",
-        }),
-      });
+  const isFetchingRef = useRef(false);
 
-      const response = await fetch(`/api/admin/categories?${params}`, {
-        credentials: "include",
-      });
+  const searchTerm = searchParams.get("search") || "";
+  const featuredFilter = searchParams.get("featured") || "all";
+  const statusFilter = searchParams.get("status") || "all";
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const currentPageSize = Number(searchParams.get("pageSize")) || 10;
 
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data.categories || []);
-        setPagination(
-          data.pagination || {
-            page: 1,
-            limit: 10,
-            total: 0,
-            totalPages: 0,
-            hasNext: false,
-            hasPrev: false,
-          }
-        );
-      } else {
-        throw new Error("Failed to fetch categories");
+  const fetchCategories = useCallback(
+    async (page = 1, pageSize = 30) => {
+      if (isFetchingRef.current) {
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load categories. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  // Initial load and when filters change
+      isFetchingRef.current = true;
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams({
+          page: page.toString(),
+          pageSize: pageSize.toString(),
+        });
+
+        if (searchTerm) {
+          params.append("search", searchTerm);
+        }
+
+        if (featuredFilter && featuredFilter !== "all") {
+          // Handle both the filter option values and direct boolean string values
+          if (featuredFilter === "featured" || featuredFilter === "true") {
+            params.append("featured", "true");
+          } else if (
+            featuredFilter === "not-featured" ||
+            featuredFilter === "false"
+          ) {
+            params.append("featured", "false");
+          }
+        }
+
+        if (statusFilter && statusFilter !== "all") {
+          params.append("active", statusFilter === "active" ? "true" : "false");
+        }
+
+        const response = await fetch(`/api/admin/categories?${params}`, {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data.categories || []);
+          setPagination(
+            data.pagination || {
+              page: page,
+              limit: pageSize,
+              total: 0,
+              totalPages: 0,
+              hasNext: false,
+              hasPrev: false,
+            }
+          );
+        } else {
+          throw new Error("Failed to fetch categories");
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load categories. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+        isFetchingRef.current = false;
+      }
+    },
+    [searchTerm, featuredFilter, statusFilter]
+  );
+
   useEffect(() => {
-    fetchCategories(1);
-  }, [searchTerm, filters.featured, filters.status]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchCategories(1);
-  };
-
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= pagination.totalPages) {
-      fetchCategories(newPage);
-    }
-  };
+    fetchCategories(currentPage, currentPageSize);
+  }, [fetchCategories, currentPage, currentPageSize]);
 
   const handleDeleteCategory = async (categoryId: string | null) => {
     try {
@@ -156,15 +148,19 @@ export default function CategoriesPage() {
       });
 
       if (response.ok) {
-        // Refresh the categories list - go to first page if current page becomes empty
         if (categories.length === 1 && pagination.page > 1) {
-          fetchCategories(pagination.page - 1);
+          fetchCategories(pagination.page - 1, pagination.limit);
         } else {
-          fetchCategories(pagination.page);
+          fetchCategories(pagination.page, pagination.limit);
         }
 
         setDeleteCategoryId(null);
         setDeleteModal(false);
+
+        toast({
+          title: "Success",
+          description: "Category deleted successfully.",
+        });
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to delete category");
@@ -202,8 +198,7 @@ export default function CategoriesPage() {
             !currentStatus ? "activated" : "deactivated"
           }.`,
         });
-        // Refresh the categories list
-        fetchCategories(pagination.page);
+        fetchCategories(pagination.page, pagination.limit);
       } else {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to update category status");
@@ -220,39 +215,66 @@ export default function CategoriesPage() {
     }
   };
 
-  const clearFilters = () => {
-    setSearchTerm("");
-    setFilters({
-      featured: "all",
-      status: "all",
-    });
+  const handleReorder = async (newData: Category[]) => {
+    try {
+      const categoryIds = newData.map((category) => category._id);
+
+      const response = await fetch("/api/admin/categories/reorder", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ categoryIds }),
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Categories reordered successfully.",
+        });
+        setCategories(newData);
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to reorder categories");
+      }
+    } catch (error: any) {
+      console.error("Error reordering categories:", error);
+      toast({
+        title: "Error",
+        description:
+          error.message || "Failed to reorder categories. Please try again.",
+        variant: "destructive",
+      });
+      fetchCategories(pagination.page, pagination.limit);
+    }
   };
 
-  const hasActiveFilters =
-    searchTerm || filters.featured !== "all" || filters.status !== "all";
+  const columns = createCategoryColumns((id) => {
+    setDeleteCategoryId(id);
+    setDeleteModal(true);
+  }, handleToggleStatus);
 
-  // Generate page numbers for pagination
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(
-      1,
-      pagination.page - Math.floor(maxVisiblePages / 2)
-    );
-    const endPage = Math.min(
-      pagination.totalPages,
-      startPage + maxVisiblePages - 1
-    );
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
+  const filterOptions = [
+    {
+      name: "featured",
+      label: "Featured",
+      options: [
+        { value: "all", label: "All" },
+        { value: "featured", label: "Featured" },
+        { value: "not-featured", label: "Not Featured" },
+      ],
+    },
+    {
+      name: "status",
+      label: "Status",
+      options: [
+        { value: "all", label: "All" },
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+      ],
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -279,296 +301,22 @@ export default function CategoriesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Search and Filters */}
-          <div className="flex flex-col gap-4 mb-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <form onSubmit={handleSearch} className="flex flex-1 gap-2">
-                <div className="flex-1 max-w-sm">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search categories..."
-                      className="h-9 pl-9"
-                      type="search"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <Button type="submit" size="sm" className="h-9">
-                  <Search className="h-4 w-4" />
-                  <span className="sr-only">Search</span>
-                </Button>
-                {hasActiveFilters && (
-                  <Button variant="outline" size="sm" onClick={clearFilters}>
-                    <X className="h-4 w-4 mr-1" />
-                    Clear
-                  </Button>
-                )}
-              </form>
-            </div>
-
-            {/* Filter Options */}
-            <div className="flex flex-wrap gap-4">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Filters:</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <label htmlFor="featured-filter" className="text-sm">
-                  Featured:
-                </label>
-                <select
-                  id="featured-filter"
-                  className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  value={filters.featured}
-                  onChange={(e) =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      featured: e.target.value,
-                    }))
-                  }
-                >
-                  <option value="all">All</option>
-                  <option value="featured">Featured</option>
-                  <option value="not-featured">Not Featured</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <label htmlFor="status-filter" className="text-sm">
-                  Status:
-                </label>
-                <select
-                  id="status-filter"
-                  className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  value={filters.status}
-                  onChange={(e) =>
-                    setFilters((prev) => ({ ...prev, status: e.target.value }))
-                  }
-                >
-                  <option value="all">All</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Results count */}
-            <div className="text-sm text-muted-foreground">
-              Showing {categories.length} of {pagination.total} categories
-              {pagination.totalPages > 1 &&
-                ` (Page ${pagination.page} of ${pagination.totalPages})`}
-            </div>
-          </div>
-
-          {/* Categories Table */}
-          <div className="rounded-md border">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : categories.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">
-                  {pagination.total === 0
-                    ? "No categories found."
-                    : "No categories match your filters."}
-                </p>
-                {hasActiveFilters && (
-                  <Button
-                    variant="outline"
-                    className="mt-2 bg-transparent"
-                    onClick={clearFilters}
-                  >
-                    Clear filters
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[80px]">Image</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead className="hidden lg:table-cell">
-                        Parent Category
-                      </TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Description
-                      </TableHead>
-                      <TableHead>Slug</TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Featured
-                      </TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {categories.map((category) => (
-                      <TableRow key={category._id}>
-                        <TableCell>
-                          <div className="relative h-10 w-10 rounded-md overflow-hidden">
-                            <Image
-                              src={category.image || "/placeholder.svg"}
-                              alt={category.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {category.parentId && (
-                            <span className="text-muted-foreground mr-2">
-                              └─
-                            </span>
-                          )}
-                          {category.name}
-                        </TableCell>
-                        <TableCell className="hidden lg:table-cell">
-                          {category.parentId ? (
-                            <Badge variant="outline">
-                              {category.parentId.name}
-                            </Badge>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">
-                              Top Level
-                            </span>
-                          )}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell max-w-[300px] truncate">
-                          {category.description || "No description"}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className="font-mono text-xs"
-                          >
-                            {category.slug}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {category.featured ? (
-                            <Badge variant="secondary">Featured</Badge>
-                          ) : (
-                            <Badge variant="outline">Regular</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              handleToggleStatus(
-                                category._id,
-                                category.active,
-                                category.name
-                              )
-                            }
-                            className={`h-6 px-2 text-xs ${
-                              category.active
-                                ? "bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900"
-                                : "bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900"
-                            }`}
-                          >
-                            {category.active ? "Active" : "Inactive"}
-                          </Button>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Link
-                              href={`/admin/categories/edit/${category._id}`}
-                            >
-                              <Button variant="ghost" size="icon">
-                                <Edit className="h-4 w-4" />
-                                <span className="sr-only">Edit</span>
-                              </Button>
-                            </Link>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => {
-                                setDeleteModal(true);
-                                setDeleteCategoryId(category._id);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-
-                {/* Pagination */}
-                {pagination.totalPages > 1 && (
-                  <div className="flex items-center justify-between px-4 py-4 border-t">
-                    <div className="text-sm text-muted-foreground">
-                      Page {pagination.page} of {pagination.totalPages}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(1)}
-                        disabled={!pagination.hasPrev}
-                      >
-                        <ChevronsLeft className="h-4 w-4" />
-                        <span className="sr-only">First page</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pagination.page - 1)}
-                        disabled={!pagination.hasPrev}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                        <span className="sr-only">Previous page</span>
-                      </Button>
-
-                      {/* Page numbers */}
-                      {getPageNumbers().map((pageNum) => (
-                        <Button
-                          key={pageNum}
-                          variant={
-                            pageNum === pagination.page ? "default" : "outline"
-                          }
-                          size="sm"
-                          onClick={() => handlePageChange(pageNum)}
-                        >
-                          {pageNum}
-                        </Button>
-                      ))}
-
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pagination.page + 1)}
-                        disabled={!pagination.hasNext}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                        <span className="sr-only">Next page</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pagination.totalPages)}
-                        disabled={!pagination.hasNext}
-                      >
-                        <ChevronsRight className="h-4 w-4" />
-                        <span className="sr-only">Last page</span>
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+          <DataTable
+            columns={columns}
+            data={categories}
+            search={true}
+            searchPlaceholder="Search categories..."
+            filters={filterOptions}
+            paginationData={{
+              total: pagination.total,
+              pageCount: pagination.totalPages,
+              page: pagination.page,
+              pageSize: pagination.limit,
+            }}
+            loading={isLoading}
+            enableRowOrdering={true}
+            dragEnd={handleReorder}
+          />
         </CardContent>
       </Card>
 

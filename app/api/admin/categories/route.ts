@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const page = Number.parseInt(searchParams.get("page") || "1");
-    const limit = Number.parseInt(searchParams.get("limit") || "10");
+    const limit = Number.parseInt(searchParams.get("pageSize") || "10");
     const search = searchParams.get("search") || "";
     const featured = searchParams.get("featured");
     const active = searchParams.get("active");
@@ -142,18 +142,19 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // Featured filter
-    if (featured !== null && featured !== "all") {
+    // Featured filter - apply when featured is not null/undefined and not "all"
+    if (featured !== null && featured !== undefined && featured !== "all") {
       query.featured = featured === "true";
     }
 
-    // Active filter
-    if (active !== null && active !== "all") {
+    // Active filter - apply when active is not null/undefined and not "all"
+    if (active !== null && active !== undefined && active !== "all") {
       query.active = active === "true";
     }
 
+    // ParentId filter - handle null, "null", "none", and valid IDs
     if (parentId !== null && parentId !== undefined) {
-      if (parentId === "null" || parentId === "none") {
+      if (parentId === "null" || parentId === "none" || parentId === "") {
         query.parentId = null;
       } else {
         query.parentId = parentId;
@@ -164,7 +165,7 @@ export async function GET(request: NextRequest) {
 
     // Get categories with pagination
     const categories = await Category.find(query)
-      .sort({ createdAt: -1 })
+      .sort({ order: 1, createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate("parentId", "name slug")
