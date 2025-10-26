@@ -40,9 +40,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Current password is incorrect" }, { status: 401 })
     }
 
-    // Update password
     user.password = newPassword
-    await user.save()
+    await user.save({ validateModifiedOnly: true })
 
     return NextResponse.json({
       message: "Password updated successfully",
