@@ -251,7 +251,7 @@ export function Header({ categoryTree }: HeaderProps) {
               <SheetContent side="left" className="w-[300px] sm:w-[400px]">
                 <div className="flex items-center mb-6">
                   <ShoppingBag className="h-6 w-6 mr-2" />
-                  <span className="font-bold text-xl">K-Store</span>
+                  <span className="font-bold text-xl">OneVendor</span>
                 </div>
 
                 <nav className="flex flex-col gap-4">
@@ -301,7 +301,7 @@ export function Header({ categoryTree }: HeaderProps) {
             <Link href="/" className="flex items-center">
               <ShoppingBag className="h-6 w-6 mr-2" />
               <span className="font-bold text-xl hidden sm:inline-block">
-                K-Store
+                OneVendor
               </span>
             </Link>
           </div>

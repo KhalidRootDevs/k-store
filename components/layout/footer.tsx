@@ -17,7 +17,7 @@ export function Footer() {
     <footer className="border-t bg-muted">
       <Container className="py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
-          <h3 className="font-bold text-lg mb-4">K-Store</h3>
+          <h3 className="font-bold text-lg mb-4">OneVendor</h3>
           <p className="text-sm text-muted-foreground mb-4">
             Your one-stop shop for all your shopping needs.
           </p>
@@ -91,10 +91,10 @@ export function Footer() {
             <li className="flex items-center">
               <Mail className="h-5 w-5 mr-2 text-muted-foreground" />
               <a
-                href="mailto:support@K-Store.com"
+                href="mailto:support@OneVendor.com"
                 className="text-muted-foreground hover:text-primary"
               >
-                support@K-Store.com
+                support@OneVendor.com
               </a>
             </li>
             <li className="flex items-center">
@@ -121,7 +121,7 @@ export function Footer() {
       </Container>
       <div className="border-t py-6">
         <Container className="text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} K-Store. All rights reserved.
+          &copy; {new Date().getFullYear()} OneVendor. All rights reserved.
         </Container>
       </div>
     </footer>

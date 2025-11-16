@@ -16,7 +16,7 @@ export async function getAdminSettings() {
       },
     },
     store: {
-      name: "K-Store",
+      name: "OneVendor",
       currency: "USD",
       taxRate: 0.08,
       shippingRate: 9.99,

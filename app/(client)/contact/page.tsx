@@ -114,10 +114,10 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-medium">Email</h3>
                       <p className="text-sm text-muted-foreground">
-                        support@K-Store.com
+                        support@OneVendor.com
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        info@K-Store.com
+                        info@OneVendor.com
                       </p>
                     </div>
                   </div>
