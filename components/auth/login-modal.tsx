@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -56,7 +57,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export function LoginModal() {
-  const { login, register: registerUser } = useAuth();
+  const router = useRouter();
+  const { login, register: registerUser, user } = useAuth();
   const { isLoginModalOpen, authMode, closeAuthModal, switchAuthMode } =
     useModal();
   const [isLoading, setIsLoading] = useState(false);
@@ -103,6 +105,10 @@ export function LoginModal() {
         setSuccess("Login successful!");
         setTimeout(() => {
           closeAuthModal();
+          // Redirect to admin dashboard if user is admin
+          if (user?.role === "admin") {
+            router.push("/admin/dashboard");
+          }
         }, 1000);
       } else {
         setError("Invalid email or password");
