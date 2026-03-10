@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { CartItem } from "@/types";
-import type React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { CartItem } from '@/types';
+import type React from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 interface CartContextType {
   items: CartItem[];
@@ -25,12 +25,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Load cart from localStorage on initial render
   useEffect(() => {
-    const storedCart = localStorage.getItem("cart");
+    const storedCart = localStorage.getItem('cart');
     if (storedCart) {
       try {
         setItems(JSON.parse(storedCart));
       } catch (error) {
-        console.error("Failed to parse cart from localStorage:", error);
+        console.error('Failed to parse cart from localStorage:', error);
       }
     }
     setIsInitialized(true);
@@ -39,7 +39,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem("cart", JSON.stringify(items));
+      localStorage.setItem('cart', JSON.stringify(items));
     }
   }, [items, isInitialized]);
 
@@ -47,7 +47,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
   const subtotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
-    0,
+    0
   );
   const shipping = subtotal > 50 ? 0 : 5.99;
   const tax = subtotal * 0.08; // 8% tax rate
@@ -60,7 +60,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const existingItemIndex = prevItems.findIndex(
         (item) =>
           item.productId === newItem.productId &&
-          item.variant === newItem.variant,
+          item.variant === newItem.variant
       );
 
       if (existingItemIndex >= 0) {
@@ -79,7 +79,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const updateQuantity = (id: number, quantity: number) => {
     if (quantity < 1) return;
     setItems((prevItems) =>
-      prevItems.map((item) => (item.id === id ? { ...item, quantity } : item)),
+      prevItems.map((item) => (item.id === id ? { ...item, quantity } : item))
     );
   };
 
@@ -105,7 +105,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         subtotal,
         shipping,
         tax,
-        total,
+        total
       }}
     >
       {children}
@@ -128,7 +128,7 @@ export function useCart() {
       subtotal: 0,
       shipping: 0,
       tax: 0,
-      total: 0,
+      total: 0
     };
   }
   return context;

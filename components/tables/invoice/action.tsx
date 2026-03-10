@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { ConfirmDeleteDialog } from "@/components/modals/confirm-delete-modal";
-import { Button } from "@/components/ui/button";
+import { ConfirmDeleteDialog } from '@/components/modals/confirm-delete-modal';
+import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Eye, Pencil, Trash2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "react-hot-toast";
+  TooltipTrigger
+} from '@/components/ui/tooltip';
+import { Eye, Pencil, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 interface InvoiceActionProps {
   invoice: any;
@@ -23,7 +23,7 @@ export default function InvoiceAction({ invoice }: InvoiceActionProps) {
 
   const handleDelete = async () => {
     console.log(invoice?.id);
-    toast.success("Invoice deleted successfully");
+    toast.success('Invoice deleted successfully');
     router.refresh();
   };
 

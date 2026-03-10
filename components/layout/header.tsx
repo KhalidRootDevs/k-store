@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import type React from "react";
+import type React from 'react';
 
-import { LoginButton } from "@/components/auth/login-button";
-import { CartButton } from "@/components/cart-button";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Container } from "@/components/ui/container";
-import { Input } from "@/components/ui/input";
+import { LoginButton } from '@/components/auth/login-button';
+import { CartButton } from '@/components/cart-button';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Container } from '@/components/ui/container';
+import { Input } from '@/components/ui/input';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -15,13 +15,13 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { WishlistDrawer } from "@/components/wishlist-drawer";
-import { useOnClickOutside } from "@/hooks/use-click-outside";
-import { allProducts } from "@/lib/product-data";
-import { cn } from "@/lib/utils";
+  navigationMenuTriggerStyle
+} from '@/components/ui/navigation-menu';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { WishlistDrawer } from '@/components/wishlist-drawer';
+import { useOnClickOutside } from '@/hooks/use-click-outside';
+import { allProducts } from '@/lib/product-data';
+import { cn } from '@/lib/utils';
 import {
   BookOpen,
   Briefcase,
@@ -41,13 +41,13 @@ import {
   ShirtIcon,
   ShoppingBag,
   Sparkles,
-  X,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { Category } from "@/types";
+  X
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { Category } from '@/types';
 
 // Debounce function to limit how often a function can be called
 function useDebounce<T>(value: T, delay: number): T {
@@ -68,88 +68,88 @@ function useDebounce<T>(value: T, delay: number): T {
 
 // Category icons mapping
 const categoryIcons: Record<string, React.ReactNode> = {
-  Electronics: <Laptop className="h-4 w-4 mr-2" />,
-  Clothing: <ShirtIcon className="h-4 w-4 mr-2" />,
-  "Home & Kitchen": <Home className="h-4 w-4 mr-2" />,
-  "Beauty & Personal Care": <Sparkles className="h-4 w-4 mr-2" />,
-  "Sports & Outdoors": <Dumbbell className="h-4 w-4 mr-2" />,
-  Books: <BookOpen className="h-4 w-4 mr-2" />,
-  "Toys & Games": <Gamepad2 className="h-4 w-4 mr-2" />,
-  "Health & Wellness": <Heart className="h-4 w-4 mr-2" />,
-  Automotive: <Car className="h-4 w-4 mr-2" />,
-  "Pet Supplies": <Dog className="h-4 w-4 mr-2" />,
-  Jewelry: <Gem className="h-4 w-4 mr-2" />,
-  "Office Supplies": <FileText className="h-4 w-4 mr-2" />,
-  Accessories: <Briefcase className="h-4 w-4 mr-2" />,
-  Footwear: <Footprints className="h-4 w-4 mr-2" />,
+  Electronics: <Laptop className="mr-2 h-4 w-4" />,
+  Clothing: <ShirtIcon className="mr-2 h-4 w-4" />,
+  'Home & Kitchen': <Home className="mr-2 h-4 w-4" />,
+  'Beauty & Personal Care': <Sparkles className="mr-2 h-4 w-4" />,
+  'Sports & Outdoors': <Dumbbell className="mr-2 h-4 w-4" />,
+  Books: <BookOpen className="mr-2 h-4 w-4" />,
+  'Toys & Games': <Gamepad2 className="mr-2 h-4 w-4" />,
+  'Health & Wellness': <Heart className="mr-2 h-4 w-4" />,
+  Automotive: <Car className="mr-2 h-4 w-4" />,
+  'Pet Supplies': <Dog className="mr-2 h-4 w-4" />,
+  Jewelry: <Gem className="mr-2 h-4 w-4" />,
+  'Office Supplies': <FileText className="mr-2 h-4 w-4" />,
+  Accessories: <Briefcase className="mr-2 h-4 w-4" />,
+  Footwear: <Footprints className="mr-2 h-4 w-4" />
 };
 
 // Mock category data for the mega menu
 const categoryGroups = [
   {
-    title: "Shop by Category",
+    title: 'Shop by Category',
     items: [
-      { name: "Electronics", href: "/products?category=Electronics" },
-      { name: "Clothing", href: "/products?category=Clothing" },
-      { name: "Home & Kitchen", href: "/products?category=Home & Kitchen" },
+      { name: 'Electronics', href: '/products?category=Electronics' },
+      { name: 'Clothing', href: '/products?category=Clothing' },
+      { name: 'Home & Kitchen', href: '/products?category=Home & Kitchen' },
       {
-        name: "Beauty & Personal Care",
-        href: "/products?category=Beauty & Personal Care",
+        name: 'Beauty & Personal Care',
+        href: '/products?category=Beauty & Personal Care'
       },
       {
-        name: "Sports & Outdoors",
-        href: "/products?category=Sports & Outdoors",
+        name: 'Sports & Outdoors',
+        href: '/products?category=Sports & Outdoors'
       },
-      { name: "Books", href: "/products?category=Books" },
-    ],
+      { name: 'Books', href: '/products?category=Books' }
+    ]
   },
   {
-    title: "More Categories",
+    title: 'More Categories',
     items: [
-      { name: "Toys & Games", href: "/products?category=Toys & Games" },
+      { name: 'Toys & Games', href: '/products?category=Toys & Games' },
       {
-        name: "Health & Wellness",
-        href: "/products?category=Health & Wellness",
+        name: 'Health & Wellness',
+        href: '/products?category=Health & Wellness'
       },
-      { name: "Automotive", href: "/products?category=Automotive" },
-      { name: "Pet Supplies", href: "/products?category=Pet Supplies" },
-      { name: "Jewelry", href: "/products?category=Jewelry" },
-      { name: "Office Supplies", href: "/products?category=Office Supplies" },
-    ],
+      { name: 'Automotive', href: '/products?category=Automotive' },
+      { name: 'Pet Supplies', href: '/products?category=Pet Supplies' },
+      { name: 'Jewelry', href: '/products?category=Jewelry' },
+      { name: 'Office Supplies', href: '/products?category=Office Supplies' }
+    ]
   },
   {
-    title: "Featured Collections",
+    title: 'Featured Collections',
     items: [
-      { name: "New Arrivals", href: "/products?sort=newest" },
-      { name: "Best Sellers", href: "/products?sort=best-selling" },
-      { name: "Top Rated", href: "/products?sort=rating" },
-      { name: "Sale Items", href: "/products?discount=true" },
-      { name: "Clearance", href: "/products?clearance=true" },
-      { name: "Gift Ideas", href: "/products?gift=true" },
-    ],
-  },
+      { name: 'New Arrivals', href: '/products?sort=newest' },
+      { name: 'Best Sellers', href: '/products?sort=best-selling' },
+      { name: 'Top Rated', href: '/products?sort=rating' },
+      { name: 'Sale Items', href: '/products?discount=true' },
+      { name: 'Clearance', href: '/products?clearance=true' },
+      { name: 'Gift Ideas', href: '/products?gift=true' }
+    ]
+  }
 ];
 
 // Featured categories with images for the mega menu
 const featuredCategories = [
   {
-    name: "Electronics",
-    description: "Latest gadgets and tech",
-    href: "/products?category=Electronics",
-    image: "/placeholder.svg?height=100&width=100",
+    name: 'Electronics',
+    description: 'Latest gadgets and tech',
+    href: '/products?category=Electronics',
+    image: '/placeholder.svg?height=100&width=100'
   },
   {
-    name: "Fashion",
-    description: "Trendy styles for everyone",
-    href: "/products?category=Clothing",
-    image: "/placeholder.svg?height=100&width=100",
+    name: 'Fashion',
+    description: 'Trendy styles for everyone',
+    href: '/products?category=Clothing',
+    image: '/placeholder.svg?height=100&width=100'
   },
   {
-    name: "Home",
-    description: "Make your space beautiful",
-    href: "/products?category=Home & Kitchen",
-    image: "/placeholder.svg?height=100&width=100",
-  },
+    name: 'Home',
+    description: 'Make your space beautiful',
+    href: '/products?category=Home & Kitchen',
+    image: '/placeholder.svg?height=100&width=100'
+  }
 ];
 
 interface HeaderProps {
@@ -160,7 +160,7 @@ export function Header({ categoryTree }: HeaderProps) {
   // Show the categoryTree on the dropdown
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<typeof allProducts>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -183,7 +183,7 @@ export function Header({ categoryTree }: HeaderProps) {
         const filtered = allProducts.filter((product) =>
           product.name
             .toLowerCase()
-            .includes(debouncedSearchQuery.toLowerCase()),
+            .includes(debouncedSearchQuery.toLowerCase())
         );
         setSearchResults(filtered.slice(0, 5)); // Limit to 5 results
         setIsSearching(false);
@@ -202,8 +202,8 @@ export function Header({ categoryTree }: HeaderProps) {
   };
 
   const navItems = [
-    { name: "Home", href: "/" },
-    { name: "Products", href: "/products" },
+    { name: 'Home', href: '/' },
+    { name: 'Products', href: '/products' }
   ];
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -211,7 +211,7 @@ export function Header({ categoryTree }: HeaderProps) {
     if (searchQuery.trim()) {
       router.push(`/products?q=${encodeURIComponent(searchQuery.trim())}`);
       setIsSearchOpen(false);
-      setSearchQuery("");
+      setSearchQuery('');
       setShowResults(false);
     }
   };
@@ -219,16 +219,16 @@ export function Header({ categoryTree }: HeaderProps) {
   const handleProductClick = (productId: number) => {
     router.push(`/products/${productId}`);
     setIsSearchOpen(false);
-    setSearchQuery("");
+    setSearchQuery('');
     setShowResults(false);
   };
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background">
       <Container>
-        <div className="flex h-16 items-center justify-between relative">
+        <div className="relative flex h-16 items-center justify-between">
           {/* Logo section - always visible */}
-          <div className="flex items-center z-20">
+          <div className="z-20 flex items-center">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
@@ -237,9 +237,9 @@ export function Header({ categoryTree }: HeaderProps) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-                <div className="flex items-center mb-6">
-                  <ShoppingBag className="h-6 w-6 mr-2" />
-                  <span className="font-bold text-xl">OneVendor</span>
+                <div className="mb-6 flex items-center">
+                  <ShoppingBag className="mr-2 h-6 w-6" />
+                  <span className="text-xl font-bold">OneVendor</span>
                 </div>
 
                 <nav className="flex flex-col gap-4">
@@ -249,8 +249,8 @@ export function Header({ categoryTree }: HeaderProps) {
                       href={item.href}
                       className={`text-lg font-medium transition-colors hover:text-primary ${
                         isActive(item.href)
-                          ? "text-primary"
-                          : "text-muted-foreground"
+                          ? 'text-primary'
+                          : 'text-muted-foreground'
                       }`}
                     >
                       {item.name}
@@ -258,7 +258,7 @@ export function Header({ categoryTree }: HeaderProps) {
                   ))}
 
                   <div className="py-2">
-                    <p className="text-lg font-medium mb-2">Categories</p>
+                    <p className="mb-2 text-lg font-medium">Categories</p>
                     <div className="grid grid-cols-1 gap-2 pl-2">
                       {categoryGroups
                         .flatMap((group) => group.items)
@@ -267,17 +267,17 @@ export function Header({ categoryTree }: HeaderProps) {
                           <Link
                             key={category.name}
                             href={category.href}
-                            className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors py-1"
+                            className="flex items-center py-1 text-sm text-muted-foreground transition-colors hover:text-primary"
                           >
                             {categoryIcons[category.name] || (
-                              <ShirtIcon className="h-4 w-4 mr-2" />
+                              <ShirtIcon className="mr-2 h-4 w-4" />
                             )}
                             {category.name}
                           </Link>
                         ))}
                       <Link
                         href="/categories"
-                        className="text-sm font-medium text-primary hover:underline mt-2"
+                        className="mt-2 text-sm font-medium text-primary hover:underline"
                       >
                         View all categories
                       </Link>
@@ -287,8 +287,8 @@ export function Header({ categoryTree }: HeaderProps) {
               </SheetContent>
             </Sheet>
             <Link href="/" className="flex items-center">
-              <ShoppingBag className="h-6 w-6 mr-2" />
-              <span className="font-bold text-xl hidden sm:inline-block">
+              <ShoppingBag className="mr-2 h-6 w-6" />
+              <span className="hidden text-xl font-bold sm:inline-block">
                 OneVendor
               </span>
             </Link>
@@ -297,8 +297,8 @@ export function Header({ categoryTree }: HeaderProps) {
           {/* Navigation Menu - hidden when search is open */}
           <div
             className={cn(
-              "absolute left-0 right-0 mx-auto flex justify-center transition-opacity duration-200",
-              isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100",
+              'absolute left-0 right-0 mx-auto flex justify-center transition-opacity duration-200',
+              isSearchOpen ? 'pointer-events-none opacity-0' : 'opacity-100'
             )}
           >
             <NavigationMenu className="hidden md:flex">
@@ -308,9 +308,7 @@ export function Header({ categoryTree }: HeaderProps) {
                     <NavigationMenuLink
                       className={cn(
                         navigationMenuTriggerStyle(),
-                        isActive("/")
-                          ? "text-primary"
-                          : "text-muted-foreground",
+                        isActive('/') ? 'text-primary' : 'text-muted-foreground'
                       )}
                     >
                       Home
@@ -321,17 +319,17 @@ export function Header({ categoryTree }: HeaderProps) {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger
                     className={
-                      isActive("/categories")
-                        ? "text-primary"
-                        : "text-muted-foreground"
+                      isActive('/categories')
+                        ? 'text-primary'
+                        : 'text-muted-foreground'
                     }
                   >
                     Categories
                   </NavigationMenuTrigger>
                   <NavigationMenuContent className="overflow-hidden">
                     {/* Responsive mega menu - adjust columns based on screen size */}
-                    <div className="w-[calc(100vw-2rem)] max-w-screen-lg mx-auto">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 max-h-[80vh] overflow-y-auto">
+                    <div className="mx-auto w-[calc(100vw-2rem)] max-w-screen-lg">
+                      <div className="grid max-h-[80vh] grid-cols-1 gap-3 overflow-y-auto p-4 sm:grid-cols-2 lg:grid-cols-4">
                         {categoryTree.map((category: any) => {
                           return (
                             <div className="col-span-1">
@@ -345,7 +343,7 @@ export function Header({ categoryTree }: HeaderProps) {
                                       <Link
                                         key={subCategory.name}
                                         href={`/products?categories=${subCategory.slug}`}
-                                        className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors py-1 px-2 rounded-md hover:bg-muted"
+                                        className="flex items-center rounded-md px-2 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
                                       >
                                         {/* {categoryIcons[category.name] || (
                                         <ShirtIcon className="h-4 w-4 mr-2 flex-shrink-0" />
@@ -354,7 +352,7 @@ export function Header({ categoryTree }: HeaderProps) {
                                           {subCategory.name}
                                         </span>
                                       </Link>
-                                    ),
+                                    )
                                   )
                                 ) : (
                                   <></>
@@ -414,9 +412,9 @@ export function Header({ categoryTree }: HeaderProps) {
                     <NavigationMenuLink
                       className={cn(
                         navigationMenuTriggerStyle(),
-                        isActive("/products")
-                          ? "text-primary"
-                          : "text-muted-foreground",
+                        isActive('/products')
+                          ? 'text-primary'
+                          : 'text-muted-foreground'
                       )}
                     >
                       Products
@@ -427,23 +425,23 @@ export function Header({ categoryTree }: HeaderProps) {
                 <NavigationMenuItem>
                   <NavigationMenuTrigger
                     className={
-                      isActive("/deals")
-                        ? "text-primary"
-                        : "text-muted-foreground"
+                      isActive('/deals')
+                        ? 'text-primary'
+                        : 'text-muted-foreground'
                     }
                   >
                     Deals
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     {/* Responsive deals dropdown */}
-                    <div className="w-[calc(100vw-2rem)] max-w-md mx-auto">
+                    <div className="mx-auto w-[calc(100vw-2rem)] max-w-md">
                       <div className="grid gap-3 p-6">
                         <div className="grid grid-cols-1 gap-2">
                           <Link
                             href="/products?discount=true"
-                            className="flex items-center gap-2 p-2 hover:bg-muted rounded-md transition-colors"
+                            className="flex items-center gap-2 rounded-md p-2 transition-colors hover:bg-muted"
                           >
-                            <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
+                            <div className="flex-shrink-0 rounded-full bg-primary/10 p-2">
                               <Sparkles className="h-4 w-4 text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
@@ -455,9 +453,9 @@ export function Header({ categoryTree }: HeaderProps) {
                           </Link>
                           <Link
                             href="/products?sort=best-selling"
-                            className="flex items-center gap-2 p-2 hover:bg-muted rounded-md transition-colors"
+                            className="flex items-center gap-2 rounded-md p-2 transition-colors hover:bg-muted"
                           >
-                            <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
+                            <div className="flex-shrink-0 rounded-full bg-primary/10 p-2">
                               <Sparkles className="h-4 w-4 text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
@@ -469,9 +467,9 @@ export function Header({ categoryTree }: HeaderProps) {
                           </Link>
                           <Link
                             href="/products?clearance=true"
-                            className="flex items-center gap-2 p-2 hover:bg-muted rounded-md transition-colors"
+                            className="flex items-center gap-2 rounded-md p-2 transition-colors hover:bg-muted"
                           >
-                            <div className="bg-primary/10 p-2 rounded-full flex-shrink-0">
+                            <div className="flex-shrink-0 rounded-full bg-primary/10 p-2">
                               <Sparkles className="h-4 w-4 text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
@@ -493,17 +491,17 @@ export function Header({ categoryTree }: HeaderProps) {
           {/* Search bar - centered and full width when open */}
           <div
             className={cn(
-              "absolute left-0 right-0 mx-auto flex justify-center transition-opacity duration-200 z-10",
-              isSearchOpen ? "opacity-100" : "opacity-0 pointer-events-none",
+              'absolute left-0 right-0 z-10 mx-auto flex justify-center transition-opacity duration-200',
+              isSearchOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
             )}
           >
             <div
               ref={searchRef}
-              className="w-full max-w-3xl px-4 mx-auto"
-              style={{ width: "calc(100% - 320px)" }}
+              className="mx-auto w-full max-w-3xl px-4"
+              style={{ width: 'calc(100% - 320px)' }}
             >
               <form
-                className="relative flex items-center max-w-xl"
+                className="relative flex max-w-xl items-center"
                 onSubmit={handleSearchSubmit}
               >
                 <Input
@@ -515,9 +513,9 @@ export function Header({ categoryTree }: HeaderProps) {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Escape") {
+                    if (e.key === 'Escape') {
                       setIsSearchOpen(false);
-                      setSearchQuery("");
+                      setSearchQuery('');
                       setShowResults(false);
                     }
                   }}
@@ -529,7 +527,7 @@ export function Header({ categoryTree }: HeaderProps) {
                   className="absolute right-0"
                   onClick={() => {
                     setIsSearchOpen(false);
-                    setSearchQuery("");
+                    setSearchQuery('');
                     setShowResults(false);
                   }}
                 >
@@ -539,10 +537,10 @@ export function Header({ categoryTree }: HeaderProps) {
 
               {/* Search Results Dropdown */}
               {showResults && (searchResults.length > 0 || isSearching) && (
-                <Card className="absolute top-full left-0 right-0 mt-1 p-2 max-h-[400px] overflow-auto z-50">
+                <Card className="absolute left-0 right-0 top-full z-50 mt-1 max-h-[400px] overflow-auto p-2">
                   {isSearching ? (
                     <div className="flex items-center justify-center py-4">
-                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       <span>Searching...</span>
                     </div>
                   ) : (
@@ -550,19 +548,19 @@ export function Header({ categoryTree }: HeaderProps) {
                       {searchResults.map((product) => (
                         <div
                           key={product.id}
-                          className="flex items-center gap-3 p-2 hover:bg-muted rounded-md cursor-pointer"
+                          className="flex cursor-pointer items-center gap-3 rounded-md p-2 hover:bg-muted"
                           onClick={() => handleProductClick(product.id)}
                         >
-                          <div className="relative h-10 w-10 rounded-md overflow-hidden flex-shrink-0">
+                          <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-md">
                             <Image
-                              src={product.image || "/placeholder.svg"}
+                              src={product.image || '/placeholder.svg'}
                               alt={product.name}
                               fill
                               className="object-cover"
                             />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-sm truncate">
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium">
                               {product.name}
                             </p>
                             <p className="text-xs text-muted-foreground">
@@ -580,18 +578,18 @@ export function Header({ categoryTree }: HeaderProps) {
                           </div>
                         </div>
                       ))}
-                      <div className="mt-2 pt-2 border-t text-center">
+                      <div className="mt-2 border-t pt-2 text-center">
                         <Button
                           variant="link"
                           className="text-xs"
                           onClick={() => {
                             router.push(
                               `/products?q=${encodeURIComponent(
-                                searchQuery.trim(),
-                              )}`,
+                                searchQuery.trim()
+                              )}`
                             );
                             setIsSearchOpen(false);
-                            setSearchQuery("");
+                            setSearchQuery('');
                             setShowResults(false);
                           }}
                         >
@@ -607,7 +605,7 @@ export function Header({ categoryTree }: HeaderProps) {
 
           {/* Action buttons - always visible */}
 
-          <div className="flex items-center gap-2 z-20">
+          <div className="z-20 flex items-center gap-2">
             {isSearchOpen ? null : (
               <Button
                 variant="ghost"
@@ -620,7 +618,7 @@ export function Header({ categoryTree }: HeaderProps) {
                   <Search className="h-5 w-5" />
                 )}
                 <span className="sr-only">
-                  {isSearchOpen ? "Close search" : "Search"}
+                  {isSearchOpen ? 'Close search' : 'Search'}
                 </span>
               </Button>
             )}

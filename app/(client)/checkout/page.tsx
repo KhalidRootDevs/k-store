@@ -1,50 +1,50 @@
-"use client";
+'use client';
 
-import { useCart } from "@/context/cart-context";
-import { useAuth } from "@/context/auth-context";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
-import { CheckCircle2, AlertCircle, CreditCard, Plus } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Container } from "@/components/ui/container";
-import { Elements } from "@stripe/react-stripe-js";
-import { getStripe } from "@/lib/stripe";
-import { StripePaymentForm } from "@/components/checkout/stripe-payment-form";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Address } from "@/types";
-import { CheckoutFormValues, checkoutSchema } from "@/lib/validations/index";
+import { useCart } from '@/context/cart-context';
+import { useAuth } from '@/context/auth-context';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/use-toast';
+import { CheckCircle2, AlertCircle, CreditCard, Plus } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Container } from '@/components/ui/container';
+import { Elements } from '@stripe/react-stripe-js';
+import { getStripe } from '@/lib/stripe';
+import { StripePaymentForm } from '@/components/checkout/stripe-payment-form';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Address } from '@/types';
+import { CheckoutFormValues, checkoutSchema } from '@/lib/validations/index';
 
 // Shipping method options
 const shippingMethods = [
   {
-    id: "standard",
-    name: "Standard Shipping",
+    id: 'standard',
+    name: 'Standard Shipping',
     price: 5.99,
-    days: "5-7 business days",
+    days: '5-7 business days'
   },
   {
-    id: "express",
-    name: "Express Shipping",
+    id: 'express',
+    name: 'Express Shipping',
     price: 12.99,
-    days: "2-3 business days",
+    days: '2-3 business days'
   },
   {
-    id: "overnight",
-    name: "Overnight Shipping",
+    id: 'overnight',
+    name: 'Overnight Shipping',
     price: 24.99,
-    days: "1 business day",
-  },
+    days: '1 business day'
+  }
 ];
 
 export default function CheckoutPage() {
@@ -52,11 +52,11 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
-  const [orderId, setOrderId] = useState("");
-  const [clientSecret, setClientSecret] = useState("");
-  const [paymentIntentId, setPaymentIntentId] = useState("");
+  const [orderId, setOrderId] = useState('');
+  const [clientSecret, setClientSecret] = useState('');
+  const [paymentIntentId, setPaymentIntentId] = useState('');
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
-  const [stripeError, setStripeError] = useState("");
+  const [stripeError, setStripeError] = useState('');
   const [stripeConfigured, setStripeConfigured] = useState(false);
   const [checkingStripe, setCheckingStripe] = useState(true);
   const [sameAsShipping, setSameAsShipping] = useState(true);
@@ -64,7 +64,7 @@ export default function CheckoutPage() {
   const [isMounted, setIsMounted] = useState(false);
 
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
   const [useNewAddress, setUseNewAddress] = useState(false);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
 
@@ -73,7 +73,7 @@ export default function CheckoutPage() {
     checkStripeConfiguration();
 
     if (items.length === 0) {
-      router.push("/cart");
+      router.push('/cart');
     }
 
     if (user) {
@@ -84,14 +84,14 @@ export default function CheckoutPage() {
   const fetchSavedAddresses = async () => {
     try {
       setLoadingAddresses(true);
-      const response = await fetch("/api/addresses");
+      const response = await fetch('/api/addresses');
       if (response.ok) {
         const data = await response.json();
         setSavedAddresses(data.addresses || []);
 
         // Auto-select default address if available
         const defaultAddress = data.addresses?.find(
-          (addr: Address) => addr.isDefault,
+          (addr: Address) => addr.isDefault
         );
         if (defaultAddress && !useNewAddress) {
           setSelectedAddressId(defaultAddress._id);
@@ -99,39 +99,39 @@ export default function CheckoutPage() {
         }
       }
     } catch (error) {
-      console.error("Error fetching addresses:", error);
+      console.error('Error fetching addresses:', error);
     } finally {
       setLoadingAddresses(false);
     }
   };
 
   const populateAddressFields = (address: Address) => {
-    setValue("shippingAddress.fullName", address.fullName);
-    setValue("shippingAddress.address", address.address);
-    setValue("shippingAddress.city", address.city);
-    setValue("shippingAddress.state", address.state);
-    setValue("shippingAddress.zipCode", address.zipCode);
-    setValue("shippingAddress.country", address.country);
-    setValue("shippingAddress.phone", address.phone);
+    setValue('shippingAddress.fullName', address.fullName);
+    setValue('shippingAddress.address', address.address);
+    setValue('shippingAddress.city', address.city);
+    setValue('shippingAddress.state', address.state);
+    setValue('shippingAddress.zipCode', address.zipCode);
+    setValue('shippingAddress.country', address.country);
+    setValue('shippingAddress.phone', address.phone);
   };
 
   const handleAddressSelection = (addressId: string) => {
-    if (addressId === "new") {
+    if (addressId === 'new') {
       setUseNewAddress(true);
-      setSelectedAddressId("");
+      setSelectedAddressId('');
       // Clear form fields
-      setValue("shippingAddress.fullName", "");
-      setValue("shippingAddress.address", "");
-      setValue("shippingAddress.city", "");
-      setValue("shippingAddress.state", "");
-      setValue("shippingAddress.zipCode", "");
-      setValue("shippingAddress.country", "");
-      setValue("shippingAddress.phone", "");
+      setValue('shippingAddress.fullName', '');
+      setValue('shippingAddress.address', '');
+      setValue('shippingAddress.city', '');
+      setValue('shippingAddress.state', '');
+      setValue('shippingAddress.zipCode', '');
+      setValue('shippingAddress.country', '');
+      setValue('shippingAddress.phone', '');
     } else {
       setUseNewAddress(false);
       setSelectedAddressId(addressId);
       const selectedAddress = savedAddresses.find(
-        (addr) => addr._id === addressId,
+        (addr) => addr._id === addressId
       );
       if (selectedAddress) {
         populateAddressFields(selectedAddress);
@@ -148,12 +148,12 @@ export default function CheckoutPage() {
 
       if (!stripe) {
         setStripeError(
-          "Credit card payments are currently unavailable. Please use an alternative payment method.",
+          'Credit card payments are currently unavailable. Please use an alternative payment method.'
         );
       }
     } catch (error) {
-      console.error("❌ Error checking Stripe configuration:", error);
-      setStripeError("Unable to load payment system. Please try again later.");
+      console.error('❌ Error checking Stripe configuration:', error);
+      setStripeError('Unable to load payment system. Please try again later.');
       setStripeConfigured(false);
     } finally {
       setCheckingStripe(false);
@@ -166,67 +166,67 @@ export default function CheckoutPage() {
     watch,
     setValue,
     getValues,
-    formState: { errors },
+    formState: { errors }
   } = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       contactInfo: {
-        fullName: "",
-        email: "",
-        phone: "",
+        fullName: '',
+        email: '',
+        phone: ''
       },
       shippingAddress: {
-        fullName: "",
-        address: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        country: "",
-        phone: "",
+        fullName: '',
+        address: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: '',
+        phone: ''
       },
       billingAddress: {
-        fullName: "",
-        address: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        country: "",
+        fullName: '',
+        address: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: ''
       },
-      paymentMethod: "credit_card",
-      shippingMethod: "standard",
-      notes: "",
-    },
+      paymentMethod: 'credit_card',
+      shippingMethod: 'standard',
+      notes: ''
+    }
   });
 
   // Watch form values
-  const paymentMethod = watch("paymentMethod");
-  const shippingMethod = watch("shippingMethod");
-  const shippingAddress = watch("shippingAddress");
+  const paymentMethod = watch('paymentMethod');
+  const shippingMethod = watch('shippingMethod');
+  const shippingAddress = watch('shippingAddress');
 
   useEffect(() => {
     if (sameAsShipping) {
-      setValue("billingAddress.fullName", shippingAddress.fullName);
-      setValue("billingAddress.address", shippingAddress.address);
-      setValue("billingAddress.city", shippingAddress.city);
-      setValue("billingAddress.state", shippingAddress.state);
-      setValue("billingAddress.zipCode", shippingAddress.zipCode);
-      setValue("billingAddress.country", shippingAddress.country);
+      setValue('billingAddress.fullName', shippingAddress.fullName);
+      setValue('billingAddress.address', shippingAddress.address);
+      setValue('billingAddress.city', shippingAddress.city);
+      setValue('billingAddress.state', shippingAddress.state);
+      setValue('billingAddress.zipCode', shippingAddress.zipCode);
+      setValue('billingAddress.country', shippingAddress.country);
     }
   }, [sameAsShipping, shippingAddress, setValue]);
 
   // Update shipping cost when shipping method changes
   useEffect(() => {
     const selectedMethod = shippingMethods.find(
-      (method) => method.id === shippingMethod,
+      (method) => method.id === shippingMethod
     );
     if (selectedMethod) {
-      console.log("Selected shipping method:", selectedMethod);
+      console.log('Selected shipping method:', selectedMethod);
     }
   }, [shippingMethod]);
 
   useEffect(() => {
     if (
-      (paymentMethod === "credit_card" || paymentMethod === "debit_card") &&
+      (paymentMethod === 'credit_card' || paymentMethod === 'debit_card') &&
       total > 0 &&
       stripeConfigured &&
       !checkingStripe
@@ -237,53 +237,53 @@ export default function CheckoutPage() {
 
   const createPaymentIntent = async () => {
     try {
-      setStripeError("");
+      setStripeError('');
 
-      if (!total || total <= 0) throw new Error("Invalid order total");
+      if (!total || total <= 0) throw new Error('Invalid order total');
 
-      const response = await fetch("/api/create-payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount: total,
-          currency: "usd",
+          currency: 'usd',
           metadata: {
             orderItems: items.length.toString(),
-            customerEmail: watch("contactInfo.email") || "guest@example.com",
-            orderTotal: total.toString(),
-          },
-        }),
+            customerEmail: watch('contactInfo.email') || 'guest@example.com',
+            orderTotal: total.toString()
+          }
+        })
       });
 
       const data = await response.json();
       if (!response.ok)
-        throw new Error(data.error || "Failed to create intent");
+        throw new Error(data.error || 'Failed to create intent');
 
       if (data.clientSecret) {
         setClientSecret(data.clientSecret);
-        setPaymentIntentId(data.paymentIntentId || "");
-      } else throw new Error("No client secret received from server");
+        setPaymentIntentId(data.paymentIntentId || '');
+      } else throw new Error('No client secret received from server');
     } catch (error: any) {
-      console.error("❌ Error creating payment intent:", error);
+      console.error('❌ Error creating payment intent:', error);
       const msg =
-        error.message || "Unable to initialize payment. Please try again.";
+        error.message || 'Unable to initialize payment. Please try again.';
       setStripeError(msg);
       toast({
-        title: "Payment setup failed",
+        title: 'Payment setup failed',
         description: msg,
-        variant: "destructive",
+        variant: 'destructive'
       });
     }
   };
 
   const onSubmit = async (data: CheckoutFormValues) => {
-    console.log("✅ Checkout form submitted with data:", data);
+    console.log('✅ Checkout form submitted with data:', data);
 
     if (items.length === 0) {
       toast({
-        title: "Cart is empty",
-        description: "Please add items to your cart before checking out.",
-        variant: "destructive",
+        title: 'Cart is empty',
+        description: 'Please add items to your cart before checking out.',
+        variant: 'destructive'
       });
       return;
     }
@@ -292,31 +292,31 @@ export default function CheckoutPage() {
       setIsSubmitting(true);
 
       if (
-        data.paymentMethod === "credit_card" ||
-        data.paymentMethod === "debit_card"
+        data.paymentMethod === 'credit_card' ||
+        data.paymentMethod === 'debit_card'
       ) {
         if (!stripeConfigured || !clientSecret) {
           setStripeError(
-            "Payment system unavailable. Please select another payment method.",
+            'Payment system unavailable. Please select another payment method.'
           );
           toast({
-            title: "Payment unavailable",
-            description: "Please choose another payment option.",
-            variant: "destructive",
+            title: 'Payment unavailable',
+            description: 'Please choose another payment option.',
+            variant: 'destructive'
           });
           return;
         }
-        console.log("🟡 Awaiting Stripe payment confirmation...");
+        console.log('🟡 Awaiting Stripe payment confirmation...');
       } else {
         await processOrder(data);
       }
     } catch (error) {
-      console.error("❌ Checkout submission error:", error);
+      console.error('❌ Checkout submission error:', error);
       toast({
-        title: "Checkout failed",
+        title: 'Checkout failed',
         description:
-          error instanceof Error ? error.message : "An unknown error occurred.",
-        variant: "destructive",
+          error instanceof Error ? error.message : 'An unknown error occurred.',
+        variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
@@ -325,7 +325,7 @@ export default function CheckoutPage() {
 
   const processOrder = async (
     data: CheckoutFormValues,
-    paymentIntent?: any,
+    paymentIntent?: any
   ) => {
     setIsSubmitting(true);
     try {
@@ -340,17 +340,17 @@ export default function CheckoutPage() {
           ? {
               attributes: item.selectedOptions,
               sku: `${item.productId}-${Object.values(
-                item.selectedOptions,
-              ).join("-")}`,
+                item.selectedOptions
+              ).join('-')}`
             }
           : undefined,
         productId: item.productId,
-        sku: item.sku || `${item.productId}-default`,
+        sku: item.sku || `${item.productId}-default`
       }));
 
       // Get selected shipping method details
       const selectedShippingMethod = shippingMethods.find(
-        (method) => method.id === data.shippingMethod,
+        (method) => method.id === data.shippingMethod
       );
 
       const billingAddressData = sameAsShipping
@@ -360,24 +360,24 @@ export default function CheckoutPage() {
             city: data.shippingAddress.city,
             state: data.shippingAddress.state,
             zipCode: data.shippingAddress.zipCode,
-            country: data.shippingAddress.country,
+            country: data.shippingAddress.country
           }
         : {
-            fullName: data.billingAddress.fullName || "",
-            address: data.billingAddress.address || "",
-            city: data.billingAddress.city || "",
-            state: data.billingAddress.state || "",
-            zipCode: data.billingAddress.zipCode || "",
-            country: data.billingAddress.country || "",
+            fullName: data.billingAddress.fullName || '',
+            address: data.billingAddress.address || '',
+            city: data.billingAddress.city || '',
+            state: data.billingAddress.state || '',
+            zipCode: data.billingAddress.zipCode || '',
+            country: data.billingAddress.country || ''
           };
 
       const orderData = {
         customer: {
-          id: user?.id || "guest",
+          id: user?.id || 'guest',
           name: data.contactInfo.fullName,
           email: data.contactInfo.email,
           phone: data.contactInfo.phone,
-          address: data.shippingAddress.address,
+          address: data.shippingAddress.address
         },
         shippingAddress: {
           fullName: data.shippingAddress.fullName,
@@ -386,14 +386,14 @@ export default function CheckoutPage() {
           state: data.shippingAddress.state,
           zipCode: data.shippingAddress.zipCode,
           country: data.shippingAddress.country,
-          phone: data.shippingAddress.phone,
+          phone: data.shippingAddress.phone
         },
         billingAddress: billingAddressData,
         items: orderItems,
         paymentMethod: data.paymentMethod,
         paymentStatus:
-          data.paymentMethod === "cash_on_delivery" ? "pending" : "paid",
-        shippingMethod: selectedShippingMethod?.name || "Standard Shipping",
+          data.paymentMethod === 'cash_on_delivery' ? 'pending' : 'paid',
+        shippingMethod: selectedShippingMethod?.name || 'Standard Shipping',
         notes: data.notes,
         subtotal,
         tax,
@@ -401,43 +401,43 @@ export default function CheckoutPage() {
         total: total + (selectedShippingMethod?.price || 0) - shipping,
         timeline: [
           {
-            status: "order_placed" as const,
+            status: 'order_placed' as const,
             date: new Date(),
-            description: "Order was placed by customer",
-          },
-        ],
+            description: 'Order was placed by customer'
+          }
+        ]
       };
 
-      console.log("📦 Sending order data to /api/orders:", orderData);
+      console.log('📦 Sending order data to /api/orders:', orderData);
 
-      const response = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
       });
 
       const result = await response.json();
-      console.log("✅ Order API response:", result);
+      console.log('✅ Order API response:', result);
 
       if (!response.ok)
-        throw new Error(result.error || "Failed to create order");
+        throw new Error(result.error || 'Failed to create order');
 
       setOrderId(result.order.orderNumber);
       clearCart();
       setOrderComplete(true);
 
       toast({
-        title: "Order placed successfully",
-        description: `Your order ${result.order.orderNumber} has been confirmed.`,
+        title: 'Order placed successfully',
+        description: `Your order ${result.order.orderNumber} has been confirmed.`
       });
     } catch (error: any) {
-      console.error("❌ Error processing order:", error);
+      console.error('❌ Error processing order:', error);
       toast({
-        title: "Error processing order",
+        title: 'Error processing order',
         description:
           error.message ||
-          "There was an error processing your order. Please try again.",
-        variant: "destructive",
+          'There was an error processing your order. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
@@ -446,20 +446,20 @@ export default function CheckoutPage() {
 
   const handleStripeSuccess = (paymentIntent: any) => {
     const formData = getValues();
-    console.log("✅ Stripe payment success, intent:", paymentIntent);
+    console.log('✅ Stripe payment success, intent:', paymentIntent);
     processOrder(formData, paymentIntent);
   };
 
   const handleStripeError = (error: string) => {
-    console.error("❌ Stripe payment error:", error);
+    console.error('❌ Stripe payment error:', error);
     setStripeError(error);
   };
 
   const handlePaymentMethodChange = (value: string) => {
-    console.log("🔄 Setting payment method to:", value);
+    console.log('🔄 Setting payment method to:', value);
     setValue(
-      "paymentMethod",
-      value as "credit_card" | "debit_card" | "paypal" | "cash_on_delivery",
+      'paymentMethod',
+      value as 'credit_card' | 'debit_card' | 'paypal' | 'cash_on_delivery'
     );
   };
 
@@ -467,22 +467,22 @@ export default function CheckoutPage() {
 
   if (orderComplete) {
     return (
-      <Container className="max-w-3xl mx-auto text-center py-12">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-6">
+      <Container className="mx-auto max-w-3xl py-12 text-center">
+        <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
           <CheckCircle2 className="h-10 w-10 text-green-600" />
         </div>
-        <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
-        <p className="text-muted-foreground mb-8">
+        <h1 className="mb-4 text-3xl font-bold">Order Confirmed!</h1>
+        <p className="mb-8 text-muted-foreground">
           Thank you for your purchase. Your order has been received and is being
           processed.
         </p>
-        <div className="bg-muted p-6 rounded-lg mb-8">
-          <h2 className="text-xl font-semibold mb-4">Order Details</h2>
-          <div className="flex justify-between mb-2">
+        <div className="mb-8 rounded-lg bg-muted p-6">
+          <h2 className="mb-4 text-xl font-semibold">Order Details</h2>
+          <div className="mb-2 flex justify-between">
             <span>Order Number:</span>
             <span className="font-medium">{orderId}</span>
           </div>
-          <div className="flex justify-between mb-2">
+          <div className="mb-2 flex justify-between">
             <span>Date:</span>
             <span>{new Date().toLocaleDateString()}</span>
           </div>
@@ -493,14 +493,14 @@ export default function CheckoutPage() {
           {paymentIntentId && (
             <div className="flex justify-between">
               <span>Payment ID:</span>
-              <span className="font-medium text-xs">{paymentIntentId}</span>
+              <span className="text-xs font-medium">{paymentIntentId}</span>
             </div>
           )}
         </div>
         <p className="mb-8">
           We've sent a confirmation email with your order details.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col justify-center gap-4 sm:flex-row">
           <Button asChild>
             <Link href="/">Continue Shopping</Link>
           </Button>
@@ -513,33 +513,33 @@ export default function CheckoutPage() {
   }
 
   if (items.length === 0 && isMounted) {
-    router.push("/cart");
+    router.push('/cart');
     return null;
   }
 
   return (
     <Container>
-      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+      <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
 
       <form
         onSubmit={handleSubmit(onSubmit, (formErrors) => {
           const currentData = getValues(); // <-- this gets whatever the user entered
 
-          console.group("🔴 Validation Failed — Form Not Submitted");
-          console.log("Form Data (User Entered):", currentData);
-          console.log("Validation Errors:", formErrors);
+          console.group('🔴 Validation Failed — Form Not Submitted');
+          console.log('Form Data (User Entered):', currentData);
+          console.log('Validation Errors:', formErrors);
           console.groupEnd();
 
           toast({
-            title: "Validation error",
+            title: 'Validation error',
             description:
-              "Please correct the highlighted fields before continuing.",
-            variant: "destructive",
+              'Please correct the highlighted fields before continuing.',
+            variant: 'destructive'
           });
         })}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
             {/* Contact Information */}
             <Card>
               <CardHeader>
@@ -553,7 +553,7 @@ export default function CheckoutPage() {
                   <Input
                     id="fullName"
                     placeholder="John Doe"
-                    {...register("contactInfo.fullName")}
+                    {...register('contactInfo.fullName')}
                   />
                   {errors.contactInfo?.fullName && (
                     <p className="text-sm text-red-500">
@@ -561,7 +561,7 @@ export default function CheckoutPage() {
                     </p>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="email">
                       Email Address <span className="text-red-500">*</span>
@@ -570,7 +570,7 @@ export default function CheckoutPage() {
                       id="email"
                       type="email"
                       placeholder="john.doe@example.com"
-                      {...register("contactInfo.email")}
+                      {...register('contactInfo.email')}
                     />
                     {errors.contactInfo?.email && (
                       <p className="text-sm text-red-500">
@@ -585,7 +585,7 @@ export default function CheckoutPage() {
                     <Input
                       id="phone"
                       placeholder="+1 (123) 456-7890"
-                      {...register("contactInfo.phone")}
+                      {...register('contactInfo.phone')}
                     />
                     {errors.contactInfo?.phone && (
                       <p className="text-sm text-red-500">
@@ -607,14 +607,14 @@ export default function CheckoutPage() {
                   <div className="space-y-3">
                     <Label>Select Address</Label>
                     <RadioGroup
-                      value={useNewAddress ? "new" : selectedAddressId}
+                      value={useNewAddress ? 'new' : selectedAddressId}
                       onValueChange={handleAddressSelection}
                       className="space-y-2"
                     >
                       {savedAddresses.map((address) => (
                         <div
                           key={address._id}
-                          className="flex items-start space-x-2 border rounded-md p-3"
+                          className="flex items-start space-x-2 rounded-md border p-3"
                         >
                           <RadioGroupItem
                             value={address._id}
@@ -629,7 +629,7 @@ export default function CheckoutPage() {
                               {address.fullName}
                             </div>
                             <div className="text-sm text-muted-foreground">
-                              {address.address}, {address.city}, {address.state}{" "}
+                              {address.address}, {address.city}, {address.state}{' '}
                               {address.zipCode}
                             </div>
                             <div className="text-sm text-muted-foreground">
@@ -638,13 +638,13 @@ export default function CheckoutPage() {
                           </Label>
                         </div>
                       ))}
-                      <div className="flex items-center space-x-2 border rounded-md p-3 border-dashed">
+                      <div className="flex items-center space-x-2 rounded-md border border-dashed p-3">
                         <RadioGroupItem value="new" id="new" />
                         <Label
                           htmlFor="new"
-                          className="flex-1 cursor-pointer flex items-center"
+                          className="flex flex-1 cursor-pointer items-center"
                         >
-                          <Plus className="h-4 w-4 mr-2" />
+                          <Plus className="mr-2 h-4 w-4" />
                           Use a new address
                         </Label>
                       </div>
@@ -662,7 +662,7 @@ export default function CheckoutPage() {
                       <Input
                         id="shippingFullName"
                         placeholder="John Doe"
-                        {...register("shippingAddress.fullName")}
+                        {...register('shippingAddress.fullName')}
                       />
                       {errors.shippingAddress?.fullName && (
                         <p className="text-sm text-red-500">
@@ -677,7 +677,7 @@ export default function CheckoutPage() {
                       <Textarea
                         id="shippingAddress"
                         placeholder="123 Main St, Apt 4B"
-                        {...register("shippingAddress.address")}
+                        {...register('shippingAddress.address')}
                       />
                       {errors.shippingAddress?.address && (
                         <p className="text-sm text-red-500">
@@ -685,7 +685,7 @@ export default function CheckoutPage() {
                         </p>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       <div className="space-y-2">
                         <Label htmlFor="shippingCity">
                           City <span className="text-red-500">*</span>
@@ -693,7 +693,7 @@ export default function CheckoutPage() {
                         <Input
                           id="shippingCity"
                           placeholder="New York"
-                          {...register("shippingAddress.city")}
+                          {...register('shippingAddress.city')}
                         />
                         {errors.shippingAddress?.city && (
                           <p className="text-sm text-red-500">
@@ -708,7 +708,7 @@ export default function CheckoutPage() {
                         <Input
                           id="shippingState"
                           placeholder="NY"
-                          {...register("shippingAddress.state")}
+                          {...register('shippingAddress.state')}
                         />
                         {errors.shippingAddress?.state && (
                           <p className="text-sm text-red-500">
@@ -723,7 +723,7 @@ export default function CheckoutPage() {
                         <Input
                           id="shippingZipCode"
                           placeholder="10001"
-                          {...register("shippingAddress.zipCode")}
+                          {...register('shippingAddress.zipCode')}
                         />
                         {errors.shippingAddress?.zipCode && (
                           <p className="text-sm text-red-500">
@@ -732,7 +732,7 @@ export default function CheckoutPage() {
                         )}
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div className="space-y-2">
                         <Label htmlFor="shippingCountry">
                           Country <span className="text-red-500">*</span>
@@ -740,7 +740,7 @@ export default function CheckoutPage() {
                         <Input
                           id="shippingCountry"
                           placeholder="United States"
-                          {...register("shippingAddress.country")}
+                          {...register('shippingAddress.country')}
                         />
                         {errors.shippingAddress?.country && (
                           <p className="text-sm text-red-500">
@@ -755,7 +755,7 @@ export default function CheckoutPage() {
                         <Input
                           id="shippingPhone"
                           placeholder="+1 (123) 456-7890"
-                          {...register("shippingAddress.phone")}
+                          {...register('shippingAddress.phone')}
                         />
                         {errors.shippingAddress?.phone && (
                           <p className="text-sm text-red-500">
@@ -797,7 +797,7 @@ export default function CheckoutPage() {
                       <Input
                         id="billingFullName"
                         placeholder="John Doe"
-                        {...register("billingAddress.fullName")}
+                        {...register('billingAddress.fullName')}
                       />
                       {errors.billingAddress?.fullName && (
                         <p className="text-sm text-red-500">
@@ -812,7 +812,7 @@ export default function CheckoutPage() {
                       <Textarea
                         id="billingAddress"
                         placeholder="123 Main St, Apt 4B"
-                        {...register("billingAddress.address")}
+                        {...register('billingAddress.address')}
                       />
                       {errors.billingAddress?.address && (
                         <p className="text-sm text-red-500">
@@ -820,7 +820,7 @@ export default function CheckoutPage() {
                         </p>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                       <div className="space-y-2">
                         <Label htmlFor="billingCity">
                           City <span className="text-red-500">*</span>
@@ -828,7 +828,7 @@ export default function CheckoutPage() {
                         <Input
                           id="billingCity"
                           placeholder="New York"
-                          {...register("billingAddress.city")}
+                          {...register('billingAddress.city')}
                         />
                         {errors.billingAddress?.city && (
                           <p className="text-sm text-red-500">
@@ -843,7 +843,7 @@ export default function CheckoutPage() {
                         <Input
                           id="billingState"
                           placeholder="NY"
-                          {...register("billingAddress.state")}
+                          {...register('billingAddress.state')}
                         />
                         {errors.billingAddress?.state && (
                           <p className="text-sm text-red-500">
@@ -858,7 +858,7 @@ export default function CheckoutPage() {
                         <Input
                           id="billingZipCode"
                           placeholder="10001"
-                          {...register("billingAddress.zipCode")}
+                          {...register('billingAddress.zipCode')}
                         />
                         {errors.billingAddress?.zipCode && (
                           <p className="text-sm text-red-500">
@@ -874,7 +874,7 @@ export default function CheckoutPage() {
                       <Input
                         id="billingCountry"
                         placeholder="United States"
-                        {...register("billingAddress.country")}
+                        {...register('billingAddress.country')}
                       />
                       {errors.billingAddress?.country && (
                         <p className="text-sm text-red-500">
@@ -895,20 +895,20 @@ export default function CheckoutPage() {
               <CardContent>
                 <RadioGroup
                   value={shippingMethod}
-                  onValueChange={(value) => setValue("shippingMethod", value)}
+                  onValueChange={(value) => setValue('shippingMethod', value)}
                   className="space-y-3"
                 >
                   {shippingMethods.map((method) => (
                     <div
                       key={method.id}
-                      className="flex items-center space-x-2 border rounded-md p-4"
+                      className="flex items-center space-x-2 rounded-md border p-4"
                     >
                       <RadioGroupItem value={method.id} id={method.id} />
                       <Label
                         htmlFor={method.id}
                         className="flex-1 cursor-pointer"
                       >
-                        <div className="flex justify-between items-center">
+                        <div className="flex items-center justify-between">
                           <div>
                             <p className="font-medium">{method.name}</p>
                             <p className="text-sm text-muted-foreground">
@@ -924,7 +924,7 @@ export default function CheckoutPage() {
                   ))}
                 </RadioGroup>
                 {errors.shippingMethod && (
-                  <p className="text-sm text-red-500 mt-2">
+                  <p className="mt-2 text-sm text-red-500">
                     {errors.shippingMethod.message}
                   </p>
                 )}
@@ -943,8 +943,8 @@ export default function CheckoutPage() {
                   className="space-y-3"
                 >
                   <div
-                    className={`flex items-center space-x-2 border rounded-md p-4 ${
-                      !stripeConfigured && !checkingStripe ? "opacity-50" : ""
+                    className={`flex items-center space-x-2 rounded-md border p-4 ${
+                      !stripeConfigured && !checkingStripe ? 'opacity-50' : ''
                     }`}
                   >
                     <RadioGroupItem
@@ -957,7 +957,7 @@ export default function CheckoutPage() {
                       className="flex-1 cursor-pointer"
                     >
                       <div className="flex items-center">
-                        <CreditCard className="h-5 w-5 mr-2" />
+                        <CreditCard className="mr-2 h-5 w-5" />
                         Credit Card
                         {checkingStripe && (
                           <span className="ml-2 text-sm text-muted-foreground">
@@ -972,29 +972,29 @@ export default function CheckoutPage() {
                       </div>
                     </Label>
                     <div className="flex gap-2">
-                      <div className="w-10 h-6 bg-[#3D95CE] rounded flex items-center justify-center text-white text-xs font-bold">
+                      <div className="flex h-6 w-10 items-center justify-center rounded bg-[#3D95CE] text-xs font-bold text-white">
                         VISA
                       </div>
-                      <div className="w-10 h-6 bg-[#EB001B] rounded flex items-center justify-center text-white text-xs font-bold">
+                      <div className="flex h-6 w-10 items-center justify-center rounded bg-[#EB001B] text-xs font-bold text-white">
                         MC
                       </div>
-                      <div className="w-10 h-6 bg-[#006FCF] rounded flex items-center justify-center text-white text-xs font-bold">
+                      <div className="flex h-6 w-10 items-center justify-center rounded bg-[#006FCF] text-xs font-bold text-white">
                         AMEX
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2 border rounded-md p-4">
+                  <div className="flex items-center space-x-2 rounded-md border p-4">
                     <RadioGroupItem value="paypal" id="paypal" />
                     <Label htmlFor="paypal" className="flex-1 cursor-pointer">
                       PayPal
                     </Label>
-                    <div className="w-16 h-6 bg-[#0070BA] rounded flex items-center justify-center text-white text-xs font-bold">
+                    <div className="flex h-6 w-16 items-center justify-center rounded bg-[#0070BA] text-xs font-bold text-white">
                       PayPal
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-2 border rounded-md p-4">
+                  <div className="flex items-center space-x-2 rounded-md border p-4">
                     <RadioGroupItem
                       value="cash_on_delivery"
                       id="cash_on_delivery"
@@ -1025,15 +1025,15 @@ export default function CheckoutPage() {
               <CardContent>
                 <Textarea
                   placeholder="Add any special instructions or notes for your order..."
-                  {...register("notes")}
+                  {...register('notes')}
                   className="min-h-[100px]"
                 />
               </CardContent>
             </Card>
 
             {/* Stripe Payment Form */}
-            {(paymentMethod === "credit_card" ||
-              paymentMethod === "debit_card") &&
+            {(paymentMethod === 'credit_card' ||
+              paymentMethod === 'debit_card') &&
               clientSecret &&
               stripePromise &&
               !stripeError &&
@@ -1043,11 +1043,11 @@ export default function CheckoutPage() {
                   options={{
                     clientSecret,
                     appearance: {
-                      theme: "stripe",
+                      theme: 'stripe',
                       variables: {
-                        colorPrimary: "#000000",
-                      },
-                    },
+                        colorPrimary: '#000000'
+                      }
+                    }
                   }}
                 >
                   <StripePaymentForm
@@ -1061,8 +1061,8 @@ export default function CheckoutPage() {
               )}
 
             {/* Non-card payment submit button */}
-            {paymentMethod !== "credit_card" &&
-              paymentMethod !== "debit_card" && (
+            {paymentMethod !== 'credit_card' &&
+              paymentMethod !== 'debit_card' && (
                 <Card>
                   <CardContent className="pt-6">
                     <Button
@@ -1073,11 +1073,11 @@ export default function CheckoutPage() {
                     >
                       {isSubmitting ? (
                         <div className="flex items-center">
-                          <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                          <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
                           Processing...
                         </div>
                       ) : (
-                        "Place Order"
+                        'Place Order'
                       )}
                     </Button>
                   </CardContent>
@@ -1095,9 +1095,9 @@ export default function CheckoutPage() {
                 <div className="space-y-2">
                   {items.map((item) => (
                     <div key={item.id} className="flex gap-2">
-                      <div className="relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0">
+                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
                         <Image
-                          src={item.image || "/placeholder.svg"}
+                          src={item.image || '/placeholder.svg'}
                           alt={item.name}
                           fill
                           className="object-cover"
@@ -1106,13 +1106,13 @@ export default function CheckoutPage() {
                       <div className="flex-1">
                         <div className="flex justify-between">
                           <div>
-                            <p className="font-medium line-clamp-1">
+                            <p className="line-clamp-1 font-medium">
                               {item.name}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               {item.selectedOptions
-                                ? Object.values(item.selectedOptions).join(", ")
-                                : "Default"}
+                                ? Object.values(item.selectedOptions).join(', ')
+                                : 'Default'}
                             </p>
                             <p className="text-xs text-muted-foreground">
                               Qty: {item.quantity}
@@ -1134,7 +1134,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between">
                   <span>Shipping</span>
                   <span>
-                    {shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}
+                    {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -1142,7 +1142,7 @@ export default function CheckoutPage() {
                   <span>${tax.toFixed(2)}</span>
                 </div>
                 <Separator />
-                <div className="flex justify-between font-medium text-lg">
+                <div className="flex justify-between text-lg font-medium">
                   <span>Total</span>
                   <span>${total.toFixed(2)}</span>
                 </div>

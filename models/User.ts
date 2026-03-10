@@ -1,23 +1,23 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
-import bcrypt from "bcryptjs";
+import mongoose, { Document, Model, Schema } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 // Define the role types
-export type UserRole = "user" | "admin" | "moderator" | "support";
-export type UserStatus = "active" | "inactive" | "suspended" | "pending";
+export type UserRole = 'user' | 'admin' | 'moderator' | 'support';
+export type UserStatus = 'active' | 'inactive' | 'suspended' | 'pending';
 export type OrderStatus =
-  | "pending"
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
-  | "refunded";
-export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
+  | 'pending'
+  | 'processing'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled'
+  | 'refunded';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 export type PaymentMethod =
-  | "credit_card"
-  | "debit_card"
-  | "paypal"
-  | "bank_transfer"
-  | "cash_on_delivery";
+  | 'credit_card'
+  | 'debit_card'
+  | 'paypal'
+  | 'bank_transfer'
+  | 'cash_on_delivery';
 
 export interface IOrderReference {
   orderId: mongoose.Types.ObjectId;
@@ -31,7 +31,7 @@ export interface IOrderReference {
 }
 
 export interface IAddress {
-  type: "shipping" | "billing";
+  type: 'shipping' | 'billing';
   fullName: string;
   address: string;
   city: string;
@@ -80,228 +80,228 @@ export interface IUser extends Document {
 const orderReferenceSchema = new Schema<IOrderReference>({
   orderId: {
     type: Schema.Types.ObjectId,
-    ref: "Order",
-    required: true,
+    ref: 'Order',
+    required: true
   },
   orderNumber: {
     type: String,
-    required: true,
+    required: true
   },
   date: {
     type: Date,
     required: true,
-    default: Date.now,
+    default: Date.now
   },
   total: {
     type: Number,
     required: true,
-    min: 0,
+    min: 0
   },
   status: {
     type: String,
     enum: [
-      "pending",
-      "processing",
-      "shipped",
-      "delivered",
-      "cancelled",
-      "refunded",
+      'pending',
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled',
+      'refunded'
     ],
     required: true,
-    default: "pending",
+    default: 'pending'
   },
   items: {
     type: Number,
     required: true,
     min: 1,
-    default: 1,
+    default: 1
   },
   paymentStatus: {
     type: String,
-    enum: ["pending", "paid", "failed", "refunded"],
+    enum: ['pending', 'paid', 'failed', 'refunded'],
     required: true,
-    default: "pending",
+    default: 'pending'
   },
   paymentMethod: {
     type: String,
     enum: [
-      "credit_card",
-      "debit_card",
-      "paypal",
-      "bank_transfer",
-      "cash_on_delivery",
+      'credit_card',
+      'debit_card',
+      'paypal',
+      'bank_transfer',
+      'cash_on_delivery'
     ],
-    required: true,
-  },
+    required: true
+  }
 });
 
 const addressSchema = new Schema<IAddress>(
   {
     type: {
       type: String,
-      enum: ["shipping", "billing"],
-      required: true,
+      enum: ['shipping', 'billing'],
+      required: true
     },
     fullName: {
       type: String,
       required: true,
-      trim: true,
+      trim: true
     },
     address: {
       type: String,
       required: true,
-      trim: true,
+      trim: true
     },
     city: {
       type: String,
       required: true,
-      trim: true,
+      trim: true
     },
     state: {
       type: String,
       required: true,
-      trim: true,
+      trim: true
     },
     zipCode: {
       type: String,
       required: true,
-      trim: true,
+      trim: true
     },
     country: {
       type: String,
       required: true,
-      trim: true,
+      trim: true
     },
     phone: {
       type: String,
-      trim: true,
+      trim: true
     },
     isDefault: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   {
-    timestamps: true,
+    timestamps: true
   }
 );
 
 const noteSchema = new Schema<INote>({
   content: {
     type: String,
-    required: [true, "Note content is required"],
+    required: [true, 'Note content is required'],
     trim: true,
-    maxlength: [1000, "Note cannot exceed 1000 characters"],
+    maxlength: [1000, 'Note cannot exceed 1000 characters']
   },
   createdBy: {
     type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+    ref: 'User',
+    required: true
   },
   createdAt: {
     type: Date,
-    default: Date.now,
+    default: Date.now
   },
   updatedAt: {
     type: Date,
-    default: Date.now,
-  },
+    default: Date.now
+  }
 });
 
 const userSchema = new Schema<IUser>(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
+      required: [true, 'Name is required'],
       trim: true,
-      minlength: [2, "Name must be at least 2 characters"],
-      maxlength: [100, "Name cannot exceed 100 characters"],
+      minlength: [2, 'Name must be at least 2 characters'],
+      maxlength: [100, 'Name cannot exceed 100 characters']
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
+      required: [true, 'Email is required'],
       unique: true,
       lowercase: true,
       trim: true,
       match: [
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
-        "Please enter a valid email",
-      ],
+        'Please enter a valid email'
+      ]
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters"],
+      required: [true, 'Password is required'],
+      minlength: [6, 'Password must be at least 6 characters']
     },
     phone: {
       type: String,
       trim: true,
-      match: [/^\+?[\d\s\-\(\)]{10,}$/, "Please enter a valid phone number"],
+      match: [/^\+?[\d\s\-\(\)]{10,}$/, 'Please enter a valid phone number']
     },
     avatar: {
       type: String,
-      trim: true,
+      trim: true
     },
     role: {
       type: String,
       enum: {
-        values: ["user", "admin", "moderator", "support"],
-        message: "Role must be either user, admin, moderator, or support",
+        values: ['user', 'admin', 'moderator', 'support'],
+        message: 'Role must be either user, admin, moderator, or support'
       },
-      default: "user",
+      default: 'user'
     },
     status: {
       type: String,
       enum: {
-        values: ["active", "inactive", "suspended", "pending"],
-        message: "Status must be active, inactive, suspended, or pending",
+        values: ['active', 'inactive', 'suspended', 'pending'],
+        message: 'Status must be active, inactive, suspended, or pending'
       },
-      default: "active",
+      default: 'active'
     },
     dateOfBirth: {
-      type: Date,
+      type: Date
     },
     addresses: [addressSchema],
     orders: [orderReferenceSchema],
     notes: [noteSchema],
     lastLogin: {
-      type: Date,
+      type: Date
     },
     emailVerified: {
       type: Boolean,
-      default: false,
+      default: false
     },
     phoneVerified: {
       type: Boolean,
-      default: false,
+      default: false
     },
     guestAccount: {
       type: Boolean,
-      default: false,
+      default: false
     },
     preferences: {
       newsletter: {
         type: Boolean,
-        default: true,
+        default: true
       },
       marketing: {
         type: Boolean,
-        default: false,
+        default: false
       },
       notifications: {
         type: Boolean,
-        default: true,
-      },
-    },
+        default: true
+      }
+    }
   },
   {
-    timestamps: true,
+    timestamps: true
   }
 );
 
 // Hash password before saving
-userSchema.pre<IUser>("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre<IUser>('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
   try {
     const salt = await bcrypt.genSalt(12);
@@ -313,8 +313,8 @@ userSchema.pre<IUser>("save", async function (next) {
 });
 
 // Update updatedAt for notes when modified
-userSchema.pre("save", function (next) {
-  if (this.isModified("notes")) {
+userSchema.pre('save', function (next) {
+  if (this.isModified('notes')) {
     this.notes.forEach((note) => {
       if (note.isModified()) {
         note.updatedAt = new Date();
@@ -341,10 +341,10 @@ userSchema.methods.toJSON = function () {
 // Static method to get user stats
 userSchema.statics.getUserStats = async function () {
   const totalUsers = await this.countDocuments();
-  const activeUsers = await this.countDocuments({ status: "active" });
+  const activeUsers = await this.countDocuments({ status: 'active' });
   const guestUsers = await this.countDocuments({ guestAccount: true });
   const newUsers = await this.countDocuments({
-    createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }, // Last 30 days
+    createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } // Last 30 days
   });
 
   return {
@@ -352,7 +352,7 @@ userSchema.statics.getUserStats = async function () {
     activeUsers,
     guestUsers,
     newUsers,
-    inactiveUsers: totalUsers - activeUsers,
+    inactiveUsers: totalUsers - activeUsers
   };
 };
 
@@ -363,8 +363,8 @@ userSchema.methods.addOrder = function (
   total: number,
   items: number,
   paymentMethod: PaymentMethod,
-  paymentStatus: PaymentStatus = "pending",
-  status: OrderStatus = "pending"
+  paymentStatus: PaymentStatus = 'pending',
+  status: OrderStatus = 'pending'
 ) {
   this.orders.push({
     orderId,
@@ -374,14 +374,14 @@ userSchema.methods.addOrder = function (
     items,
     paymentMethod,
     paymentStatus,
-    status,
+    status
   });
   return this.save();
 };
 
 // Instance method to add address
 userSchema.methods.addAddress = function (
-  addressData: Omit<IAddress, "createdAt" | "updatedAt">
+  addressData: Omit<IAddress, 'createdAt' | 'updatedAt'>
 ) {
   // If this is the first address or marked as default, set it as default
   if (this.addresses.length === 0 || addressData.isDefault) {
@@ -394,7 +394,7 @@ userSchema.methods.addAddress = function (
   this.addresses.push({
     ...addressData,
     createdAt: new Date(),
-    updatedAt: new Date(),
+    updatedAt: new Date()
   });
 
   return this.save();
@@ -408,7 +408,7 @@ userSchema.methods.setDefaultAddress = function (addressIndex: number) {
     });
     return this.save();
   }
-  throw new Error("Invalid address index");
+  throw new Error('Invalid address index');
 };
 
 // Instance method to add note
@@ -420,7 +420,7 @@ userSchema.methods.addNote = function (
     content,
     createdBy,
     createdAt: new Date(),
-    updatedAt: new Date(),
+    updatedAt: new Date()
   });
   return this.save();
 };
@@ -444,7 +444,7 @@ userSchema.statics.findOrCreateGuest = async function (
       phone,
       guestAccount: true,
       emailVerified: false,
-      status: "active",
+      status: 'active'
     });
 
     await user.save();
@@ -464,7 +464,7 @@ userSchema.statics.convertGuestToRegular = async function (
     userId,
     {
       guestAccount: false,
-      status: "active",
+      status: 'active'
     },
     { new: true }
   );
@@ -475,9 +475,9 @@ userSchema.index({ email: 1 }, { unique: true });
 userSchema.index({ status: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ guestAccount: 1 });
-userSchema.index({ "orders.date": -1 });
+userSchema.index({ 'orders.date': -1 });
 userSchema.index({ createdAt: -1 });
-userSchema.index({ "addresses.isDefault": 1 });
+userSchema.index({ 'addresses.isDefault': 1 });
 
 export const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>("User", userSchema);
+  mongoose.models.User || mongoose.model<IUser>('User', userSchema);

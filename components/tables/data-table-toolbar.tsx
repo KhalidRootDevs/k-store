@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import type { Table } from "@tanstack/react-table";
-import { Search, X, Filter } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { createContext, useContext, useState } from "react";
-import { DataTableSingleSelectFilter } from "./data-table-select-filter";
-import { DataTableViewOptions } from "./data-table-view-options";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import type { Table } from '@tanstack/react-table';
+import { Search, X, Filter } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createContext, useContext, useState } from 'react';
+import { DataTableSingleSelectFilter } from './data-table-select-filter';
+import { DataTableViewOptions } from './data-table-view-options';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 
 interface FilterOption {
   value: string;
@@ -40,7 +40,7 @@ const TableContext = createContext<Table<any> | null>(null);
 export const useTable = () => {
   const context = useContext(TableContext);
   if (!context) {
-    throw new Error("useTable must be used within a TableProvider");
+    throw new Error('useTable must be used within a TableProvider');
   }
   return context;
 };
@@ -51,7 +51,7 @@ export function DataTableToolbar<TData>({
   children,
   searchPlaceholder,
   filters = [],
-  data = [],
+  data = []
 }: DataTableToolbarProps<TData>) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -59,7 +59,7 @@ export function DataTableToolbar<TData>({
 
   // Search term state
   const [searchTerm, setSearchTerm] = useState<string>(
-    searchParams.get("search") || ""
+    searchParams.get('search') || ''
   );
 
   // Dynamic filter values state
@@ -80,7 +80,7 @@ export function DataTableToolbar<TData>({
     options: filter.options.filter(
       (option, index, self) =>
         index === self.findIndex((o) => o.value === option.value)
-    ),
+    )
   }));
 
   // Count active filters
@@ -88,19 +88,19 @@ export function DataTableToolbar<TData>({
 
   // Convert value for Select component (empty string becomes "all")
   const getSelectValue = (value: string) => {
-    return value === "" ? "all" : value;
+    return value === '' ? 'all' : value;
   };
 
   // Convert value from Select component ("all" becomes empty string)
   const getActualValue = (selectValue: string) => {
-    return selectValue === "all" ? "" : selectValue;
+    return selectValue === 'all' ? '' : selectValue;
   };
 
   // Update URL with current search and filter values
   const updateURL = () => {
     const params = new URLSearchParams();
 
-    if (searchTerm) params.set("search", searchTerm);
+    if (searchTerm) params.set('search', searchTerm);
 
     Object.keys(filterValues).forEach((key) => {
       if (filterValues[key]) params.set(key, filterValues[key]);
@@ -117,11 +117,11 @@ export function DataTableToolbar<TData>({
 
   // Handle individual search input clear
   const handleClearSearch = () => {
-    setSearchTerm("");
+    setSearchTerm('');
     // If search was previously applied, update URL immediately
-    if (searchParams.get("search")) {
+    if (searchParams.get('search')) {
       const params = new URLSearchParams(searchParams);
-      params.delete("search");
+      params.delete('search');
       router.replace(`?${params.toString()}`, { scroll: false });
     }
   };
@@ -135,7 +135,7 @@ export function DataTableToolbar<TData>({
     // Update URL immediately for filter changes
     const params = new URLSearchParams();
 
-    if (searchTerm) params.set("search", searchTerm);
+    if (searchTerm) params.set('search', searchTerm);
 
     Object.keys(newFilterValues).forEach((filterKey) => {
       if (newFilterValues[filterKey]) {
@@ -153,7 +153,7 @@ export function DataTableToolbar<TData>({
     setFilterValues({});
     const params = new URLSearchParams();
 
-    if (searchTerm) params.set("search", searchTerm);
+    if (searchTerm) params.set('search', searchTerm);
 
     // Clear all filter params
     uniqueFilters.forEach((filter) => {
@@ -172,7 +172,7 @@ export function DataTableToolbar<TData>({
 
     const params = new URLSearchParams();
 
-    if (searchTerm) params.set("search", searchTerm);
+    if (searchTerm) params.set('search', searchTerm);
 
     Object.keys(newFilterValues).forEach((filterKey) => {
       if (newFilterValues[filterKey]) {
@@ -193,11 +193,11 @@ export function DataTableToolbar<TData>({
 
   // Reset all filters and search
   const handleReset = () => {
-    setSearchTerm("");
+    setSearchTerm('');
     table.resetColumnFilters();
     setFilterValues({});
     // Immediately update URL after reset
-    router.replace("?", { scroll: false });
+    router.replace('?', { scroll: false });
   };
 
   const isFiltered =
@@ -207,17 +207,17 @@ export function DataTableToolbar<TData>({
 
   return (
     <TableContext.Provider value={table}>
-      <div className="flex flex-col gap-4 mb-6">
+      <div className="mb-6 flex flex-col gap-4">
         {/* Search Row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 items-center gap-2">
             {search && (
               <form onSubmit={handleSearch} className="flex flex-1 gap-2">
-                <div className="flex-1 max-w-sm">
+                <div className="max-w-sm flex-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
-                      placeholder={searchPlaceholder || "Search..."}
+                      placeholder={searchPlaceholder || 'Search...'}
                       className="h-9 pl-9"
                       type="search"
                       value={searchTerm}
@@ -259,7 +259,7 @@ export function DataTableToolbar<TData>({
                           className="flex items-center gap-1 px-2 py-1 text-xs"
                         >
                           <span className="font-medium capitalize">
-                            {key.replace(/_/g, " ")}:
+                            {key.replace(/_/g, ' ')}:
                           </span>
                           {getFilterLabel(key, value)}
                           <X
@@ -282,7 +282,7 @@ export function DataTableToolbar<TData>({
                       size="sm"
                       className="h-8 border-dashed"
                     >
-                      <Filter className="h-4 w-4 mr-2" />
+                      <Filter className="mr-2 h-4 w-4" />
                       Filters
                       {activeFilterCount > 0 && (
                         <Badge
@@ -296,7 +296,7 @@ export function DataTableToolbar<TData>({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-60 max-h-[80vh] overflow-hidden"
+                    className="max-h-[80vh] w-60 overflow-hidden"
                     sideOffset={5}
                     collisionPadding={16}
                   >
@@ -317,13 +317,13 @@ export function DataTableToolbar<TData>({
                     </div>
                     <DropdownMenuSeparator />
 
-                    <div className="overflow-y-auto max-h-[60vh] p-2">
+                    <div className="max-h-[60vh] overflow-y-auto p-2">
                       {uniqueFilters.length > 0 ? (
                         <div className="space-y-4">
                           {uniqueFilters.map((filter) => (
                             <div key={filter.name} className="space-y-2">
                               <label className="text-sm font-medium capitalize">
-                                {filter.label.replace(/_/g, " ")}
+                                {filter.label.replace(/_/g, ' ')}
                               </label>
                               <DataTableSingleSelectFilter
                                 title={
@@ -332,7 +332,7 @@ export function DataTableToolbar<TData>({
                                 }
                                 options={filter.options}
                                 value={getSelectValue(
-                                  filterValues[filter.name] || ""
+                                  filterValues[filter.name] || ''
                                 )}
                                 onChange={(selectValue: string) => {
                                   handleFilterChange(filter.name, selectValue);

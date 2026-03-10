@@ -1,49 +1,49 @@
-"use client";
+'use client';
 
-import type React from "react";
+import type React from 'react';
 
-import { useCart } from "@/context/cart-context";
-import { useRecentlyViewed } from "@/context/recently-viewed-context";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/components/ui/use-toast";
-import { Minus, Plus, ShoppingCart, Star } from "lucide-react";
-import Image from "next/image";
-import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { Container } from "@/components/ui/container";
-import { WishlistButton } from "@/components/wishlist-button";
-import { RecentlyViewed } from "@/components/recently-viewed";
-import { ProductRecommendations } from "@/components/product-recommendations";
-import { Skeleton } from "@/components/ui/skeleton";
-import { GroupedVariant, Product, Review } from "@/types";
+import { useCart } from '@/context/cart-context';
+import { useRecentlyViewed } from '@/context/recently-viewed-context';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from '@/components/ui/use-toast';
+import { Minus, Plus, ShoppingCart, Star } from 'lucide-react';
+import Image from 'next/image';
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { Container } from '@/components/ui/container';
+import { WishlistButton } from '@/components/wishlist-button';
+import { RecentlyViewed } from '@/components/recently-viewed';
+import { ProductRecommendations } from '@/components/product-recommendations';
+import { Skeleton } from '@/components/ui/skeleton';
+import { GroupedVariant, Product, Review } from '@/types';
 
 // Mock reviews data (you can replace this with an API later)
 const mockReviews: Review[] = [
   {
-    id: "1",
-    user: "John D.",
+    id: '1',
+    user: 'John D.',
     rating: 5,
     comment:
-      "Great quality product. Fits perfectly and the material is very comfortable.",
-    date: "2023-05-15",
+      'Great quality product. Fits perfectly and the material is very comfortable.',
+    date: '2023-05-15'
   },
   {
-    id: "2",
-    user: "Sarah M.",
+    id: '2',
+    user: 'Sarah M.',
     rating: 4,
-    comment: "Nice product, good quality. Exactly as described.",
-    date: "2023-04-22",
+    comment: 'Nice product, good quality. Exactly as described.',
+    date: '2023-04-22'
   },
   {
-    id: "3",
-    user: "Michael P.",
+    id: '3',
+    user: 'Michael P.',
     rating: 5,
-    comment: "Excellent product. This is my third purchase!",
-    date: "2023-03-10",
-  },
+    comment: 'Excellent product. This is my third purchase!',
+    date: '2023-03-10'
+  }
 ];
 
 export default function ProductPage({ params }: { params: { id: string } }) {
@@ -95,7 +95,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       name,
       options: Array.from(optionsSet),
       hasPriceVariation: priceVariation[name] || false,
-      hasStockVariation: stockVariation[name] || false,
+      hasStockVariation: stockVariation[name] || false
     }));
   }, [product?.variants, product?.price, product?.stock]);
 
@@ -107,8 +107,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
     return product.variants.find((variant) =>
       Object.entries(selectedOptions).every(
-        ([key, value]) => variant.attributes[key] === value,
-      ),
+        ([key, value]) => variant.attributes[key] === value
+      )
     );
   }, [product?.variants, selectedOptions]);
 
@@ -133,9 +133,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
         if (!response.ok) {
           if (response.status === 404) {
-            throw new Error("Product not found");
+            throw new Error('Product not found');
           }
-          throw new Error("Failed to fetch product");
+          throw new Error('Failed to fetch product');
         }
 
         const data = await response.json();
@@ -147,11 +147,11 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           name: data.product.name,
           price: data.product.price,
           image: data.product.images[0],
-          category: data.product.categoryId?.name,
+          category: data.product.categoryId?.name
         });
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-        console.error("Error fetching product:", err);
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        console.error('Error fetching product:', err);
       } finally {
         setLoading(false);
       }
@@ -179,7 +179,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const handleVariantSelect = (variantName: string, option: string) => {
     const newSelectedOptions = {
       ...selectedOptions,
-      [variantName]: option,
+      [variantName]: option
     };
 
     // If selecting this option would create an invalid combination, clear dependent options
@@ -187,8 +187,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     const validVariants =
       product?.variants.filter((variant) =>
         currentAttributes.every(
-          (key) => newSelectedOptions[key] === variant.attributes[key],
-        ),
+          (key) => newSelectedOptions[key] === variant.attributes[key]
+        )
       ) || [];
 
     // Find which attributes are still valid
@@ -221,10 +221,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   // Format selected variants for display
   const formatSelectedVariants = () => {
-    if (!groupedVariants || groupedVariants.length === 0) return "";
+    if (!groupedVariants || groupedVariants.length === 0) return '';
     return Object.entries(selectedOptions)
       .map(([key, value]) => `${key}: ${value}`)
-      .join(", ");
+      .join(', ');
   };
 
   // Handle image zoom
@@ -252,10 +252,10 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
     if (!areAllVariantsSelected()) {
       toast({
-        title: "Please select all options",
+        title: 'Please select all options',
         description:
-          "You need to select all product options before adding to cart.",
-        variant: "destructive",
+          'You need to select all product options before adding to cart.',
+        variant: 'destructive'
       });
       return;
     }
@@ -273,14 +273,14 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         image: displayImage || product.images[0],
         variant: formatSelectedVariants(),
         selectedOptions,
-        variantSku: selectedVariant?.sku,
+        variantSku: selectedVariant?.sku
       });
 
       toast({
-        title: "Added to cart",
+        title: 'Added to cart',
         description: `${quantity} × ${product.name}${
-          formatSelectedVariants() ? ` (${formatSelectedVariants()})` : ""
-        } has been added to your cart.`,
+          formatSelectedVariants() ? ` (${formatSelectedVariants()})` : ''
+        } has been added to your cart.`
       });
 
       setIsAddingToCart(false);
@@ -292,7 +292,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     handleAddToCart();
     // Navigate to checkout after a short delay
     setTimeout(() => {
-      router.push("/checkout");
+      router.push('/checkout');
     }, 800);
   };
 
@@ -300,7 +300,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   if (loading) {
     return (
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           {/* Image Gallery Skeleton */}
           <div className="space-y-4">
             <Skeleton className="aspect-square rounded-lg" />
@@ -314,7 +314,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           {/* Product Info Skeleton */}
           <div className="space-y-6">
             <div>
-              <Skeleton className="h-8 w-3/4 mb-2" />
+              <Skeleton className="mb-2 h-8 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
             </div>
             <Skeleton className="h-8 w-1/4" />
@@ -332,12 +332,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   if (error || !product) {
     return (
       <Container>
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <p className="text-muted-foreground mb-6">
+        <div className="py-12 text-center">
+          <h1 className="mb-4 text-2xl font-bold">Product Not Found</h1>
+          <p className="mb-6 text-muted-foreground">
             {error || "The product you're looking for doesn't exist."}
           </p>
-          <Button onClick={() => router.push("/products")}>
+          <Button onClick={() => router.push('/products')}>
             Browse Products
           </Button>
         </div>
@@ -350,7 +350,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   return (
     <Container>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         {/* Image Gallery */}
         <div className="space-y-4">
           <div
@@ -361,7 +361,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           >
             <div
               className={`absolute inset-0 transition-transform duration-200 ${
-                isZoomed ? "scale-150" : "scale-100"
+                isZoomed ? 'scale-150' : 'scale-100'
               }`}
               style={
                 isZoomed
@@ -370,7 +370,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               }
             >
               <Image
-                src={displayImage || "/placeholder.svg"}
+                src={displayImage || '/placeholder.svg'}
                 alt={product.name}
                 fill
                 className="object-cover"
@@ -378,7 +378,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               />
             </div>
             {isZoomed && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs py-1 px-3 rounded-full">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs text-white">
                 Hover to zoom
               </div>
             )}
@@ -388,12 +388,12 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               <div
                 key={index}
                 className={`relative aspect-square cursor-pointer overflow-hidden rounded-md border ${
-                  activeImage === index ? "ring-2 ring-primary" : ""
+                  activeImage === index ? 'ring-2 ring-primary' : ''
                 }`}
                 onClick={() => setActiveImage(index)}
               >
                 <Image
-                  src={image || "/placeholder.svg"}
+                  src={image || '/placeholder.svg'}
                   alt={`${product.name} - Image ${index + 1}`}
                   fill
                   className="object-cover"
@@ -430,8 +430,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                   key={i}
                   className={`h-4 w-4 ${
                     i < Math.floor(product.rating)
-                      ? "text-yellow-400 fill-current"
-                      : "text-gray-300"
+                      ? 'fill-current text-yellow-400'
+                      : 'text-gray-300'
                   }`}
                 />
               ))}
@@ -472,15 +472,15 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <div className="space-y-4">
             {groupedVariants.map((variant, index) => (
               <div key={index}>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="mb-2 flex items-center gap-2">
                   <h3 className="font-medium capitalize">{variant.name}</h3>
                   {variant.hasPriceVariation && (
-                    <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                    <span className="rounded bg-green-50 px-2 py-1 text-xs text-green-600">
                       Affects price
                     </span>
                   )}
                   {variant.hasStockVariation && (
-                    <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                    <span className="rounded bg-blue-50 px-2 py-1 text-xs text-blue-600">
                       Affects stock
                     </span>
                   )}
@@ -493,7 +493,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                     return (
                       <Button
                         key={optionIndex}
-                        variant={isSelected ? "default" : "outline"}
+                        variant={isSelected ? 'default' : 'outline'}
                         className="h-10 px-4"
                         onClick={() =>
                           handleVariantSelect(variant.name, option)
@@ -526,8 +526,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           {/* Quantity and Actions */}
           <div className="space-y-4">
             <div className="flex items-center">
-              <h3 className="font-medium mr-4">Quantity</h3>
-              <div className="flex items-center border rounded-md">
+              <h3 className="mr-4 font-medium">Quantity</h3>
+              <div className="flex items-center rounded-md border">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -554,7 +554,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 {displayStock} available
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row">
               <Button
                 className="flex-1"
                 size="lg"
@@ -563,13 +563,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
               >
                 {isAddingToCart ? (
                   <div className="flex items-center">
-                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
                     Adding...
                   </div>
                 ) : (
                   <>
                     <ShoppingCart className="mr-2 h-5 w-5" />
-                    {isInStock ? "Add to Cart" : "Out of Stock"}
+                    {isInStock ? 'Add to Cart' : 'Out of Stock'}
                   </>
                 )}
               </Button>
@@ -588,7 +588,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                   name: product.name,
                   price: displayPrice,
                   image: displayImage || product.images[0],
-                  category: product.categoryId?.name,
+                  category: product.categoryId?.name
                 }}
                 variant="outline"
                 size="lg"
@@ -598,9 +598,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           </div>
 
           {/* Product Details */}
-          <div className="rounded-md bg-muted p-4 text-sm space-y-2">
+          <div className="space-y-2 rounded-md bg-muted p-4 text-sm">
             <p className="font-medium">
-              Availability: {isInStock ? "In Stock" : "Out of Stock"}
+              Availability: {isInStock ? 'In Stock' : 'Out of Stock'}
             </p>
             {product.weight && <p>Weight: {product.weight} kg</p>}
             <p>Free shipping on orders over $50</p>
@@ -627,7 +627,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
             <p>{product.description}</p>
             {product.tags.length > 0 && (
               <div className="mt-4">
-                <strong>Tags:</strong> {product.tags.join(", ")}
+                <strong>Tags:</strong> {product.tags.join(', ')}
               </div>
             )}
           </div>
@@ -637,17 +637,17 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           <div className="space-y-6">
             {mockReviews.map((review) => (
               <Card key={review.id} className="p-4">
-                <div className="flex justify-between items-start">
+                <div className="flex items-start justify-between">
                   <div>
                     <p className="font-semibold">{review.user}</p>
-                    <div className="flex items-center mt-1">
+                    <div className="mt-1 flex items-center">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
                           className={`h-4 w-4 ${
                             i < review.rating
-                              ? "text-yellow-400 fill-current"
-                              : "text-gray-300"
+                              ? 'fill-current text-yellow-400'
+                              : 'text-gray-300'
                           }`}
                         />
                       ))}
@@ -689,37 +689,37 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <TabsContent value="specifications" className="py-4">
           <div className="space-y-4">
             {product.weight && (
-              <div className="flex justify-between py-2 border-b">
+              <div className="flex justify-between border-b py-2">
                 <span className="font-medium">Weight</span>
                 <span>{product.weight} kg</span>
               </div>
             )}
             {product.length && (
-              <div className="flex justify-between py-2 border-b">
+              <div className="flex justify-between border-b py-2">
                 <span className="font-medium">Length</span>
                 <span>{product.length} cm</span>
               </div>
             )}
             {product.width && (
-              <div className="flex justify-between py-2 border-b">
+              <div className="flex justify-between border-b py-2">
                 <span className="font-medium">Width</span>
                 <span>{product.width} cm</span>
               </div>
             )}
             {product.height && (
-              <div className="flex justify-between py-2 border-b">
+              <div className="flex justify-between border-b py-2">
                 <span className="font-medium">Height</span>
                 <span>{product.height} cm</span>
               </div>
             )}
             {product.brand && (
-              <div className="flex justify-between py-2 border-b">
+              <div className="flex justify-between border-b py-2">
                 <span className="font-medium">Brand</span>
                 <span>{product.brand}</span>
               </div>
             )}
             {product.sku && (
-              <div className="flex justify-between py-2 border-b">
+              <div className="flex justify-between border-b py-2">
                 <span className="font-medium">SKU</span>
                 <span>{product.sku}</span>
               </div>

@@ -1,21 +1,21 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
-import type { Category, Brand } from "@/lib/product-data"
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import type { Category, Brand } from '@/lib/product-data';
 
 interface ActiveFiltersProps {
-  searchQuery: string
-  selectedCategories: string[]
-  selectedBrands: string[]
-  priceRange: [number, number]
-  categories: Category[]
-  brands: Brand[]
-  onRemoveSearchQuery: () => void
-  onRemoveCategory: (categoryId: string, checked: boolean) => void
-  onRemoveBrand: (brandId: string, checked: boolean) => void
-  onResetPriceRange: () => void
-  onResetAllFilters: () => void
+  searchQuery: string;
+  selectedCategories: string[];
+  selectedBrands: string[];
+  priceRange: [number, number];
+  categories: Category[];
+  brands: Brand[];
+  onRemoveSearchQuery: () => void;
+  onRemoveCategory: (categoryId: string, checked: boolean) => void;
+  onRemoveBrand: (brandId: string, checked: boolean) => void;
+  onResetPriceRange: () => void;
+  onResetAllFilters: () => void;
 }
 
 export function ActiveFilters({
@@ -29,30 +29,35 @@ export function ActiveFilters({
   onRemoveCategory,
   onRemoveBrand,
   onResetPriceRange,
-  onResetAllFilters,
+  onResetAllFilters
 }: ActiveFiltersProps) {
   const activeFilterCount =
     (searchQuery ? 1 : 0) +
     selectedCategories.length +
     selectedBrands.length +
-    (priceRange[0] > 0 || priceRange[1] < 200 ? 1 : 0)
+    (priceRange[0] > 0 || priceRange[1] < 200 ? 1 : 0);
 
-  if (activeFilterCount === 0) return null
+  if (activeFilterCount === 0) return null;
 
   return (
     <div className="mb-6">
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm font-medium">Active Filters:</span>
 
         {searchQuery && (
-          <Button variant="secondary" size="sm" className="h-7 gap-1 text-xs" onClick={onRemoveSearchQuery}>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="h-7 gap-1 text-xs"
+            onClick={onRemoveSearchQuery}
+          >
             Search: {searchQuery}
             <X className="h-3 w-3" />
           </Button>
         )}
 
         {selectedCategories.map((categoryId) => {
-          const category = categories.find((c) => c.id === categoryId)
+          const category = categories.find((c) => c.id === categoryId);
           return (
             <Button
               key={categoryId}
@@ -64,11 +69,11 @@ export function ActiveFilters({
               Category: {category?.name}
               <X className="h-3 w-3" />
             </Button>
-          )
+          );
         })}
 
         {selectedBrands.map((brandId) => {
-          const brand = brands.find((b) => b.id === brandId)
+          const brand = brands.find((b) => b.id === brandId);
           return (
             <Button
               key={brandId}
@@ -80,20 +85,30 @@ export function ActiveFilters({
               Brand: {brand?.name}
               <X className="h-3 w-3" />
             </Button>
-          )
+          );
         })}
 
         {(priceRange[0] > 0 || priceRange[1] < 200) && (
-          <Button variant="secondary" size="sm" className="h-7 gap-1 text-xs" onClick={onResetPriceRange}>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="h-7 gap-1 text-xs"
+            onClick={onResetPriceRange}
+          >
             Price: ${priceRange[0]} - ${priceRange[1]}
             <X className="h-3 w-3" />
           </Button>
         )}
 
-        <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={onResetAllFilters}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 text-xs"
+          onClick={onResetAllFilters}
+        >
           Clear All
         </Button>
       </div>
     </div>
-  )
+  );
 }

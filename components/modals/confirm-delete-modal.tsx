@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { AlertTriangle } from "lucide-react";
-import { useState } from "react";
+  DialogTitle
+} from '@/components/ui/dialog';
+import { AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
 
 interface ConfirmDeleteDialogProps {
   open: boolean;
@@ -24,8 +24,8 @@ export function ConfirmDeleteDialog({
   open,
   onClose,
   onConfirm,
-  title = "Delete Confirmation",
-  description = "Are you sure you want to delete this item? This action cannot be undone.",
+  title = 'Delete Confirmation',
+  description = 'Are you sure you want to delete this item? This action cannot be undone.'
 }: ConfirmDeleteDialogProps) {
   const [loading, setLoading] = useState(false);
 
@@ -59,7 +59,7 @@ export function ConfirmDeleteDialog({
             onClick={handleConfirm}
             disabled={loading}
           >
-            {loading ? "Deleting..." : "Delete"}
+            {loading ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogFooter>
       </DialogContent>

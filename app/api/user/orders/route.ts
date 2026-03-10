@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { Order } from "@/models/Order";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/database";
+import { type NextRequest, NextResponse } from 'next/server';
+import { Order } from '@/models/Order';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
 
 /**
  * GET /api/user/orders
@@ -11,23 +11,23 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
     const userId = decoded.userId;
 
     const { searchParams } = new URL(request.url);
-    const page = Number.parseInt(searchParams.get("page") || "1");
-    const limit = Number.parseInt(searchParams.get("limit") || "20");
-    const status = searchParams.get("status");
+    const page = Number.parseInt(searchParams.get('page') || '1');
+    const limit = Number.parseInt(searchParams.get('limit') || '20');
+    const status = searchParams.get('status');
 
-    const query: any = { "customer.id": userId };
+    const query: any = { 'customer.id': userId };
 
     // Status filter
-    if (status && status !== "all") {
+    if (status && status !== 'all') {
       query.status = status;
     }
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .select("orderNumber createdAt status total items trackingNumber")
+      .select('orderNumber createdAt status total items trackingNumber')
       .lean();
 
     const total = await Order.countDocuments(query);
@@ -52,13 +52,13 @@ export async function GET(request: NextRequest) {
         total,
         totalPages,
         hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
+        hasPrev: page > 1
+      }
     });
   } catch (error) {
-    console.error("Get user orders error:", error);
+    console.error('Get user orders error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

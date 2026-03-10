@@ -1,22 +1,22 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "@/hooks/use-toast";
-import { Upload, X } from "lucide-react";
-import Image from "next/image";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { toast } from '@/hooks/use-toast';
+import { Upload, X } from 'lucide-react';
+import Image from 'next/image';
 
 export default function ProductMainImage({
   mainImage,
   setMainImage,
   setAvailableImages,
-  setImageFiles,
+  setImageFiles
 }: {
   mainImage: string;
   setMainImage: (s: string) => void;
@@ -24,7 +24,7 @@ export default function ProductMainImage({
   setImageFiles: any;
 }) {
   const removeMainImage = () => {
-    setMainImage("");
+    setMainImage('');
     setAvailableImages((prev: any) => prev.slice(1));
   };
 
@@ -32,20 +32,20 @@ export default function ProductMainImage({
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type and size
-      if (!file.type.startsWith("image/")) {
+      if (!file.type.startsWith('image/')) {
         toast({
-          title: "Invalid file type",
-          description: "Please upload an image file.",
-          variant: "destructive",
+          title: 'Invalid file type',
+          description: 'Please upload an image file.',
+          variant: 'destructive'
         });
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
         toast({
-          title: "File too large",
-          description: "Please upload an image smaller than 2MB.",
-          variant: "destructive",
+          title: 'File too large',
+          description: 'Please upload an image smaller than 2MB.',
+          variant: 'destructive'
         });
         return;
       }
@@ -73,9 +73,9 @@ export default function ProductMainImage({
       </CardHeader>
       <CardContent className="space-y-4">
         {mainImage ? (
-          <div className="relative border rounded-lg aspect-square max-w-md mx-auto overflow-hidden bg-muted">
+          <div className="relative mx-auto aspect-square max-w-md overflow-hidden rounded-lg border bg-muted">
             <Image
-              src={mainImage || "/placeholder.svg"}
+              src={mainImage || '/placeholder.svg'}
               alt="Main product image"
               fill
               className="object-cover"
@@ -83,7 +83,7 @@ export default function ProductMainImage({
             <Button
               variant="destructive"
               size="icon"
-              className="absolute top-2 right-2 h-8 w-8 rounded-full"
+              className="absolute right-2 top-2 h-8 w-8 rounded-full"
               onClick={removeMainImage}
               type="button"
             >
@@ -92,15 +92,15 @@ export default function ProductMainImage({
             </Button>
           </div>
         ) : (
-          <div className="border-2 border-dashed rounded-lg aspect-square max-w-md mx-auto flex flex-col items-center justify-center bg-muted/50 text-muted-foreground">
-            <Upload className="h-12 w-12 mb-3" />
+          <div className="mx-auto flex aspect-square max-w-md flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted/50 text-muted-foreground">
+            <Upload className="mb-3 h-12 w-12" />
             <p className="text-sm font-medium">No main image uploaded</p>
-            <p className="text-xs mt-1">Upload your primary product image</p>
+            <p className="mt-1 text-xs">Upload your primary product image</p>
           </div>
         )}
-        <div className="max-w-md mx-auto">
+        <div className="mx-auto max-w-md">
           <Label htmlFor="mainImage" className="mb-2 block">
-            {mainImage ? "Replace Main Image" : "Upload Main Image"}
+            {mainImage ? 'Replace Main Image' : 'Upload Main Image'}
           </Label>
           <Input
             id="mainImage"
@@ -108,7 +108,7 @@ export default function ProductMainImage({
             accept="image/*"
             onChange={handleMainImageChange}
           />
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="mt-2 text-sm text-muted-foreground">
             Recommended size: 1000x1000px. Max file size: 2MB.
           </p>
         </div>

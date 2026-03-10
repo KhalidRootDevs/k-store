@@ -1,6 +1,6 @@
-"use client"
+'use client';
 
-import type * as React from "react"
+import type * as React from 'react';
 import {
   BarChart as RechartsBarChart,
   Bar,
@@ -14,20 +14,26 @@ import {
   Legend,
   ResponsiveContainer,
   LineChart as RechartsLineChart,
-  Line,
-} from "recharts"
-import { cn } from "@/lib/utils"
+  Line
+} from 'recharts';
+import { cn } from '@/lib/utils';
 
 interface ChartProps extends React.HTMLAttributes<HTMLDivElement> {
-  type: "bar" | "pie" | "line"
-  data: any[]
-  options?: any
+  type: 'bar' | 'pie' | 'line';
+  data: any[];
+  options?: any;
 }
 
-export function Chart({ type, data, options, className, ...props }: ChartProps) {
+export function Chart({
+  type,
+  data,
+  options,
+  className,
+  ...props
+}: ChartProps) {
   const renderChart = () => {
     switch (type) {
-      case "bar":
+      case 'bar':
         return (
           <RechartsBarChart
             data={data}
@@ -35,11 +41,11 @@ export function Chart({ type, data, options, className, ...props }: ChartProps) 
               top: 20,
               right: 30,
               left: 20,
-              bottom: 5,
+              bottom: 5
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={options?.xAxis?.dataKey || "name"} />
+            <XAxis dataKey={options?.xAxis?.dataKey || 'name'} />
             <YAxis />
             <Tooltip />
             <Legend />
@@ -47,13 +53,15 @@ export function Chart({ type, data, options, className, ...props }: ChartProps) 
               <Bar
                 key={index}
                 dataKey={dataset.dataKey || dataset.label}
-                fill={dataset.backgroundColor || `hsl(var(--chart-${index + 1}))`}
+                fill={
+                  dataset.backgroundColor || `hsl(var(--chart-${index + 1}))`
+                }
                 radius={dataset.borderRadius || 0}
               />
             ))}
           </RechartsBarChart>
-        )
-      case "pie":
+        );
+      case 'pie':
         return (
           <RechartsPieChart>
             <Pie
@@ -63,23 +71,29 @@ export function Chart({ type, data, options, className, ...props }: ChartProps) 
               labelLine={false}
               outerRadius={80}
               fill="#8884d8"
-              dataKey={options?.dataKey || "value"}
+              dataKey={options?.dataKey || 'value'}
               label={
-                options?.label !== false ? ({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%` : undefined
+                options?.label !== false
+                  ? ({ name, percent }) =>
+                      `${name}: ${(percent * 100).toFixed(0)}%`
+                  : undefined
               }
             >
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={options?.datasets?.[0]?.backgroundColor?.[index] || `hsl(var(--chart-${(index % 5) + 1}))`}
+                  fill={
+                    options?.datasets?.[0]?.backgroundColor?.[index] ||
+                    `hsl(var(--chart-${(index % 5) + 1}))`
+                  }
                 />
               ))}
             </Pie>
             <Tooltip />
             {options?.legend !== false && <Legend />}
           </RechartsPieChart>
-        )
-      case "line":
+        );
+      case 'line':
         return (
           <RechartsLineChart
             data={data}
@@ -87,11 +101,11 @@ export function Chart({ type, data, options, className, ...props }: ChartProps) 
               top: 20,
               right: 30,
               left: 20,
-              bottom: 5,
+              bottom: 5
             }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey={options?.xAxis?.dataKey || "name"} />
+            <XAxis dataKey={options?.xAxis?.dataKey || 'name'} />
             <YAxis />
             <Tooltip />
             <Legend />
@@ -105,41 +119,59 @@ export function Chart({ type, data, options, className, ...props }: ChartProps) 
               />
             ))}
           </RechartsLineChart>
-        )
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
-    <div className={cn("w-full h-[300px]", className)} {...props}>
+    <div className={cn('h-[300px] w-full', className)} {...props}>
       <ResponsiveContainer width="100%" height="100%">
         {renderChart()}
       </ResponsiveContainer>
     </div>
-  )
+  );
 }
 
-export const ChartContainer = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return <div {...props}>{children}</div>
-}
+export const ChartContainer = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  return <div {...props}>{children}</div>;
+};
 
-export const ChartTooltip = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return <div {...props}>{children}</div>
-}
+export const ChartTooltip = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  return <div {...props}>{children}</div>;
+};
 
-export const ChartTooltipContent = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return <div {...props}>{children}</div>
-}
+export const ChartTooltipContent = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  return <div {...props}>{children}</div>;
+};
 
-export const ChartLegend = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return <div {...props}>{children}</div>
-}
+export const ChartLegend = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  return <div {...props}>{children}</div>;
+};
 
-export const ChartLegendContent = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return <div {...props}>{children}</div>
-}
+export const ChartLegendContent = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  return <div {...props}>{children}</div>;
+};
 
-export const ChartStyle = ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-  return <style {...props}>{children}</style>
-}
+export const ChartStyle = ({
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  return <style {...props}>{children}</style>;
+};

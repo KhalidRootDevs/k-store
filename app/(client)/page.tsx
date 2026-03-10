@@ -1,15 +1,15 @@
-import { BannerSlider } from "@/components/banner-slider";
-import { OfferBanner } from "@/components/offer-banner";
-import { ProductGrid } from "@/components/product-grid";
-import { PromotionalBanner } from "@/components/promotional-banner";
-import { TopCategories } from "@/components/top-categories";
-import { ValuePropositions } from "@/components/value-propositions";
-import { BrandShowcase } from "@/components/brand-showcase";
-import { StatsSection } from "@/components/stats-section";
-import { Testimonials } from "@/components/testimonials";
-import { NewsletterSection } from "@/components/newsletter-section";
-import { CTABanner } from "@/components/cta-banner";
-import { RecentlyViewed } from "@/components/recently-viewed";
+import { BannerSlider } from '@/components/banner-slider';
+import { OfferBanner } from '@/components/offer-banner';
+import { ProductGrid } from '@/components/product-grid';
+import { PromotionalBanner } from '@/components/promotional-banner';
+import { TopCategories } from '@/components/top-categories';
+import { ValuePropositions } from '@/components/value-propositions';
+import { BrandShowcase } from '@/components/brand-showcase';
+import { StatsSection } from '@/components/stats-section';
+import { Testimonials } from '@/components/testimonials';
+import { NewsletterSection } from '@/components/newsletter-section';
+import { CTABanner } from '@/components/cta-banner';
+import { RecentlyViewed } from '@/components/recently-viewed';
 
 export default function Home() {
   return (
@@ -19,16 +19,16 @@ export default function Home() {
         <BannerSlider />
       </section>
 
-      <section className="container mx-auto py-12 border-b">
+      <section className="container mx-auto border-b py-12">
         <ValuePropositions />
       </section>
 
       {/* Top Categories */}
       <section className="container mx-auto py-12">
-        <h2 className="text-3xl font-bold mb-6 text-center">
+        <h2 className="mb-6 text-center text-3xl font-bold">
           Shop by Category
         </h2>
-        <p className="text-center text-muted-foreground mb-8">
+        <p className="mb-8 text-center text-muted-foreground">
           Browse our curated collections and find exactly what you need
         </p>
         <TopCategories />
@@ -36,10 +36,10 @@ export default function Home() {
 
       {/* Featured Products */}
       <section className="container mx-auto py-12">
-        <h2 className="text-3xl font-bold mb-2 text-center">
+        <h2 className="mb-2 text-center text-3xl font-bold">
           Featured Products
         </h2>
-        <p className="text-center text-muted-foreground mb-8">
+        <p className="mb-8 text-center text-muted-foreground">
           Hand-picked items just for you
         </p>
         <ProductGrid type="featured" />
@@ -50,8 +50,8 @@ export default function Home() {
         <OfferBanner />
       </section>
 
-      <section className="container mx-auto py-16 bg-muted/30 rounded-2xl my-8">
-        <h2 className="text-3xl font-bold mb-12 text-center">
+      <section className="container mx-auto my-8 rounded-2xl bg-muted/30 py-16">
+        <h2 className="mb-12 text-center text-3xl font-bold">
           Why Shop With Us
         </h2>
         <StatsSection />
@@ -59,21 +59,21 @@ export default function Home() {
 
       {/* Best Selling Products */}
       <section className="container mx-auto py-12">
-        <h2 className="text-3xl font-bold mb-2 text-center">Best Sellers</h2>
-        <p className="text-center text-muted-foreground mb-8">
+        <h2 className="mb-2 text-center text-3xl font-bold">Best Sellers</h2>
+        <p className="mb-8 text-center text-muted-foreground">
           Our most popular products loved by customers
         </p>
         <ProductGrid type="best-selling" />
       </section>
 
-      <section className="container mx-auto py-12 border-y">
+      <section className="container mx-auto border-y py-12">
         <BrandShowcase />
       </section>
 
       {/* Top Rated Products */}
       <section className="container mx-auto py-12">
-        <h2 className="text-3xl font-bold mb-2 text-center">Top Rated</h2>
-        <p className="text-center text-muted-foreground mb-8">
+        <h2 className="mb-2 text-center text-3xl font-bold">Top Rated</h2>
+        <p className="mb-8 text-center text-muted-foreground">
           Highest rated products by our community
         </p>
         <ProductGrid type="top-rated" />
@@ -85,10 +85,10 @@ export default function Home() {
       </section>
 
       <section className="container mx-auto py-16">
-        <h2 className="text-3xl font-bold mb-2 text-center">
+        <h2 className="mb-2 text-center text-3xl font-bold">
           What Our Customers Say
         </h2>
-        <p className="text-center text-muted-foreground mb-12">
+        <p className="mb-12 text-center text-muted-foreground">
           Real reviews from real customers
         </p>
         <Testimonials />

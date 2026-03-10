@@ -1,11 +1,11 @@
-import jwt from "jsonwebtoken";
-import { IUser } from "@/models/User";
+import jwt from 'jsonwebtoken';
+import { IUser } from '@/models/User';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 if (!JWT_SECRET) {
-  throw new Error("Please define the JWT_SECRET environment variable");
+  throw new Error('Please define the JWT_SECRET environment variable');
 }
 
 export interface JWTPayload {
@@ -17,11 +17,11 @@ export interface JWTPayload {
 export function generateToken(user: IUser): string {
   const payload: JWTPayload = {
     userId: user._id.toString(),
-    email: user.email,
+    email: user.email
   };
 
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+    expiresIn: JWT_EXPIRES_IN
   });
 }
 

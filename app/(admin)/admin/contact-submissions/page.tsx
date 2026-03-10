@@ -1,57 +1,57 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  SelectValue
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+  TableRow
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Eye, Search, Trash2 } from "lucide-react";
-import { Container } from "@/components/ui/container";
-import { toast } from "@/components/ui/use-toast";
-import { ContactSubmission } from "@/types";
+  DialogTitle
+} from '@/components/ui/dialog';
+import { Eye, Search, Trash2 } from 'lucide-react';
+import { Container } from '@/components/ui/container';
+import { toast } from '@/components/ui/use-toast';
+import { ContactSubmission } from '@/types';
 
 export default function ContactSubmissionsPage() {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState<
     ContactSubmission[]
   >([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedSubmission, setSelectedSubmission] =
     useState<ContactSubmission | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
     // In a real app, this would be an API call
-    const storedSubmissions = localStorage.getItem("contactSubmissions");
+    const storedSubmissions = localStorage.getItem('contactSubmissions');
     if (storedSubmissions) {
       const parsedSubmissions = JSON.parse(storedSubmissions);
       setSubmissions(parsedSubmissions);
@@ -70,21 +70,21 @@ export default function ContactSubmissionsPage() {
           submission.name.toLowerCase().includes(query) ||
           submission.email.toLowerCase().includes(query) ||
           submission.subject.toLowerCase().includes(query) ||
-          submission.message.toLowerCase().includes(query),
+          submission.message.toLowerCase().includes(query)
       );
     }
 
     // Apply status filter
-    if (statusFilter !== "all") {
+    if (statusFilter !== 'all') {
       filtered = filtered.filter(
-        (submission) => submission.status === statusFilter,
+        (submission) => submission.status === statusFilter
       );
     }
 
     // Sort by date (newest first)
     filtered.sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     setFilteredSubmissions(filtered);
@@ -92,14 +92,14 @@ export default function ContactSubmissionsPage() {
 
   const handleViewSubmission = (submission: ContactSubmission) => {
     // Mark as read if it's new
-    if (submission.status === "new") {
+    if (submission.status === 'new') {
       const updatedSubmissions = submissions.map((s) =>
-        s.id === submission.id ? { ...s, status: "read" } : s,
+        s.id === submission.id ? { ...s, status: 'read' } : s
       );
       setSubmissions(updatedSubmissions);
       localStorage.setItem(
-        "contactSubmissions",
-        JSON.stringify(updatedSubmissions),
+        'contactSubmissions',
+        JSON.stringify(updatedSubmissions)
       );
     }
 
@@ -111,32 +111,32 @@ export default function ContactSubmissionsPage() {
     const updatedSubmissions = submissions.filter((s) => s.id !== id);
     setSubmissions(updatedSubmissions);
     localStorage.setItem(
-      "contactSubmissions",
-      JSON.stringify(updatedSubmissions),
+      'contactSubmissions',
+      JSON.stringify(updatedSubmissions)
     );
 
     toast({
-      title: "Submission deleted",
-      description: "The contact submission has been deleted.",
+      title: 'Submission deleted',
+      description: 'The contact submission has been deleted.'
     });
   };
 
   const handleUpdateStatus = (
     id: number,
-    status: "new" | "read" | "replied" | "archived",
+    status: 'new' | 'read' | 'replied' | 'archived'
   ) => {
     const updatedSubmissions = submissions.map((s) =>
-      s.id === id ? { ...s, status } : s,
+      s.id === id ? { ...s, status } : s
     );
     setSubmissions(updatedSubmissions);
     localStorage.setItem(
-      "contactSubmissions",
-      JSON.stringify(updatedSubmissions),
+      'contactSubmissions',
+      JSON.stringify(updatedSubmissions)
     );
 
     toast({
-      title: "Status updated",
-      description: `The submission status has been updated to "${status}".`,
+      title: 'Status updated',
+      description: `The submission status has been updated to "${status}".`
     });
 
     if (selectedSubmission?.id === id) {
@@ -146,13 +146,13 @@ export default function ContactSubmissionsPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "new":
+      case 'new':
         return <Badge className="bg-blue-500">New</Badge>;
-      case "read":
+      case 'read':
         return <Badge variant="outline">Read</Badge>;
-      case "replied":
+      case 'replied':
         return <Badge className="bg-green-500">Replied</Badge>;
-      case "archived":
+      case 'archived':
         return <Badge variant="secondary">Archived</Badge>;
       default:
         return null;
@@ -175,13 +175,13 @@ export default function ContactSubmissionsPage() {
           <CardHeader>
             <CardTitle>Customer Inquiries</CardTitle>
             <CardDescription>
-              {filteredSubmissions.length}{" "}
-              {filteredSubmissions.length === 1 ? "submission" : "submissions"}{" "}
+              {filteredSubmissions.length}{' '}
+              {filteredSubmissions.length === 1 ? 'submission' : 'submissions'}{' '}
               found
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex w-full max-w-sm items-center space-x-2">
                 <Input
                   placeholder="Search submissions..."
@@ -195,7 +195,7 @@ export default function ContactSubmissionsPage() {
                 </Button>
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px] h-9">
+                <SelectTrigger className="h-9 w-[180px]">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,7 +209,7 @@ export default function ContactSubmissionsPage() {
             </div>
 
             {filteredSubmissions.length === 0 ? (
-              <div className="text-center py-8">
+              <div className="py-8 text-center">
                 <p className="text-muted-foreground">No submissions found.</p>
               </div>
             ) : (
@@ -279,14 +279,14 @@ export default function ContactSubmissionsPage() {
           <DialogHeader>
             <DialogTitle>Contact Submission</DialogTitle>
             <DialogDescription>
-              Received on{" "}
+              Received on{' '}
               {selectedSubmission &&
                 new Date(selectedSubmission.createdAt).toLocaleString()}
             </DialogDescription>
           </DialogHeader>
           {selectedSubmission && (
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium">Status</h3>
                   {getStatusBadge(selectedSubmission.status)}
@@ -297,7 +297,7 @@ export default function ContactSubmissionsPage() {
                     onValueChange={(value) =>
                       handleUpdateStatus(
                         selectedSubmission.id,
-                        value as "new" | "read" | "replied" | "archived",
+                        value as 'new' | 'read' | 'replied' | 'archived'
                       )
                     }
                   >
@@ -325,7 +325,7 @@ export default function ContactSubmissionsPage() {
               </div>
               <div>
                 <h3 className="font-medium">Message</h3>
-                <div className="mt-2 p-4 border rounded-md bg-muted/50 whitespace-pre-wrap">
+                <div className="mt-2 whitespace-pre-wrap rounded-md border bg-muted/50 p-4">
                   {selectedSubmission.message}
                 </div>
               </div>
@@ -341,11 +341,11 @@ export default function ContactSubmissionsPage() {
                 </Button>
                 <Button
                   onClick={() => {
-                    handleUpdateStatus(selectedSubmission.id, "replied");
+                    handleUpdateStatus(selectedSubmission.id, 'replied');
                     toast({
-                      title: "Reply sent",
+                      title: 'Reply sent',
                       description:
-                        "In a real application, this would open an email interface.",
+                        'In a real application, this would open an email interface.'
                     });
                   }}
                 >

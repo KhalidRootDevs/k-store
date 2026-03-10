@@ -1,30 +1,30 @@
-import React from "react";
+import React from 'react';
 
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  CardTitle
+} from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { useFormContext } from "react-hook-form";
+  SelectValue
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { useFormContext } from 'react-hook-form';
 
 export default function ProductBasicInfo({
   isLoadingCategories,
   categories,
-  tags,
+  tags
 }: {
   isLoadingCategories: boolean;
   categories: any;
@@ -34,7 +34,7 @@ export default function ProductBasicInfo({
     register,
     formState: { errors },
     watch,
-    setValue,
+    setValue
   } = useFormContext();
 
   return (
@@ -46,7 +46,7 @@ export default function ProductBasicInfo({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="name">
               Product Name <span className="text-red-500">*</span>
@@ -54,7 +54,7 @@ export default function ProductBasicInfo({
             <Input
               id="name"
               placeholder="e.g., Premium T-Shirt"
-              {...register("name")}
+              {...register('name')}
             />
             {errors.name && (
               <p className="text-sm text-red-500">
@@ -67,16 +67,16 @@ export default function ProductBasicInfo({
               Category <span className="text-red-500">*</span>
             </Label>
             <Select
-              value={watch("categoryId")}
-              onValueChange={(value) => setValue("categoryId", value)}
+              value={watch('categoryId')}
+              onValueChange={(value) => setValue('categoryId', value)}
               disabled={isLoadingCategories}
             >
               <SelectTrigger>
                 <SelectValue
                   placeholder={
                     isLoadingCategories
-                      ? "Loading categories..."
-                      : "Select a category"
+                      ? 'Loading categories...'
+                      : 'Select a category'
                   }
                 />
               </SelectTrigger>
@@ -92,7 +92,7 @@ export default function ProductBasicInfo({
                         .filter(
                           (cat: any) =>
                             cat.parentId &&
-                            (typeof cat.parentId === "string"
+                            (typeof cat.parentId === 'string'
                               ? cat.parentId === parentCategory._id
                               : cat.parentId._id === parentCategory._id)
                         )
@@ -124,7 +124,7 @@ export default function ProductBasicInfo({
             id="description"
             placeholder="Describe your product..."
             rows={5}
-            {...register("description")}
+            {...register('description')}
           />
           {errors.description && (
             <p className="text-sm text-red-500">
@@ -133,7 +133,7 @@ export default function ProductBasicInfo({
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="price">
               Price <span className="text-red-500">*</span>
@@ -148,7 +148,7 @@ export default function ProductBasicInfo({
                 step="0.01"
                 className="pl-7"
                 placeholder="0.00"
-                {...register("price")}
+                {...register('price')}
               />
             </div>
             {errors.price && (
@@ -169,7 +169,7 @@ export default function ProductBasicInfo({
                 step="0.01"
                 className="pl-7"
                 placeholder="0.00"
-                {...register("compareAtPrice")}
+                {...register('compareAtPrice')}
               />
             </div>
           </div>
@@ -185,19 +185,19 @@ export default function ProductBasicInfo({
                 step="0.01"
                 className="pl-7"
                 placeholder="0.00"
-                {...register("cost")}
+                {...register('cost')}
               />
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="sku">SKU (Stock Keeping Unit)</Label>
             <Input
               id="sku"
               placeholder="e.g., TSHIRT-BLK-M"
-              {...register("sku")}
+              {...register('sku')}
             />
           </div>
           <div className="space-y-2">
@@ -205,18 +205,18 @@ export default function ProductBasicInfo({
             <Input
               id="barcode"
               placeholder="e.g., 123456789012"
-              {...register("barcode")}
+              {...register('barcode')}
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="brand">Brand</Label>
             <Input
               id="brand"
               placeholder="e.g., Nike, Apple, etc."
-              {...register("brand")}
+              {...register('brand')}
             />
           </div>
           <div className="space-y-2">
@@ -227,7 +227,7 @@ export default function ProductBasicInfo({
               id="stock"
               type="number"
               placeholder="0"
-              {...register("stock")}
+              {...register('stock')}
             />
             {errors.stock && (
               <p className="text-sm text-red-500">
@@ -239,19 +239,19 @@ export default function ProductBasicInfo({
 
         <div className="space-y-2">
           <Label>Tags</Label>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
             {tags.map((tag: any) => (
               <div key={tag.id} className="flex items-center space-x-2">
                 <Checkbox
                   id={`tag-${tag.id}`}
-                  checked={watch("tags")?.includes(tag.id) || false}
+                  checked={watch('tags')?.includes(tag.id) || false}
                   onCheckedChange={(checked) => {
-                    const currentTags = watch("tags") || [];
+                    const currentTags = watch('tags') || [];
                     if (checked) {
-                      setValue("tags", [...currentTags, tag.id]);
+                      setValue('tags', [...currentTags, tag.id]);
                     } else {
                       setValue(
-                        "tags",
+                        'tags',
                         currentTags.filter((t: any) => t !== tag.id)
                       );
                     }
@@ -274,8 +274,8 @@ export default function ProductBasicInfo({
           </div>
           <Switch
             id="active"
-            checked={watch("active")}
-            onCheckedChange={(checked) => setValue("active", checked)}
+            checked={watch('active')}
+            onCheckedChange={(checked) => setValue('active', checked)}
           />
         </div>
 
@@ -288,8 +288,8 @@ export default function ProductBasicInfo({
           </div>
           <Switch
             id="featured"
-            checked={watch("featured")}
-            onCheckedChange={(checked) => setValue("featured", checked)}
+            checked={watch('featured')}
+            onCheckedChange={(checked) => setValue('featured', checked)}
           />
         </div>
       </CardContent>

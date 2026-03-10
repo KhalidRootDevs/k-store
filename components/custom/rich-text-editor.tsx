@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-import { useFormContext } from "react-hook-form";
-import "suneditor/dist/css/suneditor.min.css";
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
+import 'suneditor/dist/css/suneditor.min.css';
 import {
   align,
   font,
@@ -20,14 +20,14 @@ import {
   table,
   template,
   textStyle,
-  video,
-} from "suneditor/src/plugins";
+  video
+} from 'suneditor/src/plugins';
 
-const ImportSunEditor = dynamic(() => import("suneditor-react"), {
+const ImportSunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false,
   loading: () => (
     <div className="h-48 w-full animate-pulse rounded-md border bg-muted" />
-  ),
+  )
 });
 
 type RichTextEditorProps = {
@@ -40,11 +40,11 @@ type RichTextEditorProps = {
 function RichTextEditor({
   name,
   disabled = false,
-  placeholder = "Enter your text here",
-  height = "300",
+  placeholder = 'Enter your text here',
+  height = '300'
 }: RichTextEditorProps) {
   const form = useFormContext();
-  const [editorValue, setEditorValue] = useState("");
+  const [editorValue, setEditorValue] = useState('');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ function RichTextEditor({
     // Watch for form changes
     const subscription = form.watch((value) => {
       if (value[name] !== undefined && value[name] !== editorValue) {
-        setEditorValue(value[name] || "");
+        setEditorValue(value[name] || '');
       }
     });
 
@@ -71,7 +71,7 @@ function RichTextEditor({
     form.setValue(name, content, {
       shouldValidate: true,
       shouldDirty: true,
-      shouldTouch: true,
+      shouldTouch: true
     });
   };
 
@@ -87,7 +87,7 @@ function RichTextEditor({
   }
 
   return (
-    <div className={disabled ? "opacity-60 cursor-not-allowed" : ""}>
+    <div className={disabled ? 'cursor-not-allowed opacity-60' : ''}>
       <ImportSunEditor
         setContents={editorValue}
         onChange={handleChange}
@@ -114,18 +114,18 @@ function RichTextEditor({
             textStyle,
             image,
             link,
-            video,
+            video
           ],
           buttonList: [
-            ["undo", "redo"],
-            ["removeFormat"],
-            ["font", "fontSize"],
-            ["bold", "italic", "underline", "fontColor", "hiliteColor"],
-            ["align", "lineHeight", "horizontalRule", "list"],
-            ["table", "link", "image", "video"],
-            ["fullScreen"],
+            ['undo', 'redo'],
+            ['removeFormat'],
+            ['font', 'fontSize'],
+            ['bold', 'italic', 'underline', 'fontColor', 'hiliteColor'],
+            ['align', 'lineHeight', 'horizontalRule', 'list'],
+            ['table', 'link', 'image', 'video'],
+            ['fullScreen']
           ],
-          resizingBar: !disabled,
+          resizingBar: !disabled
         }}
       />
     </div>

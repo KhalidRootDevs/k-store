@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Minus, Plus, ShoppingCart, X } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { useCart } from "@/context/cart-context";
-import { WishlistButton } from "@/components/wishlist-button";
-import { toast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Minus, Plus, ShoppingCart, X } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useCart } from '@/context/cart-context';
+import { WishlistButton } from '@/components/wishlist-button';
+import { toast } from '@/components/ui/use-toast';
 
 interface ProductQuickViewProps {
   product: {
@@ -31,7 +31,7 @@ interface ProductQuickViewProps {
 export function ProductQuickView({
   product,
   isOpen,
-  onClose,
+  onClose
 }: ProductQuickViewProps) {
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -41,8 +41,8 @@ export function ProductQuickView({
   // Mock multiple images
   const images = [
     product.image,
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600",
+    '/placeholder.svg?height=600&width=600',
+    '/placeholder.svg?height=600&width=600'
   ];
 
   const increaseQuantity = () => {
@@ -67,12 +67,12 @@ export function ProductQuickView({
           : product.price,
         quantity,
         image: product.image,
-        variant: "Default",
+        variant: 'Default'
       });
 
       toast({
-        title: "Added to cart",
-        description: `${quantity} × ${product.name} has been added to your cart.`,
+        title: 'Added to cart',
+        description: `${quantity} × ${product.name} has been added to your cart.`
       });
 
       setIsAddingToCart(false);
@@ -82,13 +82,13 @@ export function ProductQuickView({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[900px] p-0 overflow-hidden">
+      <DialogContent className="overflow-hidden p-0 sm:max-w-[900px]">
         <div className="absolute right-4 top-4 z-10">
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="rounded-full h-8 w-8 bg-white/80 backdrop-blur-sm"
+            className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm"
           >
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
@@ -100,20 +100,20 @@ export function ProductQuickView({
           <div className="relative">
             <div className="relative aspect-square overflow-hidden">
               <Image
-                src={images[activeImage] || "/placeholder.svg"}
+                src={images[activeImage] || '/placeholder.svg'}
                 alt={product.name}
                 fill
                 className="object-cover transition-transform duration-300 hover:scale-105"
               />
 
               {product.discount && product.discount > 0 && (
-                <Badge className="absolute top-2 right-2 bg-red-500">
+                <Badge className="absolute right-2 top-2 bg-red-500">
                   {product.discount}% OFF
                 </Badge>
               )}
 
               {product.isNew && (
-                <Badge className="absolute top-2 left-2">New</Badge>
+                <Badge className="absolute left-2 top-2">New</Badge>
               )}
 
               {product.isBestSeller && (
@@ -129,7 +129,7 @@ export function ProductQuickView({
                 <button
                   key={index}
                   className={`h-2 w-2 rounded-full transition-all ${
-                    activeImage === index ? "bg-primary w-4" : "bg-primary/30"
+                    activeImage === index ? 'w-4 bg-primary' : 'bg-primary/30'
                   }`}
                   onClick={() => setActiveImage(index)}
                 >
@@ -140,22 +140,26 @@ export function ProductQuickView({
           </div>
 
           {/* Product Details */}
-          <div className="p-6 flex flex-col">
+          <div className="flex flex-col p-6">
             <div className="mb-2">
               <p className="text-sm text-muted-foreground">
                 {product.category}
               </p>
-              <h2 className="text-2xl font-bold mt-1">{product.name}</h2>
+              <h2 className="mt-1 text-2xl font-bold">{product.name}</h2>
             </div>
 
-            <div className="flex items-center gap-2 mb-4">
+            <div className="mb-4 flex items-center gap-2">
               {/* Star Rating */}
               {product.rating && (
                 <div className="flex">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <svg
                       key={i}
-                      className={`h-4 w-4 ${i < Math.floor(product.rating) ? "text-yellow-400" : "text-gray-300"}`}
+                      className={`h-4 w-4 ${
+                        i < Math.floor(product.rating)
+                          ? 'text-yellow-400'
+                          : 'text-gray-300'
+                      }`}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -190,9 +194,9 @@ export function ProductQuickView({
               )}
             </div>
 
-            <p className="text-muted-foreground mb-6">
+            <p className="mb-6 text-muted-foreground">
               {product.description ||
-                "A high-quality product with excellent features and durability. Perfect for everyday use and special occasions."}
+                'A high-quality product with excellent features and durability. Perfect for everyday use and special occasions.'}
             </p>
 
             <div className="mt-auto space-y-4">
@@ -200,7 +204,7 @@ export function ProductQuickView({
                 <div className="mr-4">
                   <span className="text-sm font-medium">Quantity</span>
                 </div>
-                <div className="flex items-center border rounded-full">
+                <div className="flex items-center rounded-full border">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -232,7 +236,7 @@ export function ProductQuickView({
                 >
                   {isAddingToCart ? (
                     <div className="flex items-center">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                       Adding...
                     </div>
                   ) : (

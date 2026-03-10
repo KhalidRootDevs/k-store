@@ -1,26 +1,26 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { User } from "@/models/User";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/database";
+import { User } from '@/models/User';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const search = searchParams.get("search") || "";
-    const status = searchParams.get("status");
-    const role = searchParams.get("role");
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '10');
+    const search = searchParams.get('search') || '';
+    const status = searchParams.get('status');
+    const role = searchParams.get('role');
 
     // Build query
     const query: any = {};
@@ -28,19 +28,19 @@ export async function GET(request: NextRequest) {
     // Search filter
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-        { phone: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } }
       ];
     }
 
     // Status filter
-    if (status && status !== "all") {
+    if (status && status !== 'all') {
       query.status = status;
     }
 
     // Role filter
-    if (role && role !== "all") {
+    if (role && role !== 'all') {
       query.role = role;
     }
 
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 
     // Get users with pagination
     const users = await User.find(query)
-      .select("-password -addresses -notes") // Exclude sensitive data
+      .select('-password -addresses -notes') // Exclude sensitive data
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -64,13 +64,13 @@ export async function GET(request: NextRequest) {
         total,
         totalPages,
         hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
+        hasPrev: page > 1
+      }
     });
   } catch (error) {
-    console.error("Get users error:", error);
+    console.error('Get users error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

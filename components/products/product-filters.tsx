@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import type React from "react";
+import type React from 'react';
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Slider } from "@/components/ui/slider";
-import type { Brand, Category } from "@/lib/product-data";
-import { ChevronDown, ChevronUp, Filter, X } from "lucide-react";
-import { useState } from "react";
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Slider } from '@/components/ui/slider';
+import type { Brand, Category } from '@/lib/product-data';
+import { ChevronDown, ChevronUp, Filter, X } from 'lucide-react';
+import { useState } from 'react';
 
 interface ProductFiltersProps {
   categories: Category[];
@@ -49,26 +49,26 @@ export function ProductFilters({
   onResetFilters,
   onApplyFilters,
   onToggleFilters,
-  onCloseFilters,
+  onCloseFilters
 }: ProductFiltersProps) {
   const [expandedFilters, setExpandedFilters] = useState({
     categories: true,
     brands: true,
     price: true,
-    rating: true,
+    rating: true
   });
 
   const toggleFilterSection = (section: keyof typeof expandedFilters) => {
     setExpandedFilters((prev) => ({
       ...prev,
-      [section]: !prev[section],
+      [section]: !prev[section]
     }));
   };
 
   return (
     <>
       {/* Mobile filter button */}
-      <div className="md:hidden flex justify-between items-center mb-4">
+      <div className="mb-4 flex items-center justify-between md:hidden">
         <Button
           variant="outline"
           className="flex items-center gap-2"
@@ -87,12 +87,12 @@ export function ProductFilters({
       {/* Mobile filter drawer */}
       <div
         className={`
-          fixed inset-0 z-50 bg-background md:hidden transform transition-transform duration-300 ease-in-out
-          ${showFilters ? "translate-x-0" : "-translate-x-full"}
+          fixed inset-0 z-50 transform bg-background transition-transform duration-300 ease-in-out md:hidden
+          ${showFilters ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex h-full flex-col">
+          <div className="flex items-center justify-between border-b p-4">
             <h2 className="text-lg font-semibold">Filters</h2>
             <Button variant="ghost" size="icon" onClick={onCloseFilters}>
               <X className="h-5 w-5" />
@@ -117,7 +117,7 @@ export function ProductFilters({
               isMobile={true}
             />
           </div>
-          <div className="p-4 border-t flex gap-2">
+          <div className="flex gap-2 border-t p-4">
             <Button
               variant="outline"
               className="flex-1"
@@ -133,7 +133,7 @@ export function ProductFilters({
       </div>
 
       {/* Desktop sidebar filters */}
-      <div className="hidden md:block w-64 flex-shrink-0">
+      <div className="hidden w-64 flex-shrink-0 md:block">
         <div className="sticky top-24 space-y-6">
           <FilterContent
             categories={categories}
@@ -199,15 +199,15 @@ function FilterContent({
   onPriceChange,
   onSearchChange,
   onSearchSubmit,
-  isMobile,
+  isMobile
 }: FilterContentProps) {
-  const prefix = isMobile ? "mobile-" : "";
+  const prefix = isMobile ? 'mobile-' : '';
 
   return (
     <div className="space-y-6">
       {/* Search */}
       <div>
-        <h3 className="font-medium mb-2">Search</h3>
+        <h3 className="mb-2 font-medium">Search</h3>
         <form onSubmit={onSearchSubmit} className="flex gap-2">
           <Input
             placeholder="Search products..."
@@ -239,8 +239,8 @@ function FilterContent({
       {/* Categories */}
       <div>
         <div
-          className="flex items-center justify-between cursor-pointer"
-          onClick={() => toggleFilterSection("categories")}
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleFilterSection('categories')}
         >
           <h3 className="font-medium">Categories</h3>
           {expandedFilters.categories ? (
@@ -264,7 +264,7 @@ function FilterContent({
                   htmlFor={`${prefix}category-${category.id}`}
                   className="flex-1 cursor-pointer text-sm"
                 >
-                  {category.name}{" "}
+                  {category.name}{' '}
                   <span className="text-muted-foreground">
                     ({category.count})
                   </span>
@@ -278,8 +278,8 @@ function FilterContent({
       {/* Brands */}
       <div>
         <div
-          className="flex items-center justify-between cursor-pointer"
-          onClick={() => toggleFilterSection("brands")}
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleFilterSection('brands')}
         >
           <h3 className="font-medium">Brands</h3>
           {expandedFilters.brands ? (
@@ -303,7 +303,7 @@ function FilterContent({
                   htmlFor={`${prefix}brand-${brand.id}`}
                   className="flex-1 cursor-pointer text-sm"
                 >
-                  {brand.name}{" "}
+                  {brand.name}{' '}
                   <span className="text-muted-foreground">({brand.count})</span>
                 </Label>
               </div>
@@ -315,8 +315,8 @@ function FilterContent({
       {/* Price Range */}
       <div>
         <div
-          className="flex items-center justify-between cursor-pointer"
-          onClick={() => toggleFilterSection("price")}
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleFilterSection('price')}
         >
           <h3 className="font-medium">Price Range</h3>
           {expandedFilters.price ? (
@@ -347,8 +347,8 @@ function FilterContent({
       {/* Rating */}
       <div>
         <div
-          className="flex items-center justify-between cursor-pointer"
-          onClick={() => toggleFilterSection("rating")}
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleFilterSection('rating')}
         >
           <h3 className="font-medium">Rating</h3>
           {expandedFilters.rating ? (

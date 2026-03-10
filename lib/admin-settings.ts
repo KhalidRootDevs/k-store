@@ -6,22 +6,22 @@ export async function getAdminSettings() {
   return {
     payment: {
       stripe: {
-        publishableKey: "",
-        secretKey: "",
-        enabled: true,
+        publishableKey: '',
+        secretKey: '',
+        enabled: true
       },
       paypal: {
-        clientId: "your_paypal_client_id",
-        enabled: false,
-      },
+        clientId: 'your_paypal_client_id',
+        enabled: false
+      }
     },
     store: {
-      name: "OneVendor",
-      currency: "USD",
+      name: 'OneVendor',
+      currency: 'USD',
       taxRate: 0.08,
       shippingRate: 9.99,
-      freeShippingThreshold: 50,
-    },
+      freeShippingThreshold: 50
+    }
   };
 }
 
@@ -32,14 +32,14 @@ export async function getStripeConfig() {
     return {
       publishableKey: settings.payment.stripe.publishableKey,
       secretKey: settings.payment.stripe.secretKey,
-      enabled: settings.payment.stripe.enabled,
+      enabled: settings.payment.stripe.enabled
     };
   } catch (error) {
-    console.error("Failed to get Stripe configuration:", error);
+    console.error('Failed to get Stripe configuration:', error);
     return {
       publishableKey: null,
       secretKey: null,
-      enabled: false,
+      enabled: false
     };
   }
 }

@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Card, CardFooter } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/components/ui/use-toast";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import ProductAdditionalImage from "./product-additional-image";
-import ProductBasicInfo from "./product-basic-info";
-import ProductMainImage from "./product-main-image";
-import ProductSeo from "./product-seo";
-import ProductShippingInfo from "./product-shipping-Info";
-import ProductVariant from "./product-variant";
-import { Category, Product } from "@/types";
-import { ProductFormValues, productSchema } from "@/lib/validations/index";
+import { Button } from '@/components/ui/button';
+import { Card, CardFooter } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from '@/components/ui/use-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import ProductAdditionalImage from './product-additional-image';
+import ProductBasicInfo from './product-basic-info';
+import ProductMainImage from './product-main-image';
+import ProductSeo from './product-seo';
+import ProductShippingInfo from './product-shipping-Info';
+import ProductVariant from './product-variant';
+import { Category, Product } from '@/types';
+import { ProductFormValues, productSchema } from '@/lib/validations/index';
 
 interface ProductFormProps {
   product?: Product | null;
@@ -26,32 +26,32 @@ interface ProductFormProps {
 
 // Mock tags for the checkboxes
 const tags = [
-  { id: "featured", label: "Featured" },
-  { id: "best-selling", label: "Best Selling" },
-  { id: "new-arrival", label: "New Arrival" },
-  { id: "top-rated", label: "Top Rated" },
-  { id: "sale", label: "Sale" },
+  { id: 'featured', label: 'Featured' },
+  { id: 'best-selling', label: 'Best Selling' },
+  { id: 'new-arrival', label: 'New Arrival' },
+  { id: 'top-rated', label: 'Top Rated' },
+  { id: 'sale', label: 'Sale' }
 ];
 
 // Common variant attributes
 const commonAttributes = [
-  { value: "size", label: "Size" },
-  { value: "color", label: "Color" },
-  { value: "material", label: "Material" },
-  { value: "style", label: "Style" },
-  { value: "weight", label: "Weight" },
-  { value: "capacity", label: "Capacity" },
-  { value: "pattern", label: "Pattern" },
-  { value: "finish", label: "Finish" },
+  { value: 'size', label: 'Size' },
+  { value: 'color', label: 'Color' },
+  { value: 'material', label: 'Material' },
+  { value: 'style', label: 'Style' },
+  { value: 'weight', label: 'Weight' },
+  { value: 'capacity', label: 'Capacity' },
+  { value: 'pattern', label: 'Pattern' },
+  { value: 'finish', label: 'Finish' }
 ];
 
 export function ProductForm({
   product,
   isEditing = false,
-  onSuccess,
+  onSuccess
 }: ProductFormProps) {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [mainImage, setMainImage] = useState<string>("");
+  const [mainImage, setMainImage] = useState<string>('');
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,30 +61,30 @@ export function ProductForm({
   const methods = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
       price: undefined,
       compareAtPrice: undefined,
       cost: undefined,
-      sku: "",
-      barcode: "",
-      categoryId: "",
+      sku: '',
+      barcode: '',
+      categoryId: '',
       tags: [],
       stock: 0,
       weight: undefined,
       length: undefined,
       width: undefined,
       height: undefined,
-      brand: "",
+      brand: '',
       active: true,
       featured: false,
       variants: [],
       seo: {
-        title: "",
-        description: "",
-        keywords: "",
-      },
-    },
+        title: '',
+        description: '',
+        keywords: ''
+      }
+    }
   });
 
   const {
@@ -94,33 +94,33 @@ export function ProductForm({
     formState: { errors },
     reset,
     watch,
-    setValue,
+    setValue
   } = methods;
 
   const { fields, append } = useFieldArray({
     control,
-    name: "variants",
+    name: 'variants'
   });
 
   // Fetch categories for dropdown
   const fetchCategories = async () => {
     try {
-      const response = await fetch("/api/admin/categories?limit=100", {
-        credentials: "include",
+      const response = await fetch('/api/admin/categories?limit=100', {
+        credentials: 'include'
       });
 
       if (response.ok) {
         const data = await response.json();
         setCategories(data.categories || []);
       } else {
-        throw new Error("Failed to fetch categories");
+        throw new Error('Failed to fetch categories');
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error('Error fetching categories:', error);
       toast({
-        title: "Error",
-        description: "Failed to load categories.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load categories.',
+        variant: 'destructive'
       });
     } finally {
       setIsLoadingCategories(false);
@@ -139,9 +139,9 @@ export function ProductForm({
         compareAtPrice: product.compareAtPrice || undefined,
         cost: product.cost || undefined,
         sku: product.sku,
-        barcode: product.barcode || "",
+        barcode: product.barcode || '',
         categoryId:
-          typeof product.categoryId === "string"
+          typeof product.categoryId === 'string'
             ? product.categoryId
             : product.categoryId?._id,
         tags: product.tags || [],
@@ -150,15 +150,15 @@ export function ProductForm({
         length: product.length || undefined,
         width: product.width || undefined,
         height: product.height || undefined,
-        brand: product.brand || "",
+        brand: product.brand || '',
         active: product.active,
         featured: product.featured,
         variants: product.variants || [],
         seo: product.seo || {
-          title: "",
-          description: "",
-          keywords: "",
-        },
+          title: '',
+          description: '',
+          keywords: ''
+        }
       });
 
       // Set images
@@ -171,7 +171,7 @@ export function ProductForm({
   }, [product, isEditing, reset]);
 
   const handleAdditionalImagesChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const files = e.target.files;
     if (files) {
@@ -180,20 +180,20 @@ export function ProductForm({
 
       Array.from(files).forEach((file) => {
         // Validate file type and size
-        if (!file.type.startsWith("image/")) {
+        if (!file.type.startsWith('image/')) {
           toast({
-            title: "Invalid file type",
-            description: "Please upload image files only.",
-            variant: "destructive",
+            title: 'Invalid file type',
+            description: 'Please upload image files only.',
+            variant: 'destructive'
           });
           return;
         }
 
         if (file.size > 2 * 1024 * 1024) {
           toast({
-            title: "File too large",
-            description: "Please upload images smaller than 2MB.",
-            variant: "destructive",
+            title: 'File too large',
+            description: 'Please upload images smaller than 2MB.',
+            variant: 'destructive'
           });
           return;
         }
@@ -224,9 +224,9 @@ export function ProductForm({
   const onSubmit = async (data: ProductFormValues) => {
     if (!mainImage && !isEditing) {
       toast({
-        title: "Image required",
-        description: "Please upload at least one product image.",
-        variant: "destructive",
+        title: 'Image required',
+        description: 'Please upload at least one product image.',
+        variant: 'destructive'
       });
       return;
     }
@@ -238,7 +238,7 @@ export function ProductForm({
 
       // Append all form data
       Object.entries(data).forEach(([key, value]) => {
-        if (key === "variants" || key === "seo" || key === "tags") {
+        if (key === 'variants' || key === 'seo' || key === 'tags') {
           formData.append(key, JSON.stringify(value));
         } else if (value !== null && value !== undefined) {
           formData.append(key, value.toString());
@@ -248,40 +248,40 @@ export function ProductForm({
       // Append images
       if (imageFiles.length > 0) {
         imageFiles.forEach((file) => {
-          formData.append("images", file);
+          formData.append('images', file);
         });
       } else if (isEditing && mainImage) {
         // For updates, indicate to keep existing images
-        formData.append("keepExistingImages", "true");
+        formData.append('keepExistingImages', 'true');
       }
 
       const url =
         isEditing && product
           ? `/api/admin/products/${product._id}`
-          : "/api/admin/products";
+          : '/api/admin/products';
 
-      const method = isEditing ? "PUT" : "POST";
+      const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
         body: formData,
-        credentials: "include",
+        credentials: 'include'
       });
 
       if (response.ok) {
         const result = await response.json();
 
         toast({
-          title: isEditing ? "Product updated" : "Product created",
+          title: isEditing ? 'Product updated' : 'Product created',
           description: `Product "${data.name}" has been ${
-            isEditing ? "updated" : "created"
-          } successfully.`,
+            isEditing ? 'updated' : 'created'
+          } successfully.`
         });
 
         // Reset form if creating new
         if (!isEditing) {
           reset();
-          setMainImage("");
+          setMainImage('');
           setAdditionalImages([]);
           setImageFiles([]);
           setAvailableImages([]);
@@ -295,22 +295,22 @@ export function ProductForm({
         const errorData = await response.json();
         throw new Error(
           errorData.error ||
-            `Failed to ${isEditing ? "update" : "create"} product`,
+            `Failed to ${isEditing ? 'update' : 'create'} product`
         );
       }
     } catch (error: any) {
       console.error(
-        `Error ${isEditing ? "updating" : "creating"} product:`,
-        error,
+        `Error ${isEditing ? 'updating' : 'creating'} product:`,
+        error
       );
       toast({
-        title: "Error",
+        title: 'Error',
         description:
           error.message ||
           `Failed to ${
-            isEditing ? "update" : "create"
+            isEditing ? 'update' : 'create'
           } product. Please try again.`,
-        variant: "destructive",
+        variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
@@ -319,32 +319,32 @@ export function ProductForm({
 
   const addVariant = () => {
     append({
-      sku: "",
+      sku: '',
       attributes: {},
       price: undefined,
       stock: undefined,
-      image: "",
+      image: ''
     });
   };
 
   const addAttributeToVariant = (
     variantIndex: number,
-    attributeName: string,
+    attributeName: string
   ) => {
     const currentAttributes =
       watch(`variants.${variantIndex}.attributes`) || {};
     setValue(`variants.${variantIndex}.attributes`, {
       ...currentAttributes,
-      [attributeName]: "",
+      [attributeName]: ''
     });
   };
 
   const removeAttributeFromVariant = (
     variantIndex: number,
-    attributeName: string,
+    attributeName: string
   ) => {
     const currentAttributes = {
-      ...watch(`variants.${variantIndex}.attributes`),
+      ...watch(`variants.${variantIndex}.attributes`)
     };
     delete currentAttributes[attributeName];
     setValue(`variants.${variantIndex}.attributes`, currentAttributes);
@@ -353,22 +353,22 @@ export function ProductForm({
   const updateVariantAttribute = (
     variantIndex: number,
     attributeName: string,
-    value: string,
+    value: string
   ) => {
     const currentAttributes = {
-      ...watch(`variants.${variantIndex}.attributes`),
+      ...watch(`variants.${variantIndex}.attributes`)
     };
     setValue(`variants.${variantIndex}.attributes`, {
       ...currentAttributes,
-      [attributeName]: value,
+      [attributeName]: value
     });
   };
 
-  const pageTitle = isEditing ? "Edit Product" : "Create Product";
+  const pageTitle = isEditing ? 'Edit Product' : 'Create Product';
   const pageDescription = isEditing
-    ? "Update the product information."
-    : "Add a new product to your store.";
-  const submitButtonText = isEditing ? "Update Product" : "Create Product";
+    ? 'Update the product information.'
+    : 'Add a new product to your store.';
+  const submitButtonText = isEditing ? 'Update Product' : 'Create Product';
 
   return (
     <div className="space-y-6">

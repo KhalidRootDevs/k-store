@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/context/auth-context";
-import { Button } from "@/components/ui/button";
+import { useAuth } from '@/context/auth-context';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   User,
   Mail,
@@ -20,41 +20,43 @@ import {
   Edit,
   Save,
   X,
-  Loader2,
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
+  Loader2
+} from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { toast } from '@/components/ui/use-toast';
 
 export default function ProfilePage() {
   const { user, checkAuth } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    dateOfBirth: "",
+    name: '',
+    email: '',
+    phone: '',
+    dateOfBirth: ''
   });
 
   // Format date for input field (YYYY-MM-DD)
   const formatDateForInput = (dateString: string | Date) => {
-    if (!dateString) return "";
+    if (!dateString) return '';
 
     const date = new Date(dateString);
     // Check if date is valid
-    if (isNaN(date.getTime())) return "";
+    if (isNaN(date.getTime())) return '';
 
-    return date.toISOString().split("T")[0];
+    return date.toISOString().split('T')[0];
   };
 
   // Initialize form data when user loads
   useEffect(() => {
     if (user) {
       setFormData({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        dateOfBirth: user?.dateOfBirth ? formatDateForInput(user.dateOfBirth) : "",
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        dateOfBirth: user?.dateOfBirth
+          ? formatDateForInput(user.dateOfBirth)
+          : ''
       });
     }
   }, [user]);
@@ -64,20 +66,20 @@ export default function ProfilePage() {
 
     setIsLoading(true);
     try {
-      const response = await fetch("/api/user/profile", {
-        method: "PUT",
+      const response = await fetch('/api/user/profile', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
           dateOfBirth: formData.dateOfBirth
             ? new Date(formData.dateOfBirth)
-            : null,
-        }),
+            : null
+        })
       });
 
       if (response.ok) {
@@ -87,22 +89,21 @@ export default function ProfilePage() {
         await checkAuth();
 
         toast({
-          title: "Profile updated",
-          description:
-            "Your profile information has been updated successfully.",
+          title: 'Profile updated',
+          description: 'Your profile information has been updated successfully.'
         });
         setIsEditing(false);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update profile");
+        throw new Error(errorData.error || 'Failed to update profile');
       }
     } catch (error: any) {
-      console.error("Error updating profile:", error);
+      console.error('Error updating profile:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to update profile. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to update profile. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsLoading(false);
@@ -113,10 +114,12 @@ export default function ProfilePage() {
     // Reset form to original user data
     if (user) {
       setFormData({
-        name: user.name || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        dateOfBirth: user.dateOfBirth ? formatDateForInput(user.dateOfBirth) : "",
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        dateOfBirth: user.dateOfBirth
+          ? formatDateForInput(user.dateOfBirth)
+          : ''
       });
     }
     setIsEditing(false);
@@ -124,19 +127,19 @@ export default function ProfilePage() {
 
   const getInitials = (name: string) => {
     return name
-      .split(" ")
+      .split(' ')
       .map((part) => part[0])
-      .join("")
+      .join('')
       .toUpperCase()
       .slice(0, 2);
   };
 
-  console.log("user", user);
-  console.log("formData", formData);
+  console.log('user', user);
+  console.log('formData', formData);
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -202,14 +205,14 @@ export default function ProfilePage() {
                 <Button variant="outline" size="sm" disabled>
                   Change Photo
                 </Button>
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Coming soon
                 </p>
               </div>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name *</Label>
               <div className="relative">
@@ -290,7 +293,7 @@ export default function ProfilePage() {
           </div>
 
           {isEditing && (
-            <div className="p-4 bg-muted rounded-lg">
+            <div className="rounded-lg bg-muted p-4">
               <p className="text-sm text-muted-foreground">
                 <strong>Note:</strong> Changing your email address may require
                 verification.
@@ -306,22 +309,22 @@ export default function ProfilePage() {
           <CardDescription>Your account activity overview</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 border rounded-lg">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="rounded-lg border p-4 text-center">
               <div className="text-2xl font-bold">12</div>
               <div className="text-sm text-muted-foreground">Total Orders</div>
             </div>
-            <div className="text-center p-4 border rounded-lg">
+            <div className="rounded-lg border p-4 text-center">
               <div className="text-2xl font-bold">$1,234</div>
               <div className="text-sm text-muted-foreground">Total Spent</div>
             </div>
-            <div className="text-center p-4 border rounded-lg">
+            <div className="rounded-lg border p-4 text-center">
               <div className="text-2xl font-bold">5</div>
               <div className="text-sm text-muted-foreground">
                 Wishlist Items
               </div>
             </div>
-            <div className="text-center p-4 border rounded-lg">
+            <div className="rounded-lg border p-4 text-center">
               <div className="text-2xl font-bold">3</div>
               <div className="text-sm text-muted-foreground">
                 Saved Addresses

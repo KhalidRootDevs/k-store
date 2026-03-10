@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 
-import type { ColumnDef } from "@tanstack/react-table";
-import { Copy } from "lucide-react";
-import { useTransition } from "react";
-import toast from "react-hot-toast";
-import { DataTableColumnHeader } from "../data-table-column-header";
-import InvoiceAction from "./action";
+import type { ColumnDef } from '@tanstack/react-table';
+import { Copy } from 'lucide-react';
+import { useTransition } from 'react';
+import toast from 'react-hot-toast';
+import { DataTableColumnHeader } from '../data-table-column-header';
+import InvoiceAction from './action';
 
 function InvoiceNumberCell({ invoiceNumber }: { invoiceNumber: string }) {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Copied invoice number!");
+    toast.success('Copied invoice number!');
   };
 
   return (
@@ -33,16 +33,16 @@ function InvoiceNumberCell({ invoiceNumber }: { invoiceNumber: string }) {
 
 export const columns: ColumnDef<any>[] = [
   {
-    accessorKey: "invoiceNumber",
+    accessorKey: 'invoiceNumber',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Invoice #" />
     ),
     cell: ({ row }) => (
       <InvoiceNumberCell invoiceNumber={row.original.invoiceNumber} />
-    ),
+    )
   },
   {
-    accessorKey: "clientName",
+    accessorKey: 'clientName',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Client" />
     ),
@@ -53,10 +53,10 @@ export const columns: ColumnDef<any>[] = [
           {row.original.clientEmail}
         </div>
       </div>
-    ),
+    )
   },
   {
-    accessorKey: "amount",
+    accessorKey: 'amount',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Amount" />
     ),
@@ -67,33 +67,33 @@ export const columns: ColumnDef<any>[] = [
           {invoice.currency} {invoice.amount.toFixed(2)}
         </span>
       );
-    },
+    }
   },
 
   {
-    accessorKey: "createdAt",
+    accessorKey: 'createdAt',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created At" />
     ),
     cell: ({ row }) => (
       <span>{new Date(row.original.createdAt).toLocaleDateString()}</span>
-    ),
+    )
   },
   {
-    accessorKey: "dueDate",
+    accessorKey: 'dueDate',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Due Date" />
     ),
     cell: ({ row }) => (
       <span>{new Date(row.original.dueDate).toLocaleDateString()}</span>
-    ),
+    )
   },
 
   {
-    id: "actions",
+    id: 'actions',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Actions" />
     ),
-    cell: ({ row }) => <InvoiceAction invoice={row.original} />,
-  },
+    cell: ({ row }) => <InvoiceAction invoice={row.original} />
+  }
 ];

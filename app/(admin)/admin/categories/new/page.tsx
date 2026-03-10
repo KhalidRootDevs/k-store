@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { CategoryForm } from "@/components/forms/category-form";
+import { CategoryForm } from '@/components/forms/category-form';
 
 export default function NewCategoryPage() {
   return <CategoryForm />;

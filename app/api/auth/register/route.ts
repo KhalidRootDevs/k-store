@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { User } from "@/models/User";
-import { generateToken } from "@/lib/auth";
-import connectDB from "@/lib/database";
+import { User } from '@/models/User';
+import { generateToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     // Validate input
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "Name, email, and password are required" },
+        { error: 'Name, email, and password are required' },
         { status: 400 }
       );
     }
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
-        { error: "Email already registered" },
+        { error: 'Email already registered' },
         { status: 409 }
       );
     }
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     const user = await User.create({
       name,
       email,
-      password,
+      password
     });
 
     // Generate token
@@ -40,35 +40,35 @@ export async function POST(request: NextRequest) {
     // Create response
     const response = NextResponse.json(
       {
-        message: "Registration successful",
+        message: 'Registration successful',
         user: {
           id: user._id,
           name: user.name,
-          email: user.email,
-        },
+          email: user.email
+        }
       },
       { status: 201 }
     );
 
     // Set HTTP-only cookie
-    response.cookies.set("token", token, {
+    response.cookies.set('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 // 7 days
     });
 
     return response;
   } catch (error: any) {
-    console.error("Registration error:", error);
+    console.error('Registration error:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err: any) => err.message);
-      return NextResponse.json({ error: errors.join(", ") }, { status: 400 });
+      return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

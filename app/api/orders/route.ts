@@ -1,11 +1,11 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { Order } from "@/models/Order";
-import { Product } from "@/models/Product";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/database";
-import { User } from "@/models/User";
-import { Mongoose } from "mongoose";
-import bcrypt from "bcryptjs";
+import { type NextRequest, NextResponse } from 'next/server';
+import { Order } from '@/models/Order';
+import { Product } from '@/models/Product';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
+import { User } from '@/models/User';
+import { Mongoose } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 /**
  * POST /api/orders
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     let userId;
     let userEmail;
     let isGuest = false;
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    console.log("body", body);
+    console.log('body', body);
 
     const {
       items,
@@ -42,13 +42,13 @@ export async function POST(request: NextRequest) {
       // Guest user specific fields
       customer,
 
-      createAccount = true, // Option to create account for guest
+      createAccount = true // Option to create account for guest
     } = body;
 
     // Validate required fields
     if (!items || items.length === 0) {
       return NextResponse.json(
-        { error: "Order must contain at least one item" },
+        { error: 'Order must contain at least one item' },
         { status: 400 }
       );
     }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Shipping address, payment method, and shipping method are required",
+            'Shipping address, payment method, and shipping method are required'
         },
         { status: 400 }
       );
@@ -67,14 +67,14 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       if (!customer?.email) {
         return NextResponse.json(
-          { error: "Email is required for guest checkout" },
+          { error: 'Email is required for guest checkout' },
           { status: 400 }
         );
       }
 
       // Check if user already exists with this email
       let existingUser = await User.findOne({
-        email: customer?.email.toLowerCase(),
+        email: customer?.email.toLowerCase()
       });
 
       if (existingUser) {
@@ -91,12 +91,12 @@ export async function POST(request: NextRequest) {
           name: shippingAddress.fullName,
           email: customer?.email.toLowerCase(),
           password: hashedPassword,
-          role: "user",
+          role: 'user',
           emailVerified: false,
           phone: shippingAddress.phone,
           addresses: [
             {
-              type: "shipping",
+              type: 'shipping',
               fullName: shippingAddress.fullName,
               address: shippingAddress.address,
               city: shippingAddress.city,
@@ -104,10 +104,10 @@ export async function POST(request: NextRequest) {
               zipCode: shippingAddress.zipCode,
               country: shippingAddress.country,
               phone: shippingAddress.phone,
-              isDefault: true,
-            },
+              isDefault: true
+            }
           ],
-          guestAccount: true, // Mark as guest account that was auto-created
+          guestAccount: true // Mark as guest account that was auto-created
         });
 
         await newUser.save();
@@ -183,21 +183,21 @@ export async function POST(request: NextRequest) {
         image: item.image || product.images[0],
         variant: item.variant,
         productId: product._id,
-        sku: item.variant?.sku || product.sku,
+        sku: item.variant?.sku || product.sku
       });
     }
 
     // Calculate tax and shipping
     const tax = subtotal * 0.1; // 10% tax
-    const shipping = shippingMethod === "express" ? 15 : 5;
+    const shipping = shippingMethod === 'express' ? 15 : 5;
     const total = subtotal + tax + shipping;
 
     // Generate order number
     const generateOrderNumber = () => {
       const date = new Date();
       const year = date.getFullYear();
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      const day = date.getDate().toString().padStart(2, "0");
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
       const random = Math.random().toString(36).substr(2, 6).toUpperCase();
       return `ORD-${year}${month}${day}-${random}`;
     };
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
         name: shippingAddress.fullName,
         email: userEmail,
         phone: shippingAddress.phone,
-        address: shippingAddress.address,
+        address: shippingAddress.address
       },
       items: validatedItems,
       subtotal,
@@ -226,11 +226,11 @@ export async function POST(request: NextRequest) {
       guestOrder: isGuest, // Mark if this is a guest order
       timeline: [
         {
-          status: "order_placed",
+          status: 'order_placed',
           date: new Date(),
-          description: "Order was placed by customer",
-        },
-      ],
+          description: 'Order was placed by customer'
+        }
+      ]
     };
 
     const order = await Order.create(orderData);
@@ -262,35 +262,35 @@ export async function POST(request: NextRequest) {
 
     // Populate order for response
     const populatedOrder = await Order.findById(order._id)
-      .populate("customer.id", "name email")
+      .populate('customer.id', 'name email')
       .lean();
 
     // Prepare response
     const responseData: any = {
-      message: "Order created successfully",
-      order: populatedOrder,
+      message: 'Order created successfully',
+      order: populatedOrder
     };
 
     // Add guest account info if account was created
     if (isGuest && createAccount) {
       responseData.guestAccountCreated = true;
       responseData.message =
-        "Order created successfully. Account has been created for you.";
+        'Order created successfully. Account has been created for you.';
       // In a real implementation, you would send the email here
       // responseData.emailSent = true;
     }
 
     return NextResponse.json(responseData, { status: 201 });
   } catch (error: any) {
-    console.error("Create order error:", error);
+    console.error('Create order error:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err: any) => err.message);
-      return NextResponse.json({ error: errors.join(", ") }, { status: 400 });
+      return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -304,58 +304,58 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
 
     const { searchParams } = new URL(request.url);
-    const page = Number.parseInt(searchParams.get("page") || "1");
-    const limit = Number.parseInt(searchParams.get("limit") || "10");
-    const status = searchParams.get("status");
-    const paymentStatus = searchParams.get("paymentStatus");
-    const search = searchParams.get("search") || "";
-    const sortBy = searchParams.get("sortBy") || "createdAt";
-    const sortOrder = searchParams.get("sortOrder") || "desc";
+    const page = Number.parseInt(searchParams.get('page') || '1');
+    const limit = Number.parseInt(searchParams.get('limit') || '10');
+    const status = searchParams.get('status');
+    const paymentStatus = searchParams.get('paymentStatus');
+    const search = searchParams.get('search') || '';
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     const query: any = {};
 
     // Filter by customer (non-admin users see only their orders)
-    if (decoded.role !== "admin") {
-      query["customer.id"] = decoded.userId;
+    if (decoded.role !== 'admin') {
+      query['customer.id'] = decoded.userId;
     }
 
     // Status filter
-    if (status && status !== "all") {
+    if (status && status !== 'all') {
       query.status = status;
     }
 
     // Payment status filter
-    if (paymentStatus && paymentStatus !== "all") {
+    if (paymentStatus && paymentStatus !== 'all') {
       query.paymentStatus = paymentStatus;
     }
 
     // Search filter
     if (search) {
       query.$or = [
-        { orderNumber: { $regex: search, $options: "i" } },
-        { "customer.name": { $regex: search, $options: "i" } },
-        { "customer.email": { $regex: search, $options: "i" } },
-        { trackingNumber: { $regex: search, $options: "i" } },
+        { orderNumber: { $regex: search, $options: 'i' } },
+        { 'customer.name': { $regex: search, $options: 'i' } },
+        { 'customer.email': { $regex: search, $options: 'i' } },
+        { trackingNumber: { $regex: search, $options: 'i' } }
       ];
     }
 
     const skip = (page - 1) * limit;
-    const sort: any = { [sortBy]: sortOrder === "desc" ? -1 : 1 };
+    const sort: any = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
     const orders = await Order.find(query)
-      .populate("customer.id", "name email")
+      .populate('customer.id', 'name email')
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .select("-__v");
+      .select('-__v');
 
     const total = await Order.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
@@ -368,13 +368,13 @@ export async function GET(request: NextRequest) {
         total,
         totalPages,
         hasNext: page < totalPages,
-        hasPrev: page > 1,
-      },
+        hasPrev: page > 1
+      }
     });
   } catch (error) {
-    console.error("Get orders error:", error);
+    console.error('Get orders error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

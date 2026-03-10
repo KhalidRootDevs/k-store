@@ -1,40 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Product } from "@/models/Product";
-import { Category } from "@/models/Category"; // Import Category model
-import connectDB from "@/lib/database";
-import mongoose from "mongoose";
+import { NextRequest, NextResponse } from 'next/server';
+import { Product } from '@/models/Product';
+import { Category } from '@/models/Category'; // Import Category model
+import connectDB from '@/lib/database';
+import mongoose from 'mongoose';
 
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "12");
-    const search = searchParams.get("search") || "";
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '12');
+    const search = searchParams.get('search') || '';
     const categorySlugs =
-      searchParams.get("categories")?.split(",").filter(Boolean) || [];
-    const brands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
-    const minPrice = parseFloat(searchParams.get("minPrice") || "0");
-    const maxPrice = parseFloat(searchParams.get("maxPrice") || "1000");
-    const sortBy = searchParams.get("sort") || "featured";
-    const featured = searchParams.get("featured");
-    const active = searchParams.get("active") || "true";
+      searchParams.get('categories')?.split(',').filter(Boolean) || [];
+    const brands = searchParams.get('brands')?.split(',').filter(Boolean) || [];
+    const minPrice = parseFloat(searchParams.get('minPrice') || '0');
+    const maxPrice = parseFloat(searchParams.get('maxPrice') || '1000');
+    const sortBy = searchParams.get('sort') || 'featured';
+    const featured = searchParams.get('featured');
+    const active = searchParams.get('active') || 'true';
 
     // Build query
     const query: any = {};
 
     // Active products filter
-    if (active !== "all") {
-      query.active = active === "true";
+    if (active !== 'all') {
+      query.active = active === 'true';
     }
 
     // Search filter
     if (search) {
       query.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-        { tags: { $in: [new RegExp(search, "i")] } },
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { tags: { $in: [new RegExp(search, 'i')] } }
       ];
     }
 
@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
     if (categorySlugs.length > 0) {
       // Find category IDs based on slugs
       const categories = await Category.find({
-        slug: { $in: categorySlugs },
-      }).select("_id");
+        slug: { $in: categorySlugs }
+      }).select('_id');
 
       const categoryIds = categories.map((cat) => cat._id);
 
@@ -61,8 +61,8 @@ export async function GET(request: NextRequest) {
     query.price = { $gte: minPrice, $lte: maxPrice };
 
     // Featured filter
-    if (featured !== null && featured !== "all") {
-      query.featured = featured === "true";
+    if (featured !== null && featured !== 'all') {
+      query.featured = featured === 'true';
     }
 
     const skip = (page - 1) * limit;
@@ -70,22 +70,22 @@ export async function GET(request: NextRequest) {
     // Build sort object
     let sortOptions: any = {};
     switch (sortBy) {
-      case "price-asc":
+      case 'price-asc':
         sortOptions = { price: 1 };
         break;
-      case "price-desc":
+      case 'price-desc':
         sortOptions = { price: -1 };
         break;
-      case "newest":
+      case 'newest':
         sortOptions = { createdAt: -1 };
         break;
-      case "best-selling":
+      case 'best-selling':
         sortOptions = { salesCount: -1 };
         break;
-      case "rating":
+      case 'rating':
         sortOptions = { rating: -1 };
         break;
-      case "featured":
+      case 'featured':
       default:
         sortOptions = { featured: -1, createdAt: -1 };
         break;
@@ -93,11 +93,11 @@ export async function GET(request: NextRequest) {
 
     // Get products with pagination and populate category
     const products = await Product.find(query)
-      .populate("categoryId", "name slug")
+      .populate('categoryId', 'name slug')
       .sort(sortOptions)
       .skip(skip)
       .limit(limit)
-      .select("-__v");
+      .select('-__v');
 
     // Get total count for pagination
     const total = await Product.countDocuments(query);
@@ -105,10 +105,10 @@ export async function GET(request: NextRequest) {
 
     // Get categories and brands for filters
     const allCategories = await Category.find({ active: true })
-      .select("name slug")
+      .select('name slug')
       .sort({ name: 1 });
 
-    const allBrands = await Product.distinct("brand", { active: true });
+    const allBrands = await Product.distinct('brand', { active: true });
 
     // Calculate actual price range
     const priceStats = await Product.aggregate([
@@ -116,10 +116,10 @@ export async function GET(request: NextRequest) {
       {
         $group: {
           _id: null,
-          minPrice: { $min: "$price" },
-          maxPrice: { $max: "$price" },
-        },
-      },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' }
+        }
+      }
     ]);
 
     const priceRange = priceStats[0] || { minPrice: 0, maxPrice: 1000 };
@@ -132,21 +132,21 @@ export async function GET(request: NextRequest) {
         total,
         totalPages,
         hasNext: page < totalPages,
-        hasPrev: page > 1,
+        hasPrev: page > 1
       },
       filters: {
         categories: allCategories,
         brands: allBrands,
         priceRange: {
           min: priceRange.minPrice,
-          max: priceRange.maxPrice,
-        },
-      },
+          max: priceRange.maxPrice
+        }
+      }
     });
   } catch (error) {
-    console.error("Get products error:", error);
+    console.error('Get products error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

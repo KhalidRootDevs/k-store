@@ -1,22 +1,22 @@
-import { SettingsFormData } from "@/app/(admin)/admin/settings/page";
-import { Button } from "@/components/ui/button";
+import { SettingsFormData } from '@/app/(admin)/admin/settings/page';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { Cloud, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Cloud, Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 export default function AdvanceSettings({
-  handleBooleanChange,
+  handleBooleanChange
 }: {
   handleBooleanChange: (path: string, value: boolean) => void;
 }) {
@@ -24,19 +24,19 @@ export default function AdvanceSettings({
     register,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors }
   } = useFormContext<SettingsFormData>();
   const watchedValues = watch();
 
   const [showCloudinarySecrets, setShowCloudinarySecrets] = useState({
     apiKey: false,
-    apiSecret: false,
+    apiSecret: false
   });
 
-  const toggleCloudinarySecretVisibility = (field: "apiKey" | "apiSecret") => {
+  const toggleCloudinarySecretVisibility = (field: 'apiKey' | 'apiSecret') => {
     setShowCloudinarySecrets((prev) => ({
       ...prev,
-      [field]: !prev[field],
+      [field]: !prev[field]
     }));
   };
 
@@ -55,7 +55,7 @@ export default function AdvanceSettings({
             <Label htmlFor="google-analytics">Google Analytics ID</Label>
             <Input
               id="google-analytics"
-              {...register("advanced.analytics.googleAnalyticsId")}
+              {...register('advanced.analytics.googleAnalyticsId')}
             />
           </div>
 
@@ -63,7 +63,7 @@ export default function AdvanceSettings({
             <Label htmlFor="facebook-pixel">Facebook Pixel ID</Label>
             <Input
               id="facebook-pixel"
-              {...register("advanced.analytics.facebookPixelId")}
+              {...register('advanced.analytics.facebookPixelId')}
             />
           </div>
 
@@ -80,7 +80,7 @@ export default function AdvanceSettings({
               id="enable-analytics"
               checked={watchedValues.advanced?.analytics?.enabled}
               onCheckedChange={(value) =>
-                handleBooleanChange("advanced.analytics.enabled", value)
+                handleBooleanChange('advanced.analytics.enabled', value)
               }
             />
           </div>
@@ -100,12 +100,12 @@ export default function AdvanceSettings({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="cloudinary-cloud-name">Cloud Name</Label>
               <Input
                 id="cloudinary-cloud-name"
-                {...register("advanced.cloudinary.cloudName")}
+                {...register('advanced.cloudinary.cloudName')}
                 placeholder="your-cloud-name"
               />
               {errors.advanced?.cloudinary?.cloudName && (
@@ -118,7 +118,7 @@ export default function AdvanceSettings({
               <Label htmlFor="cloudinary-folder">Default Folder</Label>
               <Input
                 id="cloudinary-folder"
-                {...register("advanced.cloudinary.folder")}
+                {...register('advanced.cloudinary.folder')}
                 placeholder="ecommerce"
               />
               {errors.advanced?.cloudinary?.folder && (
@@ -134,8 +134,8 @@ export default function AdvanceSettings({
             <div className="relative">
               <Input
                 id="cloudinary-api-key"
-                type={showCloudinarySecrets.apiKey ? "text" : "password"}
-                {...register("advanced.cloudinary.apiKey")}
+                type={showCloudinarySecrets.apiKey ? 'text' : 'password'}
+                {...register('advanced.cloudinary.apiKey')}
                 placeholder="Your Cloudinary API Key"
               />
               <Button
@@ -143,7 +143,7 @@ export default function AdvanceSettings({
                 variant="ghost"
                 size="sm"
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={() => toggleCloudinarySecretVisibility("apiKey")}
+                onClick={() => toggleCloudinarySecretVisibility('apiKey')}
               >
                 {showCloudinarySecrets.apiKey ? (
                   <EyeOff className="h-4 w-4" />
@@ -164,8 +164,8 @@ export default function AdvanceSettings({
             <div className="relative">
               <Input
                 id="cloudinary-api-secret"
-                type={showCloudinarySecrets.apiSecret ? "text" : "password"}
-                {...register("advanced.cloudinary.apiSecret")}
+                type={showCloudinarySecrets.apiSecret ? 'text' : 'password'}
+                {...register('advanced.cloudinary.apiSecret')}
                 placeholder="Your Cloudinary API Secret"
               />
               <Button
@@ -173,7 +173,7 @@ export default function AdvanceSettings({
                 variant="ghost"
                 size="sm"
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={() => toggleCloudinarySecretVisibility("apiSecret")}
+                onClick={() => toggleCloudinarySecretVisibility('apiSecret')}
               >
                 {showCloudinarySecrets.apiSecret ? (
                   <EyeOff className="h-4 w-4" />
@@ -189,12 +189,12 @@ export default function AdvanceSettings({
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="cloudinary-upload-preset">Upload Preset</Label>
               <Input
                 id="cloudinary-upload-preset"
-                {...register("advanced.cloudinary.uploadPreset")}
+                {...register('advanced.cloudinary.uploadPreset')}
                 placeholder="Optional upload preset"
               />
             </div>
@@ -211,17 +211,17 @@ export default function AdvanceSettings({
                 id="cloudinary-secure"
                 checked={watchedValues.advanced?.cloudinary?.secure}
                 onCheckedChange={(value) =>
-                  handleBooleanChange("advanced.cloudinary.secure", value)
+                  handleBooleanChange('advanced.cloudinary.secure', value)
                 }
               />
             </div>
           </div>
 
-          <div className="bg-muted p-4 rounded-md">
-            <h4 className="font-medium text-sm mb-2">
+          <div className="rounded-md bg-muted p-4">
+            <h4 className="mb-2 text-sm font-medium">
               Cloudinary Setup Instructions:
             </h4>
-            <ul className="text-xs text-muted-foreground space-y-1">
+            <ul className="space-y-1 text-xs text-muted-foreground">
               <li>1. Sign up for a Cloudinary account at cloudinary.com</li>
               <li>2. Find your credentials in the Cloudinary Dashboard</li>
               <li>3. Enter your Cloud Name, API Key, and API Secret above</li>
@@ -247,7 +247,7 @@ export default function AdvanceSettings({
             <Input
               id="api-key"
               type="password"
-              {...register("advanced.api.apiKey")}
+              {...register('advanced.api.apiKey')}
             />
             {errors.advanced?.api?.apiKey && (
               <p className="text-sm text-red-500">
@@ -260,7 +260,7 @@ export default function AdvanceSettings({
             <Label htmlFor="webhook-url">Webhook URL</Label>
             <Input
               id="webhook-url"
-              {...register("advanced.api.webhookUrl")}
+              {...register('advanced.api.webhookUrl')}
               placeholder="https://example.com/webhook"
             />
           </div>
@@ -278,7 +278,7 @@ export default function AdvanceSettings({
               id="webhooks-enabled"
               checked={watchedValues.advanced?.api?.webhooksEnabled}
               onCheckedChange={(value) =>
-                handleBooleanChange("advanced.api.webhooksEnabled", value)
+                handleBooleanChange('advanced.api.webhooksEnabled', value)
               }
             />
           </div>
@@ -307,7 +307,7 @@ export default function AdvanceSettings({
               id="enable-cache"
               checked={watchedValues.advanced?.performance?.pageCaching}
               onCheckedChange={(value) =>
-                handleBooleanChange("advanced.performance.pageCaching", value)
+                handleBooleanChange('advanced.performance.pageCaching', value)
               }
             />
           </div>
@@ -317,8 +317,8 @@ export default function AdvanceSettings({
             <Input
               id="cache-duration"
               type="number"
-              {...register("advanced.performance.cacheDuration", {
-                valueAsNumber: true,
+              {...register('advanced.performance.cacheDuration', {
+                valueAsNumber: true
               })}
             />
           </div>
@@ -337,7 +337,7 @@ export default function AdvanceSettings({
               checked={watchedValues.advanced?.performance?.imageOptimization}
               onCheckedChange={(value) =>
                 handleBooleanChange(
-                  "advanced.performance.imageOptimization",
+                  'advanced.performance.imageOptimization',
                   value
                 )
               }
@@ -357,7 +357,7 @@ export default function AdvanceSettings({
               id="minify-assets"
               checked={watchedValues.advanced?.performance?.minifyAssets}
               onCheckedChange={(value) =>
-                handleBooleanChange("advanced.performance.minifyAssets", value)
+                handleBooleanChange('advanced.performance.minifyAssets', value)
               }
             />
           </div>
@@ -388,7 +388,7 @@ export default function AdvanceSettings({
               id="maintenance-mode"
               checked={watchedValues.advanced?.maintenance?.enabled}
               onCheckedChange={(value) =>
-                handleBooleanChange("advanced.maintenance.enabled", value)
+                handleBooleanChange('advanced.maintenance.enabled', value)
               }
             />
           </div>
@@ -398,11 +398,11 @@ export default function AdvanceSettings({
             <Textarea
               id="maintenance-message"
               rows={3}
-              {...register("advanced.maintenance.message")}
+              {...register('advanced.maintenance.message')}
             />
             {errors.advanced?.maintenance?.message && (
               <p className="text-sm text-red-500">
-                {typeof errors.advanced?.maintenance?.message === "object" &&
+                {typeof errors.advanced?.maintenance?.message === 'object' &&
                   errors.advanced.maintenance.message.message}
               </p>
             )}
@@ -422,7 +422,7 @@ export default function AdvanceSettings({
               checked={watchedValues.advanced?.maintenance?.allowAdminAccess}
               onCheckedChange={(value) =>
                 handleBooleanChange(
-                  "advanced.maintenance.allowAdminAccess",
+                  'advanced.maintenance.allowAdminAccess',
                   value
                 )
               }

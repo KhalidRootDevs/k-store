@@ -1,17 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { Address } from "@/models/Address";
-import { User } from "@/models/User";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/database";
+import { Address } from '@/models/Address';
+import { User } from '@/models/User';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
 
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       zipCode,
       country,
       phone,
-      isDefault,
+      isDefault
     } = await request.json();
 
     // Validate required fields
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       !phone
     ) {
       return NextResponse.json(
-        { error: "All address fields are required" },
+        { error: 'All address fields are required' },
         { status: 400 }
       );
     }
@@ -54,33 +54,33 @@ export async function POST(request: NextRequest) {
       city,
       state,
       zipCode,
-      country: country || "United States",
+      country: country || 'United States',
       phone,
-      isDefault: isDefault || false,
+      isDefault: isDefault || false
     });
 
     // Add address reference to user
     await User.findByIdAndUpdate(userId, {
-      $push: { addresses: newAddress._id },
+      $push: { addresses: newAddress._id }
     });
 
     return NextResponse.json(
       {
-        message: "Address created successfully",
-        address: newAddress,
+        message: 'Address created successfully',
+        address: newAddress
       },
       { status: 201 }
     );
   } catch (error: any) {
-    console.error("Create address error:", error);
+    console.error('Create address error:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err: any) => err.message);
-      return NextResponse.json({ error: errors.join(", ") }, { status: 400 });
+      return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -90,9 +90,9 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
@@ -101,14 +101,14 @@ export async function GET(request: NextRequest) {
     // Get all addresses for the user
     const addresses = await Address.find({ userId }).sort({
       isDefault: -1,
-      createdAt: -1,
+      createdAt: -1
     });
 
     return NextResponse.json({ addresses });
   } catch (error) {
-    console.error("Get addresses error:", error);
+    console.error('Get addresses error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

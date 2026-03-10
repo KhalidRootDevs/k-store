@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import type React from "react";
+import type React from 'react';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Mail } from "lucide-react";
-import { useState } from "react";
-import { toast } from "@/components/ui/use-toast";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Mail } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from '@/components/ui/use-toast';
 
 export function NewsletterSection() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -19,30 +19,30 @@ export function NewsletterSection() {
     // Simulate API call
     setTimeout(() => {
       toast({
-        title: "Successfully subscribed!",
-        description: "Thank you for subscribing to our newsletter.",
+        title: 'Successfully subscribed!',
+        description: 'Thank you for subscribing to our newsletter.'
       });
-      setEmail("");
+      setEmail('');
       setIsSubmitting(false);
     }, 1000);
   };
 
   return (
-    <div className="bg-primary text-primary-foreground rounded-2xl p-8 md:p-12">
-      <div className="max-w-2xl mx-auto text-center">
-        <div className="inline-flex items-center justify-center h-16 w-16 rounded-full bg-primary-foreground/10 mb-6">
+    <div className="rounded-2xl bg-primary p-8 text-primary-foreground md:p-12">
+      <div className="mx-auto max-w-2xl text-center">
+        <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-foreground/10">
           <Mail className="h-8 w-8" />
         </div>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+        <h2 className="mb-4 text-3xl font-bold md:text-4xl">
           Stay in the Loop
         </h2>
-        <p className="text-lg mb-8 text-primary-foreground/90">
+        <p className="mb-8 text-lg text-primary-foreground/90">
           Subscribe to our newsletter for exclusive deals, new arrivals, and
           style inspiration delivered to your inbox.
         </p>
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+          className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row"
         >
           <Input
             type="email"
@@ -50,7 +50,7 @@ export function NewsletterSection() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 flex-1"
+            className="flex-1 border-primary-foreground/20 bg-primary-foreground/10 text-primary-foreground placeholder:text-primary-foreground/60"
           />
           <Button
             type="submit"
@@ -58,10 +58,10 @@ export function NewsletterSection() {
             disabled={isSubmitting}
             className="font-semibold"
           >
-            {isSubmitting ? "Subscribing..." : "Subscribe"}
+            {isSubmitting ? 'Subscribing...' : 'Subscribe'}
           </Button>
         </form>
-        <p className="text-xs text-primary-foreground/70 mt-4">
+        <p className="mt-4 text-xs text-primary-foreground/70">
           By subscribing, you agree to our Privacy Policy and consent to receive
           updates.
         </p>

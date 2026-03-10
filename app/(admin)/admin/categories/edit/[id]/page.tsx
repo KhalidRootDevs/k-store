@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { CategoryForm } from "@/components/forms/category-form";
-import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CategoryForm } from '@/components/forms/category-form';
+import { Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface EditCategoryPageProps {
   params: {
@@ -19,20 +19,20 @@ export default function EditCategoryPage({ params }: EditCategoryPageProps) {
     const fetchCategory = async () => {
       try {
         const response = await fetch(`/api/admin/categories/${params.id}`, {
-          credentials: "include",
+          credentials: 'include'
         });
 
         if (response.ok) {
           const data = await response.json();
           setCategory(data.category);
         } else if (response.status === 404) {
-          setError("Category not found");
+          setError('Category not found');
         } else {
-          throw new Error("Failed to fetch category");
+          throw new Error('Failed to fetch category');
         }
       } catch (error) {
-        console.error("Error fetching category:", error);
-        setError("Failed to load category");
+        console.error('Error fetching category:', error);
+        setError('Failed to load category');
       } finally {
         setIsLoading(false);
       }
@@ -43,7 +43,7 @@ export default function EditCategoryPage({ params }: EditCategoryPageProps) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );

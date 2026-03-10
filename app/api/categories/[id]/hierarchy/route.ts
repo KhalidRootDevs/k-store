@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
-import { GET_CATEGORY_WITH_HIERARCHY } from "../../route";
+import { NextRequest } from 'next/server';
+import { GET_CATEGORY_WITH_HIERARCHY } from '../../route';
 
 export async function GET(
   request: NextRequest,

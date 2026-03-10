@@ -1,41 +1,47 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from 'next/server';
 
-import { verifyToken } from "@/lib/auth"
-import connectDB from "@/lib/database"
-import { Category } from "@/models/Category"
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
+import { Category } from '@/models/Category';
 
 export async function POST(request: NextRequest) {
   try {
-    await connectDB()
+    await connectDB();
 
-    const token = request.cookies.get("token")?.value
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    const decoded = verifyToken(token)
-    if (!decoded || decoded.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+    const decoded = verifyToken(token);
+    if (!decoded || decoded.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    const { categoryIds } = await request.json()
+    const { categoryIds } = await request.json();
 
     if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
-      return NextResponse.json({ error: "Invalid category IDs array" }, { status: 400 })
+      return NextResponse.json(
+        { error: 'Invalid category IDs array' },
+        { status: 400 }
+      );
     }
 
     // Update the order for each category
     const updatePromises = categoryIds.map((id, index) =>
-      Category.findByIdAndUpdate(id, { order: index }, { new: true }),
-    )
+      Category.findByIdAndUpdate(id, { order: index }, { new: true })
+    );
 
-    await Promise.all(updatePromises)
+    await Promise.all(updatePromises);
 
     return NextResponse.json({
-      message: "Categories reordered successfully",
-    })
+      message: 'Categories reordered successfully'
+    });
   } catch (error) {
-    console.error("Reorder categories error:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error('Reorder categories error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

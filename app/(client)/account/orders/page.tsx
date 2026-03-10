@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+  CardTitle
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   Package,
   Eye,
@@ -17,53 +17,53 @@ import {
   Search,
   Loader2,
   Filter,
-  Calendar,
-} from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
+  Calendar
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { toast } from '@/components/ui/use-toast';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Order } from "@/types";
+  SelectValue
+} from '@/components/ui/select';
+import { Order } from '@/types';
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "delivered":
-      return "bg-green-100 text-green-800 border-green-200";
-    case "shipped":
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    case "processing":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "pending":
-      return "bg-orange-100 text-orange-800 border-orange-200";
-    case "cancelled":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "refunded":
-      return "bg-purple-100 text-purple-800 border-purple-200";
+    case 'delivered':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'shipped':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'processing':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'pending':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'cancelled':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'refunded':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
 const getStatusText = (status: string) => {
   switch (status) {
-    case "pending":
-      return "Pending";
-    case "processing":
-      return "Processing";
-    case "shipped":
-      return "Shipped";
-    case "delivered":
-      return "Delivered";
-    case "cancelled":
-      return "Cancelled";
-    case "refunded":
-      return "Refunded";
+    case 'pending':
+      return 'Pending';
+    case 'processing':
+      return 'Processing';
+    case 'shipped':
+      return 'Shipped';
+    case 'delivered':
+      return 'Delivered';
+    case 'cancelled':
+      return 'Cancelled';
+    case 'refunded':
+      return 'Refunded';
     default:
       return status;
   }
@@ -72,10 +72,10 @@ const getStatusText = (status: string) => {
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchOrderId, setSearchOrderId] = useState("");
+  const [searchOrderId, setSearchOrderId] = useState('');
   const [searching, setSearching] = useState(false);
   const [searchedOrder, setSearchedOrder] = useState<Order | null>(null);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState('all');
 
   useEffect(() => {
     fetchOrders();
@@ -85,24 +85,24 @@ export default function OrdersPage() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (statusFilter !== "all") {
-        params.append("status", statusFilter);
+      if (statusFilter !== 'all') {
+        params.append('status', statusFilter);
       }
 
       const response = await fetch(`/api/user/orders?${params.toString()}`);
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch orders");
+        throw new Error(data.error || 'Failed to fetch orders');
       }
 
       setOrders(data.orders || []);
     } catch (error: any) {
-      console.error("Error fetching orders:", error);
+      console.error('Error fetching orders:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to load orders",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to load orders',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -112,9 +112,9 @@ export default function OrdersPage() {
   const handleSearchOrder = async () => {
     if (!searchOrderId.trim()) {
       toast({
-        title: "Order ID required",
-        description: "Please enter an order ID to search",
-        variant: "destructive",
+        title: 'Order ID required',
+        description: 'Please enter an order ID to search',
+        variant: 'destructive'
       });
       return;
     }
@@ -125,21 +125,21 @@ export default function OrdersPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Order not found");
+        throw new Error(data.error || 'Order not found');
       }
 
       setSearchedOrder(data.order);
       toast({
-        title: "Order found",
-        description: `Order ${data.order.orderNumber} has been found.`,
+        title: 'Order found',
+        description: `Order ${data.order.orderNumber} has been found.`
       });
     } catch (error: any) {
-      console.error("Error searching order:", error);
+      console.error('Error searching order:', error);
       setSearchedOrder(null);
       toast({
-        title: "Order not found",
-        description: error.message || "The order ID you entered was not found.",
-        variant: "destructive",
+        title: 'Order not found',
+        description: error.message || 'The order ID you entered was not found.',
+        variant: 'destructive'
       });
     } finally {
       setSearching(false);
@@ -147,14 +147,14 @@ export default function OrdersPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   };
 
-  const getTotalItems = (items: Order["items"]) => {
+  const getTotalItems = (items: Order['items']) => {
     return items.reduce((total, item) => total + item.quantity, 0);
   };
 
@@ -162,13 +162,13 @@ export default function OrdersPage() {
     try {
       const response = await fetch(`/api/user/orders/${orderNumber}/invoice`);
       if (!response.ok) {
-        throw new Error("Failed to download invoice");
+        throw new Error('Failed to download invoice');
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.style.display = "none";
+      const a = document.createElement('a');
+      a.style.display = 'none';
       a.href = url;
       a.download = `invoice-${orderNumber}.pdf`;
       document.body.appendChild(a);
@@ -176,14 +176,14 @@ export default function OrdersPage() {
       window.URL.revokeObjectURL(url);
 
       toast({
-        title: "Invoice downloaded",
-        description: `Invoice for order ${orderNumber} has been downloaded.`,
+        title: 'Invoice downloaded',
+        description: `Invoice for order ${orderNumber} has been downloaded.`
       });
     } catch (error) {
       toast({
-        title: "Download failed",
-        description: "Failed to download invoice. Please try again.",
-        variant: "destructive",
+        title: 'Download failed',
+        description: 'Failed to download invoice. Please try again.',
+        variant: 'destructive'
       });
     }
   };
@@ -200,12 +200,12 @@ export default function OrdersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2 max-w-md">
+          <div className="flex max-w-md gap-2">
             <Input
               placeholder="Enter order ID (e.g., ORD-20240115-ABC123)"
               value={searchOrderId}
               onChange={(e) => setSearchOrderId(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSearchOrder()}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearchOrder()}
             />
             <Button
               onClick={handleSearchOrder}
@@ -221,16 +221,16 @@ export default function OrdersPage() {
             </Button>
           </div>
           {searchedOrder && (
-            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
+            <div className="mt-4 rounded-md border border-green-200 bg-green-50 p-3">
               <p className="text-sm text-green-800">
                 Showing results for: <strong>{searchOrderId}</strong>
               </p>
               <Button
                 variant="link"
-                className="p-0 h-auto text-green-800"
+                className="h-auto p-0 text-green-800"
                 onClick={() => {
                   setSearchedOrder(null);
-                  setSearchOrderId("");
+                  setSearchOrderId('');
                 }}
               >
                 Show all orders
@@ -242,7 +242,7 @@ export default function OrdersPage() {
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle>Order History</CardTitle>
               <CardDescription>
@@ -254,7 +254,7 @@ export default function OrdersPage() {
             {!searchedOrder && (
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[180px]">
-                  <Filter className="h-4 w-4 mr-2" />
+                  <Filter className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -279,13 +279,13 @@ export default function OrdersPage() {
               {displayOrders.map((order) => (
                 <div
                   key={order._id}
-                  className="border rounded-lg p-4 hover:bg-accent/30 transition-colors"
+                  className="rounded-lg border p-4 transition-colors hover:bg-accent/30"
                 >
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="mb-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Package className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <Package className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
                       <div>
-                        <div className="font-semibold text-sm">
+                        <div className="text-sm font-semibold">
                           {order.orderNumber}
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -302,7 +302,7 @@ export default function OrdersPage() {
                     </Badge>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4 mb-3 text-xs">
+                  <div className="mb-3 grid grid-cols-3 gap-4 text-xs">
                     <div>
                       <p className="text-muted-foreground">Items</p>
                       <p className="font-medium">
@@ -315,8 +315,8 @@ export default function OrdersPage() {
                     </div>
                     <div>
                       <p className="text-muted-foreground">Tracking</p>
-                      <p className="font-medium truncate">
-                        {order.trackingNumber || "Not available"}
+                      <p className="truncate font-medium">
+                        {order.trackingNumber || 'Not available'}
                       </p>
                     </div>
                   </div>
@@ -347,12 +347,12 @@ export default function OrdersPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-4">
+            <div className="py-12 text-center">
+              <Package className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <p className="mb-4 text-muted-foreground">
                 {searchedOrder
-                  ? "No order found with that ID"
-                  : "No orders yet"}
+                  ? 'No order found with that ID'
+                  : 'No orders yet'}
               </p>
               {!searchedOrder && (
                 <Button asChild>

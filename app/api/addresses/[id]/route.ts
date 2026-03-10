@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { Address } from "@/models/Address";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/database";
+import { Address } from '@/models/Address';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
 
 export async function PUT(
   request: NextRequest,
@@ -11,9 +11,9 @@ export async function PUT(
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
@@ -25,7 +25,7 @@ export async function PUT(
     // Find address and verify ownership
     const address = await Address.findOne({ _id: addressId, userId });
     if (!address) {
-      return NextResponse.json({ error: "Address not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Address not found' }, { status: 404 });
     }
 
     // Update address
@@ -36,19 +36,19 @@ export async function PUT(
     );
 
     return NextResponse.json({
-      message: "Address updated successfully",
-      address: updatedAddress,
+      message: 'Address updated successfully',
+      address: updatedAddress
     });
   } catch (error: any) {
-    console.error("Update address error:", error);
+    console.error('Update address error:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err: any) => err.message);
-      return NextResponse.json({ error: errors.join(", ") }, { status: 400 });
+      return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -61,9 +61,9 @@ export async function DELETE(
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
@@ -74,7 +74,7 @@ export async function DELETE(
     // Find address and verify ownership
     const address = await Address.findOne({ _id: addressId, userId });
     if (!address) {
-      return NextResponse.json({ error: "Address not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Address not found' }, { status: 404 });
     }
 
     // Delete address
@@ -86,12 +86,12 @@ export async function DELETE(
     // });
 
     return NextResponse.json({
-      message: "Address deleted successfully",
+      message: 'Address deleted successfully'
     });
   } catch (error) {
-    console.error("Delete address error:", error);
+    console.error('Delete address error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -105,9 +105,9 @@ export async function PATCH(
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
@@ -118,7 +118,7 @@ export async function PATCH(
     // Find address and verify ownership
     const address = await Address.findOne({ _id: addressId, userId });
     if (!address) {
-      return NextResponse.json({ error: "Address not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Address not found' }, { status: 404 });
     }
 
     // Set this address as default and others as non-default
@@ -131,13 +131,13 @@ export async function PATCH(
     await address.save();
 
     return NextResponse.json({
-      message: "Address set as default successfully",
-      address,
+      message: 'Address set as default successfully',
+      address
     });
   } catch (error) {
-    console.error("Set default address error:", error);
+    console.error('Set default address error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

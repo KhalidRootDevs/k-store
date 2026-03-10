@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
-import { useCallback } from "react";
-import { useDropzone } from "react-dropzone";
-import { useFormContext } from "react-hook-form";
-import toast from "react-hot-toast";
+import { Button } from '@/components/ui/button';
+import { Upload, X } from 'lucide-react';
+import { useCallback } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { useFormContext } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
 type DropzoneSingleProps = {
   name: string;
@@ -16,12 +16,12 @@ const DropzoneSingle = ({
   name,
   disabled = false,
   maxSize = 5 * 1024 * 1024, // 5MB default
-  accept = { "image/*": [".jpeg", ".jpg", ".png", ".webp", ".gif"] },
+  accept = { 'image/*': ['.jpeg', '.jpg', '.png', '.webp', '.gif'] }
 }: DropzoneSingleProps) => {
   const {
     watch,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting }
   } = useFormContext();
 
   const image = watch(name);
@@ -32,13 +32,13 @@ const DropzoneSingle = ({
       if (fileRejections.length > 0) {
         const sizeError = fileRejections.some((rejection: any) =>
           rejection.errors.some(
-            (e: { code: string }) => e.code === "file-too-large"
+            (e: { code: string }) => e.code === 'file-too-large'
           )
         );
 
         const typeError = fileRejections.some((rejection: any) =>
           rejection.errors.some(
-            (e: { code: string }) => e.code === "file-invalid-type"
+            (e: { code: string }) => e.code === 'file-invalid-type'
           )
         );
 
@@ -49,11 +49,11 @@ const DropzoneSingle = ({
         }
 
         if (typeError) {
-          const acceptedTypes = Object.values(accept).flat().join(", ");
+          const acceptedTypes = Object.values(accept).flat().join(', ');
           toast.error(`Invalid file type. Accepted types: ${acceptedTypes}`);
         }
 
-        setValue(name, "", { shouldValidate: true });
+        setValue(name, '', { shouldValidate: true });
         return;
       }
 
@@ -62,19 +62,19 @@ const DropzoneSingle = ({
       const file = acceptedFiles[0];
 
       // Validate file type client-side as additional safety
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please upload a valid image file");
-        setValue(name, "", { shouldValidate: true });
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload a valid image file');
+        setValue(name, '', { shouldValidate: true });
         return;
       }
 
       const fileWithPreview = Object.assign(file, {
-        preview: URL.createObjectURL(file),
+        preview: URL.createObjectURL(file)
       });
 
       setValue(name, fileWithPreview, {
         shouldValidate: true,
-        shouldDirty: true,
+        shouldDirty: true
       });
     },
     [name, setValue, maxSize, accept]
@@ -85,7 +85,7 @@ const DropzoneSingle = ({
     maxSize,
     onDrop,
     disabled: isFieldDisabled,
-    multiple: false,
+    multiple: false
   });
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -96,18 +96,18 @@ const DropzoneSingle = ({
       URL.revokeObjectURL(image.preview);
     }
 
-    setValue(name, "", {
+    setValue(name, '', {
       shouldValidate: true,
-      shouldDirty: true,
+      shouldDirty: true
     });
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
+    if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   return (
@@ -122,14 +122,14 @@ const DropzoneSingle = ({
             bg-white shadow-sm transition-all duration-200
             ${
               isFieldDisabled
-                ? "cursor-not-allowed opacity-60"
-                : "cursor-pointer hover:border-gray-500"
+                ? 'cursor-not-allowed opacity-60'
+                : 'cursor-pointer hover:border-gray-500'
             }
             ${
               image
-                ? "border border-gray-300 rounded-md"
-                : `border-2 border-dashed border-gray-300 rounded-md ${
-                    isDragActive ? "border-blue-500 bg-blue-50" : ""
+                ? 'rounded-md border border-gray-300'
+                : `rounded-md border-2 border-dashed border-gray-300 ${
+                    isDragActive ? 'border-blue-500 bg-blue-50' : ''
                   }`
             }
           `}
@@ -152,7 +152,7 @@ const DropzoneSingle = ({
                   type="button"
                   size="icon"
                   variant="destructive"
-                  className="absolute -top-2 -right-2 z-10 h-6 w-6 rounded-full"
+                  className="absolute -right-2 -top-2 z-10 h-6 w-6 rounded-full"
                   onClick={handleRemove}
                   disabled={isFieldDisabled}
                 >
@@ -162,7 +162,7 @@ const DropzoneSingle = ({
 
               {/* File info overlay */}
               {image?.name && (
-                <div className="absolute bottom-2 left-2 right-2 bg-black/70 text-white text-xs p-2 rounded">
+                <div className="absolute bottom-2 left-2 right-2 rounded bg-black/70 p-2 text-xs text-white">
                   <div className="truncate">{image.name}</div>
                   <div>{formatFileSize(image.size)}</div>
                 </div>
@@ -173,25 +173,25 @@ const DropzoneSingle = ({
               <div className="flex flex-col items-center justify-center gap-2">
                 <Upload
                   className={`h-8 w-8 ${
-                    isFieldDisabled ? "text-gray-400" : "text-gray-500"
+                    isFieldDisabled ? 'text-gray-400' : 'text-gray-500'
                   }`}
                 />
                 <div className="space-y-1">
                   <span
-                    className={`text-lg font-bold block ${
-                      isFieldDisabled ? "text-gray-400" : "text-gray-700"
+                    className={`block text-lg font-bold ${
+                      isFieldDisabled ? 'text-gray-400' : 'text-gray-700'
                     }`}
                   >
                     {isDragActive
-                      ? "Drop the image here"
-                      : "Drag and drop or browse to upload"}
+                      ? 'Drop the image here'
+                      : 'Drag and drop or browse to upload'}
                   </span>
                   <span
-                    className={`text-sm block ${
-                      isFieldDisabled ? "text-gray-400" : "text-gray-500"
+                    className={`block text-sm ${
+                      isFieldDisabled ? 'text-gray-400' : 'text-gray-500'
                     }`}
                   >
-                    Supports {Object.values(accept).flat().join(", ")} (Max.{" "}
+                    Supports {Object.values(accept).flat().join(', ')} (Max.{' '}
                     {formatFileSize(maxSize)})
                   </span>
                 </div>

@@ -1,50 +1,50 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Trash2, X } from "lucide-react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+  SelectValue
+} from '@/components/ui/select';
+import { Plus, Trash2, X } from 'lucide-react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 
 export default function ProductVariant({
   availableImages,
   addAttributeToVariant,
   commonAttributes,
   updateVariantAttribute,
-  removeAttributeFromVariant,
+  removeAttributeFromVariant
 }: any) {
   const {
     register,
     formState: { errors },
     watch,
     setValue,
-    control,
+    control
   } = useFormContext();
 
   const { fields, remove, append } = useFieldArray({
     control,
-    name: "variants",
+    name: 'variants'
   });
 
   const addVariant = () => {
     append({
-      sku: "",
+      sku: '',
       attributes: {},
       price: undefined,
       stock: undefined,
-      image: "",
+      image: ''
     });
   };
 
@@ -61,7 +61,7 @@ export default function ProductVariant({
           const variantAttributes = watch(`variants.${index}.attributes`) || {};
 
           return (
-            <div key={field.id} className="border rounded-lg p-4 space-y-4">
+            <div key={field.id} className="space-y-4 rounded-lg border p-4">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium">Variant {index + 1}</h4>
                 <Button
@@ -75,7 +75,7 @@ export default function ProductVariant({
                 </Button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor={`variants.${index}.sku`}>Variant SKU</Label>
                   <Input
@@ -90,11 +90,11 @@ export default function ProductVariant({
                     Variant Image
                   </Label>
                   <Select
-                    value={watch(`variants.${index}.image`) || "none"}
+                    value={watch(`variants.${index}.image`) || 'none'}
                     onValueChange={(value) =>
                       setValue(
                         `variants.${index}.image`,
-                        value === "none" ? "" : value
+                        value === 'none' ? '' : value
                       )
                     }
                   >
@@ -113,7 +113,7 @@ export default function ProductVariant({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor={`variants.${index}.price`}>
                     Variant Price
@@ -184,7 +184,7 @@ export default function ProductVariant({
                 ))}
 
                 {Object.keys(variantAttributes).length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-2">
+                  <p className="py-2 text-center text-sm text-muted-foreground">
                     No attributes added. Click "Add attribute" to define variant
                     properties.
                   </p>
@@ -196,8 +196,8 @@ export default function ProductVariant({
                 const attrError = variantsErrors?.[index]?.attributes;
                 const message =
                   attrError &&
-                  typeof attrError === "object" &&
-                  "message" in attrError
+                  typeof attrError === 'object' &&
+                  'message' in attrError
                     ? (attrError as any).message
                     : undefined;
                 return message ? (

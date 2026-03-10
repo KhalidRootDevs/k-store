@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { Container } from "@/components/ui/container";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect, useState } from 'react';
+import { Container } from '@/components/ui/container';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // This would typically come from an API or CMS
 const defaultAboutContent = {
-  title: "About OneVendor",
-  subtitle: "Your Trusted Shopping Destination",
+  title: 'About OneVendor',
+  subtitle: 'Your Trusted Shopping Destination',
   mainContent: `
     <p>Welcome to OneVendor, where shopping meets convenience and quality. Established in 2023, we've quickly grown to become a trusted name in online retail.</p>
     
@@ -31,7 +31,7 @@ const defaultAboutContent = {
     
     <p>Thank you for choosing OneVendor. We look forward to serving you and exceeding your expectations.</p>
   `,
-  updatedAt: "2023-10-15",
+  updatedAt: '2023-10-15'
 };
 
 export default function AboutPage() {
@@ -48,7 +48,7 @@ export default function AboutPage() {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setAboutContent(defaultAboutContent);
       } catch (error) {
-        console.error("Failed to fetch about content:", error);
+        console.error('Failed to fetch about content:', error);
       } finally {
         setIsLoading(false);
       }
@@ -71,17 +71,17 @@ export default function AboutPage() {
             </div>
           ) : (
             <>
-              <h1 className="text-4xl font-bold mb-3">{aboutContent?.title}</h1>
-              <p className="text-xl text-muted-foreground mb-8">
+              <h1 className="mb-3 text-4xl font-bold">{aboutContent?.title}</h1>
+              <p className="mb-8 text-xl text-muted-foreground">
                 {aboutContent?.subtitle}
               </p>
               <div
-                className="prose max-w-none prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground"
+                className="prose prose-headings:font-bold prose-headings:text-foreground prose-p:text-muted-foreground prose-li:text-muted-foreground max-w-none"
                 dangerouslySetInnerHTML={{
-                  __html: aboutContent?.mainContent || "",
+                  __html: aboutContent?.mainContent || ''
                 }}
               />
-              <p className="text-sm text-muted-foreground mt-8">
+              <p className="mt-8 text-sm text-muted-foreground">
                 Last updated: {aboutContent?.updatedAt}
               </p>
             </>

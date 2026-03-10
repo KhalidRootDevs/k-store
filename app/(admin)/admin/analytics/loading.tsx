@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Container } from "@/components/ui/container"
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Container } from '@/components/ui/container';
 
 export default function AnalyticsLoading() {
   return (
@@ -9,7 +9,7 @@ export default function AnalyticsLoading() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <Skeleton className="h-8 w-32" />
-            <Skeleton className="h-4 w-96 mt-2" />
+            <Skeleton className="mt-2 h-4 w-96" />
           </div>
           <div className="flex items-center gap-2">
             <Skeleton className="h-10 w-[180px]" />
@@ -30,7 +30,7 @@ export default function AnalyticsLoading() {
                 </CardHeader>
                 <CardContent>
                   <Skeleton className="h-8 w-20" />
-                  <Skeleton className="h-4 w-32 mt-2" />
+                  <Skeleton className="mt-2 h-4 w-32" />
                 </CardContent>
               </Card>
             ))}
@@ -53,5 +53,5 @@ export default function AnalyticsLoading() {
         </div>
       </div>
     </Container>
-  )
+  );
 }

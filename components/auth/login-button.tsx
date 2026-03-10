@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button, type ButtonProps } from "@/components/ui/button";
-import { useModal } from "@/context/modal-context";
-import { useAuth } from "@/context/auth-context";
-import { LogIn, LogOut, UserCircle } from "lucide-react";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import { Button, type ButtonProps } from '@/components/ui/button';
+import { useModal } from '@/context/modal-context';
+import { useAuth } from '@/context/auth-context';
+import { LogIn, LogOut, UserCircle } from 'lucide-react';
+import Link from 'next/link';
 
 interface LoginButtonProps extends ButtonProps {
   showIcon?: boolean;
-  mode?: "login" | "register";
+  mode?: 'login' | 'register';
 }
 
 export function LoginButton({
   showIcon = true,
-  mode = "login",
+  mode = 'login',
   children,
   ...props
 }: LoginButtonProps) {
@@ -33,7 +33,7 @@ export function LoginButton({
     return (
       <Button {...props}>
         {showIcon && <LogIn className="mr-2 h-4 w-4" />}
-        {children || (mode === "register" ? "Register" : "Login")}
+        {children || (mode === 'register' ? 'Register' : 'Login')}
       </Button>
     );
   }
@@ -57,7 +57,7 @@ export function LoginButton({
   }
 
   const handleClick = () => {
-    if (mode === "register") {
+    if (mode === 'register') {
       modal.openRegisterModal();
     } else {
       modal.openLoginModal();
@@ -67,7 +67,7 @@ export function LoginButton({
   return (
     <Button onClick={handleClick} {...props}>
       {showIcon && <LogIn className="mr-2 h-4 w-4" />}
-      {children || (mode === "register" ? "Register" : "Login")}
+      {children || (mode === 'register' ? 'Register' : 'Login')}
     </Button>
   );
 }

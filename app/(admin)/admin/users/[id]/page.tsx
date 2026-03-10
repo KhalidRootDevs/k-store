@@ -1,33 +1,33 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  SelectValue
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  TableRow
+} from '@/components/ui/table';
 import {
   ArrowLeft,
   Ban,
@@ -39,17 +39,17 @@ import {
   User,
   Calendar,
   MapPin,
-  Shield,
-} from "lucide-react";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { Container } from "@/components/ui/container";
-import { toast } from "@/components/ui/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
-import { Order, User as IUser } from "@/types";
+  Shield
+} from 'lucide-react';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { Container } from '@/components/ui/container';
+import { toast } from '@/components/ui/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Order, User as IUser } from '@/types';
 
 export default function UserDetailsPage() {
   const params = useParams();
@@ -62,7 +62,7 @@ export default function UserDetailsPage() {
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [newNote, setNewNote] = useState("");
+  const [newNote, setNewNote] = useState('');
   const [isAddingNote, setIsAddingNote] = useState(false);
 
   // Fetch user data
@@ -70,7 +70,7 @@ export default function UserDetailsPage() {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
-        credentials: "include",
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -78,20 +78,20 @@ export default function UserDetailsPage() {
         setUser(data.user);
       } else if (response.status === 404) {
         toast({
-          title: "User not found",
-          description: "The requested user does not exist.",
-          variant: "destructive",
+          title: 'User not found',
+          description: 'The requested user does not exist.',
+          variant: 'destructive'
         });
-        router.push("/admin/users");
+        router.push('/admin/users');
       } else {
-        throw new Error("Failed to fetch user");
+        throw new Error('Failed to fetch user');
       }
     } catch (error) {
-      console.error("Error fetching user:", error);
+      console.error('Error fetching user:', error);
       toast({
-        title: "Error",
-        description: "Failed to load user data. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load user data. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsLoading(false);
@@ -105,22 +105,22 @@ export default function UserDetailsPage() {
       const response = await fetch(
         `/api/admin/orders?userId=${userId}&limit=50`,
         {
-          credentials: "include",
-        },
+          credentials: 'include'
+        }
       );
 
       if (response.ok) {
         const data = await response.json();
         setOrders(data.orders || []);
       } else {
-        throw new Error("Failed to fetch user orders");
+        throw new Error('Failed to fetch user orders');
       }
     } catch (error) {
-      console.error("Error fetching user orders:", error);
+      console.error('Error fetching user orders:', error);
       toast({
-        title: "Error",
-        description: "Failed to load user orders.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load user orders.',
+        variant: 'destructive'
       });
     } finally {
       setIsLoadingOrders(false);
@@ -140,36 +140,36 @@ export default function UserDetailsPage() {
     setIsSaving(true);
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify({
           name: user.name,
           email: user.email,
           phone: user.phone,
-          role: user.role,
-        }),
+          role: user.role
+        })
       });
 
       if (response.ok) {
         toast({
-          title: "User updated",
-          description: "User information has been updated successfully.",
+          title: 'User updated',
+          description: 'User information has been updated successfully.'
         });
         setIsEditing(false);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update user");
+        throw new Error(errorData.error || 'Failed to update user');
       }
     } catch (error: any) {
-      console.error("Error updating user:", error);
+      console.error('Error updating user:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to update user. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to update user. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsSaving(false);
@@ -181,32 +181,32 @@ export default function UserDetailsPage() {
 
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify({ status }),
+        credentials: 'include',
+        body: JSON.stringify({ status })
       });
 
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
         toast({
-          title: "Status updated",
-          description: `User status has been updated to ${status}.`,
+          title: 'Status updated',
+          description: `User status has been updated to ${status}.`
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update user status");
+        throw new Error(errorData.error || 'Failed to update user status');
       }
     } catch (error: any) {
-      console.error("Error updating user status:", error);
+      console.error('Error updating user status:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to update user status. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to update user status. Please try again.',
+        variant: 'destructive'
       });
     }
   };
@@ -217,32 +217,32 @@ export default function UserDetailsPage() {
     setIsAddingNote(true);
     try {
       const response = await fetch(`/api/admin/users/${userId}/notes`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify({ content: newNote }),
+        credentials: 'include',
+        body: JSON.stringify({ content: newNote })
       });
 
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        setNewNote("");
+        setNewNote('');
         toast({
-          title: "Note added",
-          description: "Note has been added successfully.",
+          title: 'Note added',
+          description: 'Note has been added successfully.'
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add note");
+        throw new Error(errorData.error || 'Failed to add note');
       }
     } catch (error: any) {
-      console.error("Error adding note:", error);
+      console.error('Error adding note:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to add note. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to add note. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsAddingNote(false);
@@ -254,32 +254,32 @@ export default function UserDetailsPage() {
 
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify({ role }),
+        credentials: 'include',
+        body: JSON.stringify({ role })
       });
 
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
         toast({
-          title: "Role updated",
-          description: `User role has been updated to ${role}.`,
+          title: 'Role updated',
+          description: `User role has been updated to ${role}.`
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update user role");
+        throw new Error(errorData.error || 'Failed to update user role');
       }
     } catch (error: any) {
-      console.error("Error updating user role:", error);
+      console.error('Error updating user role:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to update user role. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to update user role. Please try again.',
+        variant: 'destructive'
       });
     }
   };
@@ -290,69 +290,69 @@ export default function UserDetailsPage() {
     const totalOrders = user.orders.length;
     const totalSpent = user.orders.reduce((sum, order) => sum + order.total, 0);
     const completedOrders = user.orders.filter(
-      (order) => order.status === "delivered",
+      (order) => order.status === 'delivered'
     ).length;
 
     return {
       totalOrders,
       totalSpent,
-      completedOrders,
+      completedOrders
     };
   };
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case "active":
-        return "default";
-      case "inactive":
-        return "secondary";
-      case "suspended":
-        return "destructive";
-      case "pending":
-        return "outline";
+      case 'active':
+        return 'default';
+      case 'inactive':
+        return 'secondary';
+      case 'suspended':
+        return 'destructive';
+      case 'pending':
+        return 'outline';
       default:
-        return "secondary";
+        return 'secondary';
     }
   };
 
   const getRoleVariant = (role: string) => {
     switch (role) {
-      case "admin":
-        return "destructive";
-      case "moderator":
-        return "default";
-      case "support":
-        return "secondary";
-      case "user":
-        return "outline";
+      case 'admin':
+        return 'destructive';
+      case 'moderator':
+        return 'default';
+      case 'support':
+        return 'secondary';
+      case 'user':
+        return 'outline';
       default:
-        return "outline";
+        return 'outline';
     }
   };
 
   const getOrderStatusVariant = (status: string) => {
     switch (status) {
-      case "delivered":
-        return "default";
-      case "shipped":
-        return "secondary";
-      case "processing":
-        return "outline";
-      case "pending":
-        return "outline";
-      case "cancelled":
-        return "destructive";
-      case "refunded":
-        return "destructive";
+      case 'delivered':
+        return 'default';
+      case 'shipped':
+        return 'secondary';
+      case 'processing':
+        return 'outline';
+      case 'pending':
+        return 'outline';
+      case 'cancelled':
+        return 'destructive';
+      case 'refunded':
+        return 'destructive';
       default:
-        return "outline";
+        return 'outline';
     }
   };
 
   if (isLoading) {
     return (
       <Container>
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex min-h-[400px] items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       </Container>
@@ -362,7 +362,7 @@ export default function UserDetailsPage() {
   if (!user) {
     return (
       <Container>
-        <div className="flex items-center gap-4 mb-6">
+        <div className="mb-6 flex items-center gap-4">
           <Link href="/admin/users">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
@@ -385,20 +385,20 @@ export default function UserDetailsPage() {
   const stats = calculateUserStats();
   const defaultAddress =
     user.addresses.find((addr) => addr.isDefault) || user.addresses[0];
-  const formattedDate = new Date(user.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  const formattedDate = new Date(user.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
   const lastLoginFormatted = user.lastLogin
-    ? new Date(user.lastLogin).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+    ? new Date(user.lastLogin).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
       })
-    : "Never";
+    : 'Never';
 
   return (
     <Container>
@@ -445,7 +445,7 @@ export default function UserDetailsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {/* User Profile Card */}
           <Card className="md:col-span-1">
             <CardHeader>
@@ -456,7 +456,7 @@ export default function UserDetailsPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex flex-col items-center">
-                <Avatar className="h-24 w-24 mb-4">
+                <Avatar className="mb-4 h-24 w-24">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback>
                     <User className="h-12 w-12" />
@@ -467,9 +467,9 @@ export default function UserDetailsPage() {
                   <Mail className="h-4 w-4" />
                   <span>{user.email}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                   <Phone className="h-4 w-4" />
-                  <span>{user.phone || "N/A"}</span>
+                  <span>{user.phone || 'N/A'}</span>
                 </div>
                 <div className="mt-4 flex flex-col gap-2">
                   <Badge
@@ -487,7 +487,7 @@ export default function UserDetailsPage() {
               <Separator />
 
               <div className="space-y-2">
-                <h4 className="font-medium text-sm">Account Details</h4>
+                <h4 className="text-sm font-medium">Account Details</h4>
                 <div className="grid grid-cols-2 gap-1 text-sm">
                   <div className="text-muted-foreground">User ID:</div>
                   <div className="font-mono text-xs">{user._id}</div>
@@ -506,7 +506,7 @@ export default function UserDetailsPage() {
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Change Status</h4>
+                  <h4 className="text-sm font-medium">Change Status</h4>
                   <Select
                     value={user.status}
                     onValueChange={handleStatusChange}
@@ -524,7 +524,7 @@ export default function UserDetailsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Change Role</h4>
+                  <h4 className="text-sm font-medium">Change Role</h4>
                   <Select value={user.role} onValueChange={handleRoleChange}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select role" />
@@ -539,11 +539,11 @@ export default function UserDetailsPage() {
                 </div>
               </div>
 
-              {user.status !== "suspended" && (
+              {user.status !== 'suspended' && (
                 <Button
                   variant="destructive"
                   className="w-full"
-                  onClick={() => handleStatusChange("suspended")}
+                  onClick={() => handleStatusChange('suspended')}
                 >
                   <Ban className="mr-2 h-4 w-4" />
                   Suspend User
@@ -553,7 +553,7 @@ export default function UserDetailsPage() {
           </Card>
 
           {/* Main Content */}
-          <div className="md:col-span-2 space-y-6">
+          <div className="space-y-6 md:col-span-2">
             {/* Personal Information */}
             <Card>
               <CardHeader>
@@ -563,7 +563,7 @@ export default function UserDetailsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
                     <Input
@@ -591,7 +591,7 @@ export default function UserDetailsPage() {
                     <Label htmlFor="phone">Phone Number</Label>
                     <Input
                       id="phone"
-                      value={user.phone || ""}
+                      value={user.phone || ''}
                       onChange={(e) =>
                         setUser({ ...user, phone: e.target.value })
                       }
@@ -603,7 +603,7 @@ export default function UserDetailsPage() {
                     <Input
                       id="dateOfBirth"
                       type="date"
-                      value={user.dateOfBirth || ""}
+                      value={user.dateOfBirth || ''}
                       onChange={(e) =>
                         setUser({ ...user, dateOfBirth: e.target.value })
                       }
@@ -616,20 +616,20 @@ export default function UserDetailsPage() {
                 {defaultAddress && (
                   <div className="mt-6 space-y-2">
                     <Label>Default Address</Label>
-                    <div className="p-3 border rounded-md bg-muted/50">
+                    <div className="rounded-md border bg-muted/50 p-3">
                       <div className="flex items-start gap-2">
-                        <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                        <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
                         <div className="text-sm">
                           <div className="font-medium">
                             {defaultAddress.fullName}
                           </div>
                           <div>{defaultAddress.address}</div>
                           <div>
-                            {defaultAddress.city}, {defaultAddress.state}{" "}
+                            {defaultAddress.city}, {defaultAddress.state}{' '}
                             {defaultAddress.zipCode}
                           </div>
                           <div>{defaultAddress.country}</div>
-                          <div className="text-muted-foreground mt-1">
+                          <div className="mt-1 text-muted-foreground">
                             {defaultAddress.phone}
                           </div>
                         </div>
@@ -643,18 +643,18 @@ export default function UserDetailsPage() {
                   <Label>Verification Status</Label>
                   <div className="flex gap-4">
                     <Badge
-                      variant={user.emailVerified ? "default" : "secondary"}
+                      variant={user.emailVerified ? 'default' : 'secondary'}
                     >
                       {user.emailVerified
-                        ? "Email Verified"
-                        : "Email Not Verified"}
+                        ? 'Email Verified'
+                        : 'Email Not Verified'}
                     </Badge>
                     <Badge
-                      variant={user.phoneVerified ? "default" : "secondary"}
+                      variant={user.phoneVerified ? 'default' : 'secondary'}
                     >
                       {user.phoneVerified
-                        ? "Phone Verified"
-                        : "Phone Not Verified"}
+                        ? 'Phone Verified'
+                        : 'Phone Not Verified'}
                     </Badge>
                   </div>
                 </div>
@@ -709,14 +709,14 @@ export default function UserDetailsPage() {
                                 <TableCell>
                                   {order.items.reduce(
                                     (sum, item) => sum + item.quantity,
-                                    0,
+                                    0
                                   )}
                                 </TableCell>
                                 <TableCell>${order.total.toFixed(2)}</TableCell>
                                 <TableCell>
                                   <Badge
                                     variant={getOrderStatusVariant(
-                                      order.status,
+                                      order.status
                                     )}
                                     className="capitalize"
                                   >
@@ -736,7 +736,7 @@ export default function UserDetailsPage() {
                         </Table>
                       </div>
                     ) : (
-                      <div className="text-center py-6 text-muted-foreground">
+                      <div className="py-6 text-center text-muted-foreground">
                         This user has not placed any orders yet.
                       </div>
                     )}
@@ -755,7 +755,7 @@ export default function UserDetailsPage() {
                   </CardHeader>
                   <CardContent>
                     {/* Add New Note */}
-                    <div className="space-y-4 mb-6">
+                    <div className="mb-6 space-y-4">
                       <Label htmlFor="newNote">Add New Note</Label>
                       <Textarea
                         id="newNote"
@@ -775,7 +775,7 @@ export default function UserDetailsPage() {
                             Adding...
                           </>
                         ) : (
-                          "Add Note"
+                          'Add Note'
                         )}
                       </Button>
                     </div>
@@ -784,8 +784,8 @@ export default function UserDetailsPage() {
                     <div className="space-y-4">
                       {user.notes.length > 0 ? (
                         user.notes.map((note) => (
-                          <div key={note._id} className="p-4 border rounded-lg">
-                            <div className="flex items-start justify-between mb-2">
+                          <div key={note._id} className="rounded-lg border p-4">
+                            <div className="mb-2 flex items-start justify-between">
                               <div className="flex items-center gap-2">
                                 <Shield className="h-4 w-4 text-muted-foreground" />
                                 <span className="text-sm font-medium">
@@ -800,7 +800,7 @@ export default function UserDetailsPage() {
                           </div>
                         ))
                       ) : (
-                        <div className="text-center py-6 text-muted-foreground">
+                        <div className="py-6 text-center text-muted-foreground">
                           No notes have been added for this user.
                         </div>
                       )}

@@ -5,17 +5,17 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  DialogTitle
+} from '@/components/ui/dialog';
 
-import { Button } from "../ui/button";
-import { CustomDeleteModalProps } from "@/types";
+import { Button } from '../ui/button';
+import { CustomDeleteModalProps } from '@/types';
 
 export default function DeleteModal({
   open,
   setOpen,
-  title = "Are you sure you want to delete?",
-  action,
+  title = 'Are you sure you want to delete?',
+  action
 }: CustomDeleteModalProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>

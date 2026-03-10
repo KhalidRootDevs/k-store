@@ -1,7 +1,7 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { Order, type OrderStatus } from "@/models/Order";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/database";
+import { type NextRequest, NextResponse } from 'next/server';
+import { Order, type OrderStatus } from '@/models/Order';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
 
 /**
  * GET /api/orders/[id]
@@ -16,11 +16,11 @@ export async function GET(
 
     const { id } = params;
 
-    console.log("🔍 Searching for order with orderNumber:", id);
+    console.log('🔍 Searching for order with orderNumber:', id);
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
@@ -29,14 +29,14 @@ export async function GET(
     // Clean and validate the order number
     const orderNumber = id.trim().toUpperCase();
 
-    console.log("🧹 Cleaned orderNumber:", orderNumber);
-    console.log("👤 User ID:", userId);
+    console.log('🧹 Cleaned orderNumber:', orderNumber);
+    console.log('👤 User ID:', userId);
 
     // Validate order number format (basic validation)
-    if (!orderNumber.startsWith("ORD-")) {
-      console.log("❌ Invalid order number format");
+    if (!orderNumber.startsWith('ORD-')) {
+      console.log('❌ Invalid order number format');
       return NextResponse.json(
-        { error: "Invalid order number format" },
+        { error: 'Invalid order number format' },
         { status: 400 }
       );
     }
@@ -44,19 +44,19 @@ export async function GET(
     // Find order by orderNumber for the specific user
     const order = await Order.findOne({
       orderNumber: orderNumber,
-      "customer.id": new mongoose.Types.ObjectId(userId), // Ensure userId is ObjectId
+      'customer.id': new mongoose.Types.ObjectId(userId) // Ensure userId is ObjectId
     })
-      .populate("items.productId", "name images sku")
-      .populate("timeline.updatedBy", "name email");
+      .populate('items.productId', 'name images sku')
+      .populate('timeline.updatedBy', 'name email');
 
-    console.log("📦 Found order:", order ? "Yes" : "No");
+    console.log('📦 Found order:', order ? 'Yes' : 'No');
 
     if (!order) {
       console.log("❌ Order not found or user doesn't have permission");
       return NextResponse.json(
         {
           error:
-            "Order not found or you don't have permission to view this order",
+            "Order not found or you don't have permission to view this order"
         },
         { status: 404 }
       );
@@ -75,19 +75,19 @@ export async function GET(
         name:
           orderObject.customer.name ||
           orderObject.customer.id?.name ||
-          "Customer",
+          'Customer',
         email:
           orderObject.customer.email ||
           orderObject.customer.id?.email ||
-          "unknown@example.com",
+          'unknown@example.com',
         phone:
           orderObject.customer.phone ||
           orderObject.shippingAddress?.phone ||
-          "N/A",
+          'N/A',
         address:
           orderObject.customer.address ||
           orderObject.shippingAddress?.address ||
-          "N/A",
+          'N/A'
       },
       timeline: orderObject.timeline.map((event: any) => ({
         status: event.status,
@@ -95,24 +95,24 @@ export async function GET(
         description: event.description,
         updatedBy: event.updatedBy
           ? {
-              name: event.updatedBy.name || "System",
-              email: event.updatedBy.email || "system",
+              name: event.updatedBy.name || 'System',
+              email: event.updatedBy.email || 'system'
             }
-          : undefined,
-      })),
+          : undefined
+      }))
     };
 
-    console.log("✅ Successfully normalized order data");
+    console.log('✅ Successfully normalized order data');
     return NextResponse.json({ order: normalizedOrder });
   } catch (error: any) {
-    console.error("❌ Get user order error:", error);
-    console.error("Error details:", {
+    console.error('❌ Get user order error:', error);
+    console.error('Error details:', {
       name: error.name,
       message: error.message,
-      stack: error.stack,
+      stack: error.stack
     });
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -129,16 +129,16 @@ export async function PUT(
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
 
     // Only admins can update orders
-    if (decoded.role !== "admin") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    if (decoded.role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     const { id } = params;
@@ -147,7 +147,7 @@ export async function PUT(
     const order = await Order.findById(id);
 
     if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     // Update allowed fields
@@ -158,7 +158,7 @@ export async function PUT(
       shippingMethod,
       notes,
       shippingAddress,
-      billingAddress,
+      billingAddress
     } = body;
 
     if (status && status !== order.status) {
@@ -176,23 +176,23 @@ export async function PUT(
     await order.save();
 
     const updatedOrder = await Order.findById(id)
-      .populate("customer.id", "name email")
-      .populate("items.productId", "name images");
+      .populate('customer.id', 'name email')
+      .populate('items.productId', 'name images');
 
     return NextResponse.json({
-      message: "Order updated successfully",
-      order: updatedOrder,
+      message: 'Order updated successfully',
+      order: updatedOrder
     });
   } catch (error: any) {
-    console.error("Update order error:", error);
+    console.error('Update order error:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err: any) => err.message);
-      return NextResponse.json({ error: errors.join(", ") }, { status: 400 });
+      return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -209,9 +209,9 @@ export async function DELETE(
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
@@ -220,45 +220,45 @@ export async function DELETE(
     const order = await Order.findById(id);
 
     if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
     // Users can cancel their own orders, admins can cancel any order
     if (
-      decoded.role !== "admin" &&
+      decoded.role !== 'admin' &&
       order.customer.id.toString() !== decoded.userId
     ) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Only allow cancellation if order is pending or processing
-    if (!["pending", "processing"].includes(order.status)) {
+    if (!['pending', 'processing'].includes(order.status)) {
       return NextResponse.json(
-        { error: "Order cannot be cancelled at this stage" },
+        { error: 'Order cannot be cancelled at this stage' },
         { status: 400 }
       );
     }
 
-    order.status = "cancelled";
+    order.status = 'cancelled';
     order.timeline.push({
-      status: "cancelled",
+      status: 'cancelled',
       date: new Date(),
       description: `Order cancelled by ${
-        decoded.role === "admin" ? "admin" : "customer"
+        decoded.role === 'admin' ? 'admin' : 'customer'
       }`,
-      updatedBy: decoded.userId,
+      updatedBy: decoded.userId
     });
 
     await order.save();
 
     return NextResponse.json({
-      message: "Order cancelled successfully",
-      order,
+      message: 'Order cancelled successfully',
+      order
     });
   } catch (error) {
-    console.error("Cancel order error:", error);
+    console.error('Cancel order error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

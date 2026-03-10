@@ -1,22 +1,22 @@
-import { SettingsFormData } from "@/app/(admin)/admin/settings/page";
+import { SettingsFormData } from '@/app/(admin)/admin/settings/page';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import Image from "next/image";
-import { useFormContext } from "react-hook-form";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import Image from 'next/image';
+import { useFormContext } from 'react-hook-form';
 
 export default function General({
   logo,
   handleLogoChange,
   favicon,
-  handleFaviconChange,
+  handleFaviconChange
 }: {
   logo: string | null;
   favicon: string | null;
@@ -25,7 +25,7 @@ export default function General({
 }) {
   const {
     register,
-    formState: { errors },
+    formState: { errors }
   } = useFormContext<SettingsFormData>();
 
   return (
@@ -36,12 +36,12 @@ export default function General({
           <CardDescription>Basic information about your store.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="store-name">Store Name</Label>
               <Input
                 id="store-name"
-                {...register("general.storeInfo.storeName")}
+                {...register('general.storeInfo.storeName')}
               />
               {errors.general?.storeInfo?.storeName && (
                 <p className="text-sm text-red-500">
@@ -54,7 +54,7 @@ export default function General({
               <Input
                 id="store-email"
                 type="email"
-                {...register("general.storeInfo.storeEmail")}
+                {...register('general.storeInfo.storeEmail')}
               />
               {errors.general?.storeInfo?.storeEmail && (
                 <p className="text-sm text-red-500">
@@ -66,7 +66,7 @@ export default function General({
               <Label htmlFor="store-phone">Store Phone</Label>
               <Input
                 id="store-phone"
-                {...register("general.storeInfo.storePhone")}
+                {...register('general.storeInfo.storePhone')}
               />
               {errors.general?.storeInfo?.storePhone && (
                 <p className="text-sm text-red-500">
@@ -78,7 +78,7 @@ export default function General({
               <Label htmlFor="store-address">Store Address</Label>
               <Input
                 id="store-address"
-                {...register("general.storeInfo.storeAddress")}
+                {...register('general.storeInfo.storeAddress')}
               />
               {errors.general?.storeInfo?.storeAddress && (
                 <p className="text-sm text-red-500">
@@ -95,21 +95,21 @@ export default function General({
           <CardDescription>Upload your store logo and favicon.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-4">
               <Label>Store Logo</Label>
-              <div className="border rounded-md p-4 flex flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center rounded-md border p-4">
                 {logo ? (
-                  <div className="relative h-20 w-40 mb-4">
+                  <div className="relative mb-4 h-20 w-40">
                     <Image
-                      src={logo || "/placeholder.svg"}
+                      src={logo || '/placeholder.svg'}
                       alt="Store logo"
                       fill
                       className="object-contain"
                     />
                   </div>
                 ) : (
-                  <div className="h-20 w-40 mb-4 bg-muted flex items-center justify-center">
+                  <div className="mb-4 flex h-20 w-40 items-center justify-center bg-muted">
                     <p className="text-muted-foreground">No logo</p>
                   </div>
                 )}
@@ -119,26 +119,26 @@ export default function General({
                   accept="image/*"
                   onChange={handleLogoChange}
                 />
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Recommended size: 200x100px. Max file size: 1MB.
                 </p>
               </div>
             </div>
             <div className="space-y-4">
               <Label>Favicon</Label>
-              <div className="border rounded-md p-4 flex flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center rounded-md border p-4">
                 {favicon ? (
-                  <div className="relative h-10 w-10 mb-4">
+                  <div className="relative mb-4 h-10 w-10">
                     <Image
-                      src={favicon || "/placeholder.svg"}
+                      src={favicon || '/placeholder.svg'}
                       alt="Favicon"
                       fill
                       className="object-contain"
                     />
                   </div>
                 ) : (
-                  <div className="h-10 w-10 mb-4 bg-muted flex items-center justify-center">
-                    <p className="text-muted-foreground text-xs">No icon</p>
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center bg-muted">
+                    <p className="text-xs text-muted-foreground">No icon</p>
                   </div>
                 )}
                 <Input
@@ -147,7 +147,7 @@ export default function General({
                   accept="image/*"
                   onChange={handleFaviconChange}
                 />
-                <p className="text-xs text-muted-foreground mt-2">
+                <p className="mt-2 text-xs text-muted-foreground">
                   Recommended size: 32x32px. Max file size: 100KB.
                 </p>
               </div>
@@ -165,7 +165,7 @@ export default function General({
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="meta-title">Meta Title</Label>
-            <Input id="meta-title" {...register("general.seo.metaTitle")} />
+            <Input id="meta-title" {...register('general.seo.metaTitle')} />
             {errors.general?.seo?.metaTitle && (
               <p className="text-sm text-red-500">
                 {errors.general.seo.metaTitle.message}
@@ -177,7 +177,7 @@ export default function General({
             <Textarea
               id="meta-description"
               rows={3}
-              {...register("general.seo.metaDescription")}
+              {...register('general.seo.metaDescription')}
             />
             {errors.general?.seo?.metaDescription && (
               <p className="text-sm text-red-500">
@@ -189,7 +189,7 @@ export default function General({
             <Label htmlFor="meta-keywords">Meta Keywords</Label>
             <Input
               id="meta-keywords"
-              {...register("general.seo.metaKeywords")}
+              {...register('general.seo.metaKeywords')}
             />
             {errors.general?.seo?.metaKeywords && (
               <p className="text-sm text-red-500">
@@ -207,33 +207,33 @@ export default function General({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="facebook">Facebook</Label>
               <Input
                 id="facebook"
-                {...register("general.socialMedia.facebook")}
+                {...register('general.socialMedia.facebook')}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="instagram">Instagram</Label>
               <Input
                 id="instagram"
-                {...register("general.socialMedia.instagram")}
+                {...register('general.socialMedia.instagram')}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="twitter">Twitter</Label>
               <Input
                 id="twitter"
-                {...register("general.socialMedia.twitter")}
+                {...register('general.socialMedia.twitter')}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="youtube">YouTube</Label>
               <Input
                 id="youtube"
-                {...register("general.socialMedia.youtube")}
+                {...register('general.socialMedia.youtube')}
               />
             </div>
           </div>

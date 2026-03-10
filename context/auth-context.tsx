@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
 import {
   createContext,
   useContext,
   useState,
   useEffect,
-  type ReactNode,
-} from "react";
+  type ReactNode
+} from 'react';
 
 interface User {
   id: string;
   name: string;
   email: string;
-  role: "user" | "admin" | "moderator" | "support";
+  role: 'user' | 'admin' | 'moderator' | 'support';
   phone?: string;
   dateOfBirth?: Date;
 }
@@ -36,9 +36,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/auth/me", {
-        method: "GET",
-        credentials: "include",
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
       }
     } catch (error) {
-      console.error("Auth check error:", error);
+      console.error('Auth check error:', error);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -59,13 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
       });
 
       if (response.ok) {
@@ -74,11 +74,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return true;
       } else {
         const errorData = await response.json();
-        console.error("Login failed:", errorData.error);
+        console.error('Login failed:', errorData.error);
         return false;
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error('Login error:', error);
       return false;
     } finally {
       setIsLoading(false);
@@ -93,13 +93,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify({ name, email, password }),
+        credentials: 'include',
+        body: JSON.stringify({ name, email, password })
       });
 
       if (response.ok) {
@@ -108,11 +108,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return true;
       } else {
         const errorData = await response.json();
-        console.error("Registration failed:", errorData.error);
+        console.error('Registration failed:', errorData.error);
         return false;
       }
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error('Registration error:', error);
       return false;
     } finally {
       setIsLoading(false);
@@ -123,18 +123,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async (): Promise<void> => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
       });
 
       if (response.ok) {
         setUser(null);
       } else {
-        console.error("Logout failed");
+        console.error('Logout failed');
       }
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -151,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     register,
     logout,
     isLoading,
-    checkAuth,
+    checkAuth
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -160,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

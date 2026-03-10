@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Settings } from "@/models/Settings";
-import connectDB from "@/lib/database";
+import { NextRequest, NextResponse } from 'next/server';
+import { Settings } from '@/models/Settings';
+import connectDB from '@/lib/database';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,26 +13,26 @@ export async function GET(request: NextRequest) {
     const safeSettings = JSON.parse(JSON.stringify(settings));
 
     if (safeSettings.payment?.paymentMethods?.stripe) {
-      safeSettings.payment.paymentMethods.stripe.secretKey = "[HIDDEN]";
+      safeSettings.payment.paymentMethods.stripe.secretKey = '[HIDDEN]';
     }
 
     if (safeSettings.payment?.paymentMethods?.paypal) {
-      safeSettings.payment.paymentMethods.paypal.secret = "[HIDDEN]";
+      safeSettings.payment.paymentMethods.paypal.secret = '[HIDDEN]';
     }
 
     if (safeSettings.email?.provider?.smtp) {
-      safeSettings.email.provider.smtp.password = "[HIDDEN]";
+      safeSettings.email.provider.smtp.password = '[HIDDEN]';
     }
 
     if (safeSettings.advanced?.api) {
-      safeSettings.advanced.api.apiKey = "[HIDDEN]";
+      safeSettings.advanced.api.apiKey = '[HIDDEN]';
     }
 
     return NextResponse.json({ settings: safeSettings });
   } catch (error) {
-    console.error("Get settings error:", error);
+    console.error('Get settings error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

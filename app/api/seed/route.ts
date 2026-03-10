@@ -1,5 +1,5 @@
-import { clearDatabase, seedDynamic } from "@/lib/seed/dynamic-seeder";
-import { NextRequest, NextResponse } from "next/server";
+import { clearDatabase, seedDynamic } from '@/lib/seed/dynamic-seeder';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,26 +7,26 @@ export async function POST(request: NextRequest) {
       action,
       categoriesCount = 10,
       productsCount = 50,
-      clearExisting = true,
+      clearExisting = true
     } = await request.json();
 
-    if (action === "seed") {
+    if (action === 'seed') {
       const result = await seedDynamic({
         categoriesCount: Math.min(parseInt(categoriesCount) || 10, 100), // Limit to 100 max
         productsCount: Math.min(parseInt(productsCount) || 50, 1000), // Limit to 1000 max
-        clearExisting: Boolean(clearExisting),
+        clearExisting: Boolean(clearExisting)
       });
 
       return NextResponse.json({
         success: true,
-        message: "Database seeded successfully",
-        data: result,
+        message: 'Database seeded successfully',
+        data: result
       });
-    } else if (action === "clear") {
+    } else if (action === 'clear') {
       await clearDatabase();
       return NextResponse.json({
         success: true,
-        message: "Database cleared successfully",
+        message: 'Database cleared successfully'
       });
     } else {
       return NextResponse.json(
@@ -35,9 +35,9 @@ export async function POST(request: NextRequest) {
       );
     }
   } catch (error) {
-    console.error("Seed API error:", error);
+    console.error('Seed API error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -45,12 +45,12 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({
-    message: "Use POST request with parameters",
+    message: 'Use POST request with parameters',
     example: {
-      action: "seed",
+      action: 'seed',
       categoriesCount: 20,
       productsCount: 100,
-      clearExisting: true,
-    },
+      clearExisting: true
+    }
   });
 }

@@ -1,50 +1,54 @@
-"use client"
+'use client';
 
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductPaginationProps {
-  currentPage: number
-  totalPages: number
-  onPageChange: (page: number) => void
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
-export function ProductPagination({ currentPage, totalPages, onPageChange }: ProductPaginationProps) {
+export function ProductPagination({
+  currentPage,
+  totalPages,
+  onPageChange
+}: ProductPaginationProps) {
   // Generate page numbers to display
   const getPageNumbers = () => {
-    const pages = []
+    const pages = [];
 
     // Always show first page
-    pages.push(1)
+    pages.push(1);
 
     // Calculate range around current page
-    const startPage = Math.max(2, currentPage - 1)
-    const endPage = Math.min(totalPages - 1, currentPage + 1)
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
 
     // Add ellipsis after first page if needed
     if (startPage > 2) {
-      pages.push("ellipsis-start")
+      pages.push('ellipsis-start');
     }
 
     // Add pages around current page
     for (let i = startPage; i <= endPage; i++) {
-      pages.push(i)
+      pages.push(i);
     }
 
     // Add ellipsis before last page if needed
     if (endPage < totalPages - 1) {
-      pages.push("ellipsis-end")
+      pages.push('ellipsis-end');
     }
 
     // Always show last page if there's more than one page
     if (totalPages > 1) {
-      pages.push(totalPages)
+      pages.push(totalPages);
     }
 
-    return pages
-  }
+    return pages;
+  };
 
-  const pageNumbers = getPageNumbers()
+  const pageNumbers = getPageNumbers();
 
   return (
     <div className="mt-8 flex justify-center">
@@ -61,26 +65,32 @@ export function ProductPagination({ currentPage, totalPages, onPageChange }: Pro
         </Button>
 
         {pageNumbers.map((page, index) => {
-          if (page === "ellipsis-start" || page === "ellipsis-end") {
+          if (page === 'ellipsis-start' || page === 'ellipsis-end') {
             return (
-              <Button key={`ellipsis-${index}`} variant="ghost" size="sm" className="h-8 w-8" disabled>
+              <Button
+                key={`ellipsis-${index}`}
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8"
+                disabled
+              >
                 ...
               </Button>
-            )
+            );
           }
 
           return (
             <Button
               key={page}
-              variant={currentPage === page ? "outline" : "ghost"}
+              variant={currentPage === page ? 'outline' : 'ghost'}
               size="sm"
               className="h-8 w-8"
               onClick={() => onPageChange(page as number)}
-              aria-current={currentPage === page ? "page" : undefined}
+              aria-current={currentPage === page ? 'page' : undefined}
             >
               {page}
             </Button>
-          )
+          );
         })}
 
         <Button
@@ -95,5 +105,5 @@ export function ProductPagination({ currentPage, totalPages, onPageChange }: Pro
         </Button>
       </div>
     </div>
-  )
+  );
 }

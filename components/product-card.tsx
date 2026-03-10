@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ShoppingCart, Star } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { useCart } from "@/context/cart-context";
-import { WishlistButton } from "@/components/wishlist-button";
-import { toast } from "@/components/ui/use-toast";
-import { ProductCardProps } from "@/types";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ShoppingCart, Star } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useCart } from '@/context/cart-context';
+import { WishlistButton } from '@/components/wishlist-button';
+import { toast } from '@/components/ui/use-toast';
+import { ProductCardProps } from '@/types';
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart();
@@ -20,7 +20,7 @@ export function ProductCard({ product }: ProductCardProps) {
     if (!product.compareAtPrice || product.compareAtPrice <= product.price)
       return 0;
     return Math.round(
-      ((product.compareAtPrice - product.price) / product.compareAtPrice) * 100,
+      ((product.compareAtPrice - product.price) / product.compareAtPrice) * 100
     );
   };
 
@@ -46,12 +46,12 @@ export function ProductCard({ product }: ProductCardProps) {
         price: product.price,
         quantity: 1,
         image: product.images[0],
-        variant: "Default",
+        variant: 'Default'
       });
 
       toast({
-        title: "Added to cart",
-        description: `${product.name} has been added to your cart.`,
+        title: 'Added to cart',
+        description: `${product.name} has been added to your cart.`
       });
 
       setIsAddingToCart(false);
@@ -63,36 +63,36 @@ export function ProductCard({ product }: ProductCardProps) {
   const isBestSeller = product.salesCount > 100;
 
   return (
-    <Card className="overflow-hidden group h-full hover:shadow-lg transition-shadow">
+    <Card className="group h-full overflow-hidden transition-shadow hover:shadow-lg">
       <div className="relative">
         <Link href={`/products/${product.id}`}>
-          <div className="aspect-square relative overflow-hidden bg-muted">
+          <div className="relative aspect-square overflow-hidden bg-muted">
             <Image
-              src={product.images[0] || "/placeholder.svg"}
+              src={product.images[0] || '/placeholder.svg'}
               alt={product.name}
               fill
               className="object-cover transition-transform group-hover:scale-105"
             />
 
             {/* Badges */}
-            <div className="absolute top-2 left-2 flex flex-col gap-1">
+            <div className="absolute left-2 top-2 flex flex-col gap-1">
               {discount > 0 && (
-                <Badge className="bg-red-500 hover:bg-red-600 text-xs">
+                <Badge className="bg-red-500 text-xs hover:bg-red-600">
                   {discount}% OFF
                 </Badge>
               )}
               {isNew && (
-                <Badge className="bg-green-500 hover:bg-green-600 text-xs">
+                <Badge className="bg-green-500 text-xs hover:bg-green-600">
                   New
                 </Badge>
               )}
               {isBestSeller && (
-                <Badge className="bg-amber-500 hover:bg-amber-600 text-xs">
+                <Badge className="bg-amber-500 text-xs hover:bg-amber-600">
                   Best Seller
                 </Badge>
               )}
               {!product.active && (
-                <Badge className="bg-gray-500 hover:bg-gray-600 text-xs">
+                <Badge className="bg-gray-500 text-xs hover:bg-gray-600">
                   Out of Stock
                 </Badge>
               )}
@@ -100,40 +100,40 @@ export function ProductCard({ product }: ProductCardProps) {
 
             {/* Rating badge */}
             {product.rating >= 4 && (
-              <Badge className="absolute top-2 right-2 bg-blue-500 hover:bg-blue-600 text-xs">
+              <Badge className="absolute right-2 top-2 bg-blue-500 text-xs hover:bg-blue-600">
                 ⭐ {product.rating.toFixed(1)}
               </Badge>
             )}
           </div>
         </Link>
 
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100">
           <WishlistButton product={product} />
         </div>
       </div>
 
       <CardContent className="p-4">
         <Link href={`/products/${product.id}`}>
-          <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors mb-1">
+          <h3 className="mb-1 line-clamp-2 text-sm font-semibold transition-colors group-hover:text-primary">
             {product.name}
           </h3>
         </Link>
 
-        <p className="text-xs text-muted-foreground mb-2">
+        <p className="mb-2 text-xs text-muted-foreground">
           {product.brand && `${product.brand} • `}
           {product.category}
         </p>
 
         {/* Star Rating */}
-        <div className="flex items-center mb-2">
+        <div className="mb-2 flex items-center">
           <div className="flex items-center">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
                 key={i}
                 className={`h-3 w-3 ${
                   i < Math.floor(product.rating)
-                    ? "text-yellow-400 fill-current"
-                    : "text-gray-300"
+                    ? 'fill-current text-yellow-400'
+                    : 'text-gray-300'
                 }`}
               />
             ))}
@@ -170,13 +170,13 @@ export function ProductCard({ product }: ProductCardProps) {
         >
           {isAddingToCart ? (
             <>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-1" />
+              <div className="mr-1 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
               Adding...
             </>
           ) : (
             <>
               <ShoppingCart className="mr-1 h-4 w-4" />
-              {product.active ? "Add to Cart" : "Out of Stock"}
+              {product.active ? 'Add to Cart' : 'Out of Stock'}
             </>
           )}
         </Button>

@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import type { Column } from "@tanstack/react-table";
+  SelectValue
+} from '@/components/ui/select';
+import type { Column } from '@tanstack/react-table';
 
 interface DataTableSingleSelectFilterProps<TData> {
   column?: Column<TData, string>;
@@ -19,7 +19,7 @@ interface DataTableSingleSelectFilterProps<TData> {
   value: string;
   onChange: (value: string) => void;
   onColumnFilterChange?: (value: string) => void;
-  variant?: "default" | "inline";
+  variant?: 'default' | 'inline';
 }
 
 export function DataTableSingleSelectFilter<TData>({
@@ -29,7 +29,7 @@ export function DataTableSingleSelectFilter<TData>({
   value,
   onChange,
   onColumnFilterChange,
-  variant = "default",
+  variant = 'default'
 }: DataTableSingleSelectFilterProps<TData>) {
   // Remove duplicate options
   const uniqueOptions = options.filter(
@@ -44,16 +44,16 @@ export function DataTableSingleSelectFilter<TData>({
 
   // Get display value for SelectValue
   const getDisplayValue = () => {
-    if (value === "all") return `All ${title}`;
+    if (value === 'all') return `All ${title}`;
     const option = uniqueOptions.find((opt) => opt.value === value);
     return option?.label || `All ${title}`;
   };
 
   // Inline variant for dropdown menu
-  if (variant === "inline") {
+  if (variant === 'inline') {
     return (
       <Select value={value} onValueChange={handleValueChange}>
-        <SelectTrigger className="w-full h-9">
+        <SelectTrigger className="h-9 w-full">
           <SelectValue>{getDisplayValue()}</SelectValue>
         </SelectTrigger>
         <SelectContent className="max-h-60 overflow-y-auto">
@@ -72,12 +72,12 @@ export function DataTableSingleSelectFilter<TData>({
     <div className="flex items-center gap-2">
       <label
         htmlFor={`${title?.toLowerCase()}-filter`}
-        className="text-sm whitespace-nowrap"
+        className="whitespace-nowrap text-sm"
       >
         {title}:
       </label>
       <Select value={value} onValueChange={handleValueChange}>
-        <SelectTrigger className="w-[180px] h-9">
+        <SelectTrigger className="h-9 w-[180px]">
           <SelectValue>{getDisplayValue()}</SelectValue>
         </SelectTrigger>
         <SelectContent className="max-h-60 overflow-y-auto">

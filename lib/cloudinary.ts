@@ -1,6 +1,6 @@
-import { Settings } from "@/models/Settings";
-import { v2 as cloudinary } from "cloudinary";
-import { useSearchParams } from "next/navigation";
+import { Settings } from '@/models/Settings';
+import { v2 as cloudinary } from 'cloudinary';
+import { useSearchParams } from 'next/navigation';
 
 // Configure Cloudinary with settings from database
 export const configureCloudinary = async (): Promise<typeof cloudinary> => {
@@ -13,26 +13,26 @@ export const configureCloudinary = async (): Promise<typeof cloudinary> => {
       !cloudinaryConfig.apiKey ||
       !cloudinaryConfig.apiSecret
     ) {
-      throw new Error("Cloudinary configuration is incomplete in settings");
+      throw new Error('Cloudinary configuration is incomplete in settings');
     }
 
     cloudinary.config({
       cloud_name: cloudinaryConfig.cloudName,
       api_key: cloudinaryConfig.apiKey,
       api_secret: cloudinaryConfig.apiSecret,
-      secure: cloudinaryConfig.secure,
+      secure: cloudinaryConfig.secure
     });
 
     return cloudinary;
   } catch (error) {
-    console.error("Failed to configure Cloudinary from settings:", error);
+    console.error('Failed to configure Cloudinary from settings:', error);
 
     // Fallback to environment variables if database configuration fails
     cloudinary.config({
       cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
       api_key: process.env.CLOUDINARY_API_KEY!,
       api_secret: process.env.CLOUDINARY_API_SECRET!,
-      secure: true,
+      secure: true
     });
 
     return cloudinary;
@@ -44,7 +44,7 @@ export const uploadToCloudinary = async (
   options?: {
     folder?: string;
     transformation?: any[];
-    resourceType?: "image" | "video" | "auto" | "raw";
+    resourceType?: 'image' | 'video' | 'auto' | 'raw';
   }
 ): Promise<{ secure_url: string; public_id: string }> => {
   const cloudinaryInstance = await configureCloudinary();
@@ -58,14 +58,14 @@ export const uploadToCloudinary = async (
     cloudinaryInstance.uploader
       .upload_stream(
         {
-          resource_type: options?.resourceType || "image",
-          folder: options?.folder || cloudinaryConfig.folder || "categories",
+          resource_type: options?.resourceType || 'image',
+          folder: options?.folder || cloudinaryConfig.folder || 'categories',
           upload_preset: cloudinaryConfig.uploadPreset || undefined,
           transformation: options?.transformation || [
-            { width: 800, height: 800, crop: "limit" },
-            { quality: "auto" },
-            { format: "webp" },
-          ],
+            { width: 800, height: 800, crop: 'limit' },
+            { quality: 'auto' },
+            { format: 'webp' }
+          ]
         },
         (error, result) => {
           if (error) {
@@ -73,10 +73,10 @@ export const uploadToCloudinary = async (
           } else if (result) {
             resolve({
               secure_url: result.secure_url,
-              public_id: result.public_id,
+              public_id: result.public_id
             });
           } else {
-            reject(new Error("Upload failed"));
+            reject(new Error('Upload failed'));
           }
         }
       )
@@ -92,34 +92,34 @@ export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
 // Utility function for specific upload types
 export const uploadCategoryImage = async (file: Blob) => {
   return uploadToCloudinary(file, {
-    folder: "categories",
+    folder: 'categories',
     transformation: [
-      { width: 800, height: 800, crop: "limit" },
-      { quality: "auto" },
-      { format: "webp" },
-    ],
+      { width: 800, height: 800, crop: 'limit' },
+      { quality: 'auto' },
+      { format: 'webp' }
+    ]
   });
 };
 
 export const uploadProductImage = async (file: Blob) => {
   return uploadToCloudinary(file, {
-    folder: "products",
+    folder: 'products',
     transformation: [
-      { width: 1200, height: 1200, crop: "limit" },
-      { quality: "auto" },
-      { format: "webp" },
-    ],
+      { width: 1200, height: 1200, crop: 'limit' },
+      { quality: 'auto' },
+      { format: 'webp' }
+    ]
   });
 };
 
 export const uploadUserAvatar = async (file: Blob) => {
   return uploadToCloudinary(file, {
-    folder: "avatars",
+    folder: 'avatars',
     transformation: [
-      { width: 300, height: 300, crop: "fill" },
-      { quality: "auto" },
-      { format: "webp" },
-    ],
+      { width: 300, height: 300, crop: 'fill' },
+      { quality: 'auto' },
+      { format: 'webp' }
+    ]
   });
 };
 
@@ -150,7 +150,7 @@ export const getCloudinaryConfig = async () => {
   return {
     cloudName: cloudinaryConfig.cloudName,
     uploadPreset: cloudinaryConfig.uploadPreset,
-    folder: cloudinaryConfig.folder,
+    folder: cloudinaryConfig.folder
   };
 };
 

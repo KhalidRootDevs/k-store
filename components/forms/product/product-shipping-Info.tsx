@@ -3,11 +3,11 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useFormContext } from "react-hook-form";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useFormContext } from 'react-hook-form';
 
 export default function ProductShippingInfo() {
   const { register } = useFormContext();
@@ -28,11 +28,11 @@ export default function ProductShippingInfo() {
             type="number"
             step="0.01"
             placeholder="0.00"
-            {...register("weight")}
+            {...register('weight')}
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="length">Length (cm)</Label>
             <Input
@@ -40,7 +40,7 @@ export default function ProductShippingInfo() {
               type="number"
               step="0.1"
               placeholder="0.0"
-              {...register("length")}
+              {...register('length')}
             />
           </div>
           <div className="space-y-2">
@@ -50,7 +50,7 @@ export default function ProductShippingInfo() {
               type="number"
               step="0.1"
               placeholder="0.0"
-              {...register("width")}
+              {...register('width')}
             />
           </div>
           <div className="space-y-2">
@@ -60,7 +60,7 @@ export default function ProductShippingInfo() {
               type="number"
               step="0.1"
               placeholder="0.0"
-              {...register("height")}
+              {...register('height')}
             />
           </div>
         </div>

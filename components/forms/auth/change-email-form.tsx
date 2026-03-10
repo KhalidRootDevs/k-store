@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  CardTitle
+} from '@/components/ui/card';
 
-import { useAuth } from "@/context/auth-context";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useAuth } from '@/context/auth-context';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
-import InputField from "../../custom/input";
-import toast from "react-hot-toast";
-import { EmailFormValues, emailSchema } from "@/lib/validations/index";
+import InputField from '../../custom/input';
+import toast from 'react-hot-toast';
+import { EmailFormValues, emailSchema } from '@/lib/validations/index';
 
 interface ChangeEmailFormProps {
   onSuccess?: () => void;
@@ -33,9 +33,9 @@ export function ChangeEmailForm({ onSuccess }: ChangeEmailFormProps) {
   const methods = useForm<EmailFormValues>({
     resolver: zodResolver(emailSchema),
     defaultValues: {
-      newEmail: "",
-      password: "",
-    },
+      newEmail: '',
+      password: ''
+    }
   });
 
   const { handleSubmit, reset } = methods;
@@ -44,31 +44,31 @@ export function ChangeEmailForm({ onSuccess }: ChangeEmailFormProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/user/change-email", {
-        method: "POST",
+      const response = await fetch('/api/user/change-email', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify({
           newEmail: data.newEmail,
-          password: data.password,
-        }),
+          password: data.password
+        })
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("Your email has been updated successfully.");
+        toast.success('Your email has been updated successfully.');
         reset();
         await checkAuth();
         onSuccess?.();
       } else {
-        throw new Error(result.error || "Failed to change email");
+        throw new Error(result.error || 'Failed to change email');
       }
     } catch (error: any) {
-      console.error("Error changing email:", error);
-      toast.error(error.message || "An error occurred. Please try again.");
+      console.error('Error changing email:', error);
+      toast.error(error.message || 'An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

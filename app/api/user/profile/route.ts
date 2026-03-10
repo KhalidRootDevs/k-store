@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-import { User } from "@/models/User";
-import { verifyToken } from "@/lib/auth";
-import connectDB from "@/lib/database";
+import { User } from '@/models/User';
+import { verifyToken } from '@/lib/auth';
+import connectDB from '@/lib/database';
 // app/api/user/profile/route.ts - Update the PUT method
 export async function PUT(request: NextRequest) {
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest) {
     // Validate required fields
     if (!name || !email) {
       return NextResponse.json(
-        { error: "Name and email are required" },
+        { error: 'Name and email are required' },
         { status: 400 }
       );
     }
@@ -29,12 +29,12 @@ export async function PUT(request: NextRequest) {
     // Check if email is already taken by another user
     const existingUser = await User.findOne({
       email,
-      _id: { $ne: userId },
+      _id: { $ne: userId }
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "Email is already taken" },
+        { error: 'Email is already taken' },
         { status: 409 }
       );
     }
@@ -44,37 +44,37 @@ export async function PUT(request: NextRequest) {
       name,
       email,
       ...(phone !== undefined && { phone }),
-      ...(dateOfBirth !== undefined && { dateOfBirth }),
+      ...(dateOfBirth !== undefined && { dateOfBirth })
     };
 
     // Update user profile
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
-      runValidators: true,
-    }).select("-password"); // Exclude password from response
+      runValidators: true
+    }).select('-password'); // Exclude password from response
 
     if (!updatedUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     return NextResponse.json({
-      message: "Profile updated successfully",
-      user: updatedUser,
+      message: 'Profile updated successfully',
+      user: updatedUser
     });
   } catch (error: any) {
-    console.error("Profile update error:", error);
+    console.error('Profile update error:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err: any) => err.message);
-      return NextResponse.json({ error: errors.join(", ") }, { status: 400 });
+      return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
     }
 
-    if (error.name === "JsonWebTokenError") {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+    if (error.name === 'JsonWebTokenError') {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -84,25 +84,25 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
     const userId = decoded.userId;
 
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(userId).select('-password');
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     return NextResponse.json({ user });
   } catch (error) {
-    console.error("Get profile error:", error);
+    console.error('Get profile error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

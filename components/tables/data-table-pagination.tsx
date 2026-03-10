@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
-import type { Table } from "@tanstack/react-table";
+import type { Table } from '@tanstack/react-table';
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+  ChevronsRight
+} from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useCallback, useEffect } from "react";
+  SelectValue
+} from '@/components/ui/select';
+import { useCallback, useEffect } from 'react';
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
@@ -26,7 +26,7 @@ interface DataTablePaginationProps<TData> {
 
 export function DataTablePagination<TData>({
   table,
-  totalItems = 0,
+  totalItems = 0
 }: DataTablePaginationProps<TData>) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,8 +38,8 @@ export function DataTablePagination<TData>({
   const updateURL = useCallback(
     (newPage: number, newPageSize: number) => {
       const params = new URLSearchParams(searchParams.toString());
-      params.set("page", String(newPage + 1));
-      params.set("pageSize", String(newPageSize));
+      params.set('page', String(newPage + 1));
+      params.set('pageSize', String(newPageSize));
       router.replace(`?${params.toString()}`, { scroll: false });
     },
     [router, searchParams]
@@ -64,8 +64,8 @@ export function DataTablePagination<TData>({
   );
 
   useEffect(() => {
-    const currentPage = Number(searchParams.get("page")) || 1;
-    const currentPageSize = Number(searchParams.get("pageSize")) || 10;
+    const currentPage = Number(searchParams.get('page')) || 1;
+    const currentPageSize = Number(searchParams.get('pageSize')) || 10;
 
     if (currentPage !== pageIndex + 1 || currentPageSize !== pageSize) {
       updateURL(pageIndex, pageSize);
@@ -78,7 +78,7 @@ export function DataTablePagination<TData>({
       <div className="flex flex-col items-center gap-4 text-sm text-gray-600 sm:flex-row sm:gap-8">
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
           <span className="font-medium text-indigo-600">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredSelectedRowModel().rows.length} of{' '}
             {table.getFilteredRowModel().rows.length} selected
           </span>
         ) : (
@@ -99,7 +99,7 @@ export function DataTablePagination<TData>({
           >
             <SelectTrigger
               id="rows-per-page"
-              className="h-8 w-[80px] rounded-full border border-gray-300 shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 hover:border-gray-400"
+              className="h-8 w-[80px] rounded-full border border-gray-300 shadow-sm transition-all duration-200 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>

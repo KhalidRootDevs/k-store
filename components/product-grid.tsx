@@ -1,11 +1,11 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Product } from "@/types";
-import Image from "next/image";
-import Link from "next/link";
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Product } from '@/types';
+import Image from 'next/image';
+import Link from 'next/link';
 
 async function getProducts(
-  type: "featured" | "best-selling" | "top-rated" | "new-arrivals",
+  type: 'featured' | 'best-selling' | 'top-rated' | 'new-arrivals'
 ): Promise<Product[]> {
   try {
     const response = await fetch(
@@ -13,13 +13,13 @@ async function getProducts(
       {
         next: {
           revalidate: 3600, // Revalidate every hour
-          tags: ["products"],
-        },
-      },
+          tags: ['products']
+        }
+      }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch products");
+      throw new Error('Failed to fetch products');
     }
 
     const data = await response.json();
@@ -34,208 +34,208 @@ async function getProducts(
 const fallbackProducts = {
   featured: [
     {
-      _id: "1",
-      name: "Premium T-Shirt",
-      description: "High-quality cotton t-shirt",
+      _id: '1',
+      name: 'Premium T-Shirt',
+      description: 'High-quality cotton t-shirt',
       price: 29.99,
       compareAtPrice: 39.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "1", name: "Clothing", slug: "clothing" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '1', name: 'Clothing', slug: 'clothing' },
       featured: true,
       rating: 4.5,
       reviewCount: 24,
       salesCount: 150,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "2",
-      name: "Wireless Headphones",
-      description: "Noise-cancelling wireless headphones",
+      _id: '2',
+      name: 'Wireless Headphones',
+      description: 'Noise-cancelling wireless headphones',
       price: 129.99,
       compareAtPrice: 159.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "2", name: "Electronics", slug: "electronics" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '2', name: 'Electronics', slug: 'electronics' },
       featured: true,
       rating: 4.8,
       reviewCount: 89,
       salesCount: 320,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "3",
-      name: "Leather Wallet",
-      description: "Genuine leather wallet",
+      _id: '3',
+      name: 'Leather Wallet',
+      description: 'Genuine leather wallet',
       price: 49.99,
       compareAtPrice: 69.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "3", name: "Accessories", slug: "accessories" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '3', name: 'Accessories', slug: 'accessories' },
       featured: true,
       rating: 4.3,
       reviewCount: 42,
       salesCount: 180,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "4",
-      name: "Smart Watch",
-      description: "Advanced smartwatch with health tracking",
+      _id: '4',
+      name: 'Smart Watch',
+      description: 'Advanced smartwatch with health tracking',
       price: 199.99,
       compareAtPrice: 249.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "2", name: "Electronics", slug: "electronics" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '2', name: 'Electronics', slug: 'electronics' },
       featured: true,
       rating: 4.7,
       reviewCount: 156,
       salesCount: 420,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
+      updatedAt: new Date().toISOString()
+    }
   ],
-  "best-selling": [
+  'best-selling': [
     {
-      _id: "5",
-      name: "Running Shoes",
-      description: "Lightweight running shoes",
+      _id: '5',
+      name: 'Running Shoes',
+      description: 'Lightweight running shoes',
       price: 89.99,
       compareAtPrice: 119.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "4", name: "Footwear", slug: "footwear" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '4', name: 'Footwear', slug: 'footwear' },
       featured: true,
       rating: 4.6,
       reviewCount: 203,
       salesCount: 890,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "6",
-      name: "Bluetooth Speaker",
-      description: "Portable Bluetooth speaker",
+      _id: '6',
+      name: 'Bluetooth Speaker',
+      description: 'Portable Bluetooth speaker',
       price: 79.99,
       compareAtPrice: 99.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "2", name: "Electronics", slug: "electronics" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '2', name: 'Electronics', slug: 'electronics' },
       featured: true,
       rating: 4.4,
       reviewCount: 167,
       salesCount: 540,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "7",
-      name: "Backpack",
-      description: "Durable travel backpack",
+      _id: '7',
+      name: 'Backpack',
+      description: 'Durable travel backpack',
       price: 59.99,
       compareAtPrice: 79.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "3", name: "Accessories", slug: "accessories" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '3', name: 'Accessories', slug: 'accessories' },
       featured: true,
       rating: 4.5,
       reviewCount: 98,
       salesCount: 320,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "8",
-      name: "Sunglasses",
-      description: "UV protection sunglasses",
+      _id: '8',
+      name: 'Sunglasses',
+      description: 'UV protection sunglasses',
       price: 39.99,
       compareAtPrice: 59.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "3", name: "Accessories", slug: "accessories" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '3', name: 'Accessories', slug: 'accessories' },
       featured: true,
       rating: 4.2,
       reviewCount: 76,
       salesCount: 210,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
+      updatedAt: new Date().toISOString()
+    }
   ],
-  "top-rated": [
+  'top-rated': [
     {
-      _id: "9",
-      name: "Coffee Maker",
-      description: "Programmable coffee maker",
+      _id: '9',
+      name: 'Coffee Maker',
+      description: 'Programmable coffee maker',
       price: 149.99,
       compareAtPrice: 199.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "5", name: "Home", slug: "home" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '5', name: 'Home', slug: 'home' },
       featured: true,
       rating: 4.9,
       reviewCount: 234,
       salesCount: 670,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "10",
-      name: "Yoga Mat",
-      description: "Non-slip yoga mat",
+      _id: '10',
+      name: 'Yoga Mat',
+      description: 'Non-slip yoga mat',
       price: 29.99,
       compareAtPrice: 39.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "6", name: "Fitness", slug: "fitness" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '6', name: 'Fitness', slug: 'fitness' },
       featured: true,
       rating: 4.8,
       reviewCount: 189,
       salesCount: 450,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "11",
-      name: "Water Bottle",
-      description: "Insulated water bottle",
+      _id: '11',
+      name: 'Water Bottle',
+      description: 'Insulated water bottle',
       price: 19.99,
       compareAtPrice: 29.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "6", name: "Fitness", slug: "fitness" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '6', name: 'Fitness', slug: 'fitness' },
       featured: true,
       rating: 4.7,
       reviewCount: 156,
       salesCount: 780,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
-      _id: "12",
-      name: "Desk Lamp",
-      description: "LED desk lamp",
+      _id: '12',
+      name: 'Desk Lamp',
+      description: 'LED desk lamp',
       price: 49.99,
       compareAtPrice: 69.99,
-      images: ["/placeholder.svg?height=400&width=400"],
-      categoryId: { _id: "5", name: "Home", slug: "home" },
+      images: ['/placeholder.svg?height=400&width=400'],
+      categoryId: { _id: '5', name: 'Home', slug: 'home' },
       featured: true,
       rating: 4.6,
       reviewCount: 134,
       salesCount: 290,
       active: true,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    },
-  ],
+      updatedAt: new Date().toISOString()
+    }
+  ]
 };
 
 export async function ProductGrid({
-  type,
+  type
 }: {
-  type: "featured" | "best-selling" | "top-rated" | "new-arrivals";
+  type: 'featured' | 'best-selling' | 'top-rated' | 'new-arrivals';
 }) {
   const products = await getProducts(type);
   const displayProducts =
@@ -253,25 +253,25 @@ export async function ProductGrid({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {displayProducts.map((product) => {
         const discount = calculateDiscount(
           product.price,
-          product.compareAtPrice,
+          product.compareAtPrice
         );
         const isNew = isNewProduct(product.createdAt);
 
         return (
           <Link key={product._id} href={`/products/${product._id}`}>
-            <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
+            <Card className="group h-full overflow-hidden transition-shadow duration-300 hover:shadow-lg">
               <div className="relative h-48 w-full overflow-hidden">
                 <Image
-                  src={product.images[0] || "/placeholder.svg"}
+                  src={product.images[0] || '/placeholder.svg'}
                   alt={product.name}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="absolute top-2 right-2 flex flex-col gap-1">
+                <div className="absolute right-2 top-2 flex flex-col gap-1">
                   {discount > 0 && (
                     <Badge className="bg-red-500 hover:bg-red-600">
                       {discount}% OFF
@@ -284,16 +284,16 @@ export async function ProductGrid({
                   )}
                 </div>
                 {product.rating >= 4.5 && (
-                  <Badge className="absolute top-2 left-2 bg-amber-500 hover:bg-amber-600">
+                  <Badge className="absolute left-2 top-2 bg-amber-500 hover:bg-amber-600">
                     ⭐ {product.rating}
                   </Badge>
                 )}
               </div>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-lg line-clamp-1 mb-1">
+                <h3 className="mb-1 line-clamp-1 text-lg font-semibold">
                   {product.name}
                 </h3>
-                <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
+                <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
                   {product.description}
                 </p>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -304,7 +304,7 @@ export async function ProductGrid({
                   <span>({product.reviewCount})</span>
                 </div>
               </CardContent>
-              <CardFooter className="p-4 pt-0 flex justify-between items-center">
+              <CardFooter className="flex items-center justify-between p-4 pt-0">
                 <div className="flex items-center gap-2">
                   {discount > 0 ? (
                     <>

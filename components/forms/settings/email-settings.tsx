@@ -1,26 +1,26 @@
-import { SettingsFormData } from "@/app/(admin)/admin/settings/page";
-import { Button } from "@/components/ui/button";
+import { SettingsFormData } from '@/app/(admin)/admin/settings/page';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { useFormContext } from "react-hook-form";
+  SelectValue
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { useFormContext } from 'react-hook-form';
 
 export default function EmailSettings({
-  handleBooleanChange,
+  handleBooleanChange
 }: {
   handleBooleanChange: (path: string, value: boolean) => void;
 }) {
@@ -28,7 +28,7 @@ export default function EmailSettings({
     register,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors }
   } = useFormContext<SettingsFormData>();
   const watchedValues = watch();
 
@@ -47,7 +47,7 @@ export default function EmailSettings({
             <Select
               value={watchedValues.email?.provider?.service}
               onValueChange={(value: any) =>
-                setValue("email.provider.service", value)
+                setValue('email.provider.service', value)
               }
             >
               <SelectTrigger id="email-provider">
@@ -62,24 +62,24 @@ export default function EmailSettings({
             </Select>
           </div>
 
-          {watchedValues.email?.provider?.service === "smtp" && (
+          {watchedValues.email?.provider?.service === 'smtp' && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="smtp-host">SMTP Host</Label>
                 <Input
                   id="smtp-host"
-                  {...register("email.provider.smtp.host")}
+                  {...register('email.provider.smtp.host')}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="smtp-port">SMTP Port</Label>
                   <Input
                     id="smtp-port"
                     type="number"
-                    {...register("email.provider.smtp.port", {
-                      valueAsNumber: true,
+                    {...register('email.provider.smtp.port', {
+                      valueAsNumber: true
                     })}
                   />
                 </div>
@@ -88,7 +88,7 @@ export default function EmailSettings({
                   <Select
                     value={watchedValues.email?.provider?.smtp?.security}
                     onValueChange={(value: any) =>
-                      setValue("email.provider.smtp.security", value)
+                      setValue('email.provider.smtp.security', value)
                     }
                   >
                     <SelectTrigger id="smtp-security">
@@ -107,7 +107,7 @@ export default function EmailSettings({
                 <Label htmlFor="smtp-username">SMTP Username</Label>
                 <Input
                   id="smtp-username"
-                  {...register("email.provider.smtp.username")}
+                  {...register('email.provider.smtp.username')}
                 />
               </div>
 
@@ -116,7 +116,7 @@ export default function EmailSettings({
                 <Input
                   id="smtp-password"
                   type="password"
-                  {...register("email.provider.smtp.password")}
+                  {...register('email.provider.smtp.password')}
                 />
               </div>
             </>
@@ -158,7 +158,7 @@ export default function EmailSettings({
                 checked={watchedValues.email?.notifications?.orderConfirmation}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "email.notifications.orderConfirmation",
+                    'email.notifications.orderConfirmation',
                     value
                   )
                 }
@@ -181,7 +181,7 @@ export default function EmailSettings({
                 }
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "email.notifications.shippingConfirmation",
+                    'email.notifications.shippingConfirmation',
                     value
                   )
                 }
@@ -202,7 +202,7 @@ export default function EmailSettings({
                 checked={watchedValues.email?.notifications?.orderCanceled}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "email.notifications.orderCanceled",
+                    'email.notifications.orderCanceled',
                     value
                   )
                 }
@@ -223,7 +223,7 @@ export default function EmailSettings({
                 checked={watchedValues.email?.notifications?.customerAccount}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "email.notifications.customerAccount",
+                    'email.notifications.customerAccount',
                     value
                   )
                 }
@@ -244,7 +244,7 @@ export default function EmailSettings({
                 checked={watchedValues.email?.notifications?.passwordReset}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "email.notifications.passwordReset",
+                    'email.notifications.passwordReset',
                     value
                   )
                 }
@@ -265,7 +265,7 @@ export default function EmailSettings({
                 checked={watchedValues.email?.notifications?.abandonedCart}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "email.notifications.abandonedCart",
+                    'email.notifications.abandonedCart',
                     value
                   )
                 }

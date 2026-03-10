@@ -1,53 +1,64 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import Image from "next/image"
-import { Card } from "@/components/ui/card"
-import type { Product, Category, Brand } from "@/lib/product-data"
+import Link from 'next/link';
+import Image from 'next/image';
+import { Card } from '@/components/ui/card';
+import type { Product, Category, Brand } from '@/lib/product-data';
 
 interface ProductListProps {
-  products: Product[]
-  categories: Category[]
-  brands: Brand[]
+  products: Product[];
+  categories: Category[];
+  brands: Brand[];
 }
 
-export function ProductList({ products, categories, brands }: ProductListProps) {
+export function ProductList({
+  products,
+  categories,
+  brands
+}: ProductListProps) {
   return (
     <div className="space-y-4">
       {products.map((product) => (
-        <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+        <Card
+          key={product.id}
+          className="overflow-hidden transition-shadow hover:shadow-lg"
+        >
           <div className="flex flex-col sm:flex-row">
-            <div className="relative h-48 sm:h-auto sm:w-48 flex-shrink-0">
+            <div className="relative h-48 flex-shrink-0 sm:h-auto sm:w-48">
               <Image
-                src={product.image || "/placeholder.svg?height=200&width=200"}
+                src={product.image || '/placeholder.svg?height=200&width=200'}
                 alt={product.name}
                 fill
                 className="object-cover"
               />
               {product.discount > 0 && (
-                <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                <div className="absolute right-2 top-2 rounded bg-red-500 px-2 py-1 text-xs font-bold text-white">
                   {product.discount}% OFF
                 </div>
               )}
               {product.isNew && (
-                <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">
+                <div className="absolute left-2 top-2 rounded bg-primary px-2 py-1 text-xs font-bold text-primary-foreground">
                   NEW
                 </div>
               )}
             </div>
-            <div className="p-4 flex-1">
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+            <div className="flex-1 p-4">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-start">
                 <div>
-                  <h3 className="font-semibold text-lg">{product.name}</h3>
+                  <h3 className="text-lg font-semibold">{product.name}</h3>
                   <p className="text-sm text-muted-foreground">
                     {categories.find((c) => c.id === product.category)?.name}
                   </p>
-                  <div className="flex items-center mt-1">
+                  <div className="mt-1 flex items-center">
                     <div className="flex">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <svg
                           key={i}
-                          className={`h-4 w-4 ${i < Math.floor(product.rating) ? "text-yellow-400" : "text-gray-300"}`}
+                          className={`h-4 w-4 ${
+                            i < Math.floor(product.rating)
+                              ? 'text-yellow-400'
+                              : 'text-gray-300'
+                          }`}
                           fill="currentColor"
                           viewBox="0 0 20 20"
                         >
@@ -59,29 +70,40 @@ export function ProductList({ products, categories, brands }: ProductListProps) 
                         </svg>
                       ))}
                     </div>
-                    <span className="ml-1 text-sm text-muted-foreground">({product.rating})</span>
+                    <span className="ml-1 text-sm text-muted-foreground">
+                      ({product.rating})
+                    </span>
                   </div>
                 </div>
                 <div>
                   {product.discount > 0 ? (
                     <div className="flex flex-col items-end">
                       <span className="text-lg font-bold">
-                        ${(product.price * (1 - product.discount / 100)).toFixed(2)}
+                        $
+                        {(product.price * (1 - product.discount / 100)).toFixed(
+                          2
+                        )}
                       </span>
-                      <span className="text-sm text-muted-foreground line-through">${product.price.toFixed(2)}</span>
+                      <span className="text-sm text-muted-foreground line-through">
+                        ${product.price.toFixed(2)}
+                      </span>
                     </div>
                   ) : (
-                    <span className="text-lg font-bold">${product.price.toFixed(2)}</span>
+                    <span className="text-lg font-bold">
+                      ${product.price.toFixed(2)}
+                    </span>
                   )}
                 </div>
               </div>
-              <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                A high-quality product with excellent features and durability. Perfect for everyday use and special
-                occasions.
+              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                A high-quality product with excellent features and durability.
+                Perfect for everyday use and special occasions.
               </p>
               <div className="mt-4 flex items-center gap-2">
                 {product.isBestSeller && (
-                  <div className="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded">BEST SELLER</div>
+                  <div className="rounded bg-amber-500 px-2 py-1 text-xs font-bold text-white">
+                    BEST SELLER
+                  </div>
                 )}
                 <div className="text-sm text-muted-foreground">
                   Brand: {brands.find((b) => b.id === product.brand)?.name}
@@ -91,14 +113,14 @@ export function ProductList({ products, categories, brands }: ProductListProps) 
               <div className="mt-4 flex items-center gap-2">
                 <Link
                   href={`/products/${product.id}`}
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm font-medium"
+                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   View Details
                 </Link>
                 <button
-                  className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors text-sm font-medium"
+                  className="rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90"
                   onClick={(e) => {
-                    e.preventDefault()
+                    e.preventDefault();
                     // Add to cart functionality would go here
                   }}
                 >
@@ -110,5 +132,5 @@ export function ProductList({ products, categories, brands }: ProductListProps) 
         </Card>
       ))}
     </div>
-  )
+  );
 }

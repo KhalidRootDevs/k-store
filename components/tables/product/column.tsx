@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import type { ColumnDef } from "@tanstack/react-table";
-import { Edit, Trash2 } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { DataTableColumnHeader } from "../data-table-column-header";
-import { Product } from "@/types";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import type { ColumnDef } from '@tanstack/react-table';
+import { Edit, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { DataTableColumnHeader } from '../data-table-column-header';
+import { Product } from '@/types';
 
 interface ProductActionsProps {
   product: Product;
@@ -18,7 +18,7 @@ interface ProductActionsProps {
 function ProductActions({
   product,
   onDelete,
-  onToggleStatus,
+  onToggleStatus
 }: ProductActionsProps) {
   return (
     <div className="flex justify-end gap-2">
@@ -41,33 +41,33 @@ function ProductActions({
 }
 
 const getStockStatus = (stock: number, active: boolean) => {
-  if (!active) return { text: "Inactive", variant: "secondary" as const };
+  if (!active) return { text: 'Inactive', variant: 'secondary' as const };
   if (stock === 0)
-    return { text: "Out of Stock", variant: "destructive" as const };
-  if (stock < 10) return { text: "Low Stock", variant: "destructive" as const };
-  return { text: "In Stock", variant: "default" as const };
+    return { text: 'Out of Stock', variant: 'destructive' as const };
+  if (stock < 10) return { text: 'Low Stock', variant: 'destructive' as const };
+  return { text: 'In Stock', variant: 'default' as const };
 };
 
 export const createProductColumns = (
   onDelete: (id: string, name: string) => void,
-  onToggleStatus: (id: string, currentStatus: boolean, name: string) => void,
+  onToggleStatus: (id: string, currentStatus: boolean, name: string) => void
 ): ColumnDef<Product>[] => [
   {
-    accessorKey: "images",
-    header: "Image",
+    accessorKey: 'images',
+    header: 'Image',
     cell: ({ row }) => (
-      <div className="relative h-10 w-10 rounded-md overflow-hidden">
+      <div className="relative h-10 w-10 overflow-hidden rounded-md">
         <Image
-          src={row.original.images[0] || "/placeholder.svg"}
+          src={row.original.images[0] || '/placeholder.svg'}
           alt={row.original.name}
           fill
           className="object-cover"
         />
       </div>
-    ),
+    )
   },
   {
-    accessorKey: "name",
+    accessorKey: 'name',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -80,10 +80,10 @@ export const createProductColumns = (
           </Badge>
         )}
       </div>
-    ),
+    )
   },
   {
-    accessorKey: "sku",
+    accessorKey: 'sku',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="SKU" />
     ),
@@ -91,19 +91,19 @@ export const createProductColumns = (
       <Badge variant="outline" className="font-mono text-xs">
         {row.original.sku}
       </Badge>
-    ),
+    )
   },
   {
-    accessorKey: "categoryId",
+    accessorKey: 'categoryId',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Category" />
     ),
     cell: ({ row }) => (
-      <span>{row.original.categoryId?.name || "Uncategorized"}</span>
-    ),
+      <span>{row.original.categoryId?.name || 'Uncategorized'}</span>
+    )
   },
   {
-    accessorKey: "price",
+    accessorKey: 'price',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Price" />
     ),
@@ -117,24 +117,24 @@ export const createProductColumns = (
             </span>
           )}
       </div>
-    ),
+    )
   },
   {
-    accessorKey: "stock",
+    accessorKey: 'stock',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Stock" />
     ),
-    cell: ({ row }) => <span>{row.original.stock}</span>,
+    cell: ({ row }) => <span>{row.original.stock}</span>
   },
   {
-    accessorKey: "active",
+    accessorKey: 'active',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
       const stockStatus = getStockStatus(
         row.original.stock,
-        row.original.active,
+        row.original.active
       );
       return (
         <Button
@@ -144,24 +144,24 @@ export const createProductColumns = (
             onToggleStatus(
               row.original._id,
               row.original.active,
-              row.original.name,
+              row.original.name
             )
           }
           className={`h-6 px-2 text-xs ${
-            stockStatus.variant === "destructive"
-              ? "bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900"
-              : stockStatus.variant === "secondary"
-                ? "bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900"
-                : "bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900"
+            stockStatus.variant === 'destructive'
+              ? 'bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900'
+              : stockStatus.variant === 'secondary'
+              ? 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900'
+              : 'bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900'
           }`}
         >
           {stockStatus.text}
         </Button>
       );
-    },
+    }
   },
   {
-    id: "actions",
+    id: 'actions',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Actions" />
     ),
@@ -171,6 +171,6 @@ export const createProductColumns = (
         onDelete={onDelete}
         onToggleStatus={onToggleStatus}
       />
-    ),
-  },
+    )
+  }
 ];

@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  CardTitle
+} from '@/components/ui/card';
 
-import { useAuth } from "@/context/auth-context";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import InputField from "../../custom/input";
-import toast from "react-hot-toast";
-import { PasswordFormValues, passwordSchema } from "@/lib/validations/index";
+import { useAuth } from '@/context/auth-context';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import InputField from '../../custom/input';
+import toast from 'react-hot-toast';
+import { PasswordFormValues, passwordSchema } from '@/lib/validations/index';
 
 interface ChangePasswordFormProps {
   onSuccess?: () => void;
@@ -32,10 +32,10 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
   const methods = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
     defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    },
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    }
   });
 
   const { handleSubmit, reset } = methods;
@@ -44,30 +44,30 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/user/change-password", {
-        method: "POST",
+      const response = await fetch('/api/user/change-password', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify({
           currentPassword: data.currentPassword,
-          newPassword: data.newPassword,
-        }),
+          newPassword: data.newPassword
+        })
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        toast.success("Your password has been changed successfully.");
+        toast.success('Your password has been changed successfully.');
         reset();
         onSuccess?.();
       } else {
-        throw new Error(result.error || "Failed to change password");
+        throw new Error(result.error || 'Failed to change password');
       }
     } catch (error: any) {
-      console.error("Error changing password:", error);
-      toast.error(error.message || "An error occurred. Please try again.");
+      console.error('Error changing password:', error);
+      toast.error(error.message || 'An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -101,7 +101,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
               required
               disabled={isSubmitting}
             />
-            <p className="text-sm text-muted-foreground -mt-2">
+            <p className="-mt-2 text-sm text-muted-foreground">
               Must be at least 6 characters long
             </p>
 

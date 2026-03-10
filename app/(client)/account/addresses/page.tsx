@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Plus, Edit, Trash2, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { toast } from "@/components/ui/use-toast";
+  CardTitle
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { toast } from '@/components/ui/use-toast';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  DialogTrigger
+} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,10 +30,10 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useAuth } from "@/context/auth-context";
-import { Address } from "@/types";
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
+import { useAuth } from '@/context/auth-context';
+import { Address } from '@/types';
 
 export default function AddressesPage() {
   const { user } = useAuth();
@@ -46,15 +46,15 @@ export default function AddressesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
-    label: "",
-    fullName: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "United States",
-    phone: "",
-    isDefault: false,
+    label: '',
+    fullName: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: 'United States',
+    phone: '',
+    isDefault: false
   });
 
   // Fetch addresses on component mount
@@ -65,22 +65,22 @@ export default function AddressesPage() {
   const fetchAddresses = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/addresses", {
-        credentials: "include",
+      const response = await fetch('/api/addresses', {
+        credentials: 'include'
       });
 
       if (response.ok) {
         const data = await response.json();
         setAddresses(data.addresses || []);
       } else {
-        throw new Error("Failed to fetch addresses");
+        throw new Error('Failed to fetch addresses');
       }
     } catch (error) {
-      console.error("Error fetching addresses:", error);
+      console.error('Error fetching addresses:', error);
       toast({
-        title: "Error",
-        description: "Failed to load addresses. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load addresses. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsLoading(false);
@@ -90,13 +90,13 @@ export default function AddressesPage() {
   const handleAddAddress = async () => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/addresses", {
-        method: "POST",
+      const response = await fetch('/api/addresses', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify(formData),
+        credentials: 'include',
+        body: JSON.stringify(formData)
       });
 
       if (response.ok) {
@@ -105,20 +105,20 @@ export default function AddressesPage() {
         setIsDialogOpen(false);
         resetForm();
         toast({
-          title: "Address added",
-          description: "Your new address has been saved successfully.",
+          title: 'Address added',
+          description: 'Your new address has been saved successfully.'
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to add address");
+        throw new Error(errorData.error || 'Failed to add address');
       }
     } catch (error: any) {
-      console.error("Error adding address:", error);
+      console.error('Error adding address:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to add address. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to add address. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
@@ -131,39 +131,39 @@ export default function AddressesPage() {
     setIsSubmitting(true);
     try {
       const response = await fetch(`/api/addresses/${editingAddress._id}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify(formData),
+        credentials: 'include',
+        body: JSON.stringify(formData)
       });
 
       if (response.ok) {
         const data = await response.json();
         setAddresses((prev) =>
           prev.map((addr) =>
-            addr._id === editingAddress._id ? data.address : addr,
-          ),
+            addr._id === editingAddress._id ? data.address : addr
+          )
         );
         setIsDialogOpen(false);
         setEditingAddress(null);
         resetForm();
         toast({
-          title: "Address updated",
-          description: "Your address has been updated successfully.",
+          title: 'Address updated',
+          description: 'Your address has been updated successfully.'
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update address");
+        throw new Error(errorData.error || 'Failed to update address');
       }
     } catch (error: any) {
-      console.error("Error updating address:", error);
+      console.error('Error updating address:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to update address. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to update address. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsSubmitting(false);
@@ -176,31 +176,31 @@ export default function AddressesPage() {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/addresses/${addressToDelete._id}`, {
-        method: "DELETE",
-        credentials: "include",
+        method: 'DELETE',
+        credentials: 'include'
       });
 
       if (response.ok) {
         setAddresses((prev) =>
-          prev.filter((addr) => addr._id !== addressToDelete._id),
+          prev.filter((addr) => addr._id !== addressToDelete._id)
         );
         setIsDeleteDialogOpen(false);
         setAddressToDelete(null);
         toast({
-          title: "Address deleted",
-          description: "The address has been removed.",
+          title: 'Address deleted',
+          description: 'The address has been removed.'
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete address");
+        throw new Error(errorData.error || 'Failed to delete address');
       }
     } catch (error: any) {
-      console.error("Error deleting address:", error);
+      console.error('Error deleting address:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to delete address. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to delete address. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsDeleting(false);
@@ -215,8 +215,8 @@ export default function AddressesPage() {
   const handleSetDefault = async (id: string) => {
     try {
       const response = await fetch(`/api/addresses/${id}`, {
-        method: "PATCH",
-        credentials: "include",
+        method: 'PATCH',
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -225,24 +225,24 @@ export default function AddressesPage() {
         setAddresses((prev) =>
           prev.map((addr) => ({
             ...addr,
-            isDefault: addr._id === id,
-          })),
+            isDefault: addr._id === id
+          }))
         );
         toast({
-          title: "Default address updated",
-          description: "Your default shipping address has been changed.",
+          title: 'Default address updated',
+          description: 'Your default shipping address has been changed.'
         });
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to set default address");
+        throw new Error(errorData.error || 'Failed to set default address');
       }
     } catch (error: any) {
-      console.error("Error setting default address:", error);
+      console.error('Error setting default address:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to set default address. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to set default address. Please try again.',
+        variant: 'destructive'
       });
     }
   };
@@ -258,22 +258,22 @@ export default function AddressesPage() {
       zipCode: address.zipCode,
       country: address.country,
       phone: address.phone,
-      isDefault: address.isDefault,
+      isDefault: address.isDefault
     });
     setIsDialogOpen(true);
   };
 
   const resetForm = () => {
     setFormData({
-      label: "",
-      fullName: user?.name || "",
-      address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      country: "United States",
-      phone: "",
-      isDefault: false,
+      label: '',
+      fullName: user?.name || '',
+      address: '',
+      city: '',
+      state: '',
+      zipCode: '',
+      country: 'United States',
+      phone: '',
+      isDefault: false
     });
     setEditingAddress(null);
   };
@@ -283,14 +283,14 @@ export default function AddressesPage() {
     if (user?.name && !editingAddress) {
       setFormData((prev) => ({
         ...prev,
-        fullName: user.name,
+        fullName: user.name
       }));
     }
   }, [user, editingAddress]);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -320,15 +320,15 @@ export default function AddressesPage() {
                   Add Address
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>
-                    {editingAddress ? "Edit Address" : "Add New Address"}
+                    {editingAddress ? 'Edit Address' : 'Add New Address'}
                   </DialogTitle>
                   <DialogDescription>
                     {editingAddress
-                      ? "Update your address information"
-                      : "Add a new shipping address"}
+                      ? 'Update your address information'
+                      : 'Add a new shipping address'}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-4">
@@ -452,7 +452,7 @@ export default function AddressesPage() {
                       onChange={(e) =>
                         setFormData({
                           ...formData,
-                          isDefault: e.target.checked,
+                          isDefault: e.target.checked
                         })
                       }
                       className="h-4 w-4"
@@ -482,12 +482,12 @@ export default function AddressesPage() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {editingAddress ? "Updating..." : "Adding..."}
+                        {editingAddress ? 'Updating...' : 'Adding...'}
                       </>
                     ) : editingAddress ? (
-                      "Update Address"
+                      'Update Address'
                     ) : (
-                      "Add Address"
+                      'Add Address'
                     )}
                   </Button>
                 </div>
@@ -497,21 +497,21 @@ export default function AddressesPage() {
         </CardHeader>
         <CardContent>
           {addresses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {addresses.map((address) => (
                 <div
                   key={address._id}
-                  className="border rounded-lg p-4 relative"
+                  className="relative rounded-lg border p-4"
                 >
                   {address.isDefault && (
-                    <Badge className="absolute top-4 right-4 bg-primary">
+                    <Badge className="absolute right-4 top-4 bg-primary">
                       Default
                     </Badge>
                   )}
-                  <div className="flex items-start gap-3 mb-3">
-                    <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div className="mb-3 flex items-start gap-3">
+                    <MapPin className="mt-0.5 h-5 w-5 text-muted-foreground" />
                     <div className="flex-1">
-                      <h3 className="font-semibold mb-1 capitalize">
+                      <h3 className="mb-1 font-semibold capitalize">
                         {address.label}
                       </h3>
                       <p className="text-sm">{address.fullName}</p>
@@ -524,12 +524,12 @@ export default function AddressesPage() {
                       <p className="text-sm text-muted-foreground">
                         {address.country}
                       </p>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="mt-1 text-sm text-muted-foreground">
                         {address.phone}
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-2 mt-4">
+                  <div className="mt-4 flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -560,9 +560,9 @@ export default function AddressesPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <MapPin className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground mb-4">No saved addresses</p>
+            <div className="py-12 text-center">
+              <MapPin className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+              <p className="mb-4 text-muted-foreground">No saved addresses</p>
               <Button onClick={() => setIsDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Add Your First Address
@@ -581,10 +581,10 @@ export default function AddressesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Address</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the{" "}
+              Are you sure you want to delete the{' '}
               <span className="font-semibold capitalize">
                 {addressToDelete?.label}
-              </span>{" "}
+              </span>{' '}
               address? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -609,7 +609,7 @@ export default function AddressesPage() {
                   Deleting...
                 </>
               ) : (
-                "Delete Address"
+                'Delete Address'
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -1,68 +1,68 @@
-"use client";
+'use client';
 
-import type React from "react";
+import type React from 'react';
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
-import { ArrowLeft, Loader2, Upload } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { Container } from "@/components/ui/container";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { BannerFormValues, bannerSchema } from "@/lib/validations/index";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/use-toast';
+import { ArrowLeft, Loader2, Upload } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { Container } from '@/components/ui/container';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { BannerFormValues, bannerSchema } from '@/lib/validations/index';
 
 // Mock banner data
 const bannersData = {
-  "1": {
+  '1': {
     id: 1,
-    title: "Summer Collection",
-    description: "Discover our new summer collection with up to 50% off",
-    image: "/placeholder.svg?height=600&width=1200",
-    link: "/products?category=summer",
-    buttonText: "Shop Now",
+    title: 'Summer Collection',
+    description: 'Discover our new summer collection with up to 50% off',
+    image: '/placeholder.svg?height=600&width=1200',
+    link: '/products?category=summer',
+    buttonText: 'Shop Now',
     active: true,
     order: 1,
-    startDate: "2023-06-01",
-    endDate: "2023-08-31",
+    startDate: '2023-06-01',
+    endDate: '2023-08-31'
   },
-  "2": {
+  '2': {
     id: 2,
-    title: "New Arrivals",
-    description: "Check out our latest products just for you",
-    image: "/placeholder.svg?height=600&width=1200",
-    link: "/products?tag=new",
-    buttonText: "Explore",
+    title: 'New Arrivals',
+    description: 'Check out our latest products just for you',
+    image: '/placeholder.svg?height=600&width=1200',
+    link: '/products?tag=new',
+    buttonText: 'Explore',
     active: true,
     order: 2,
-    startDate: "2023-05-15",
-    endDate: "2023-12-31",
+    startDate: '2023-05-15',
+    endDate: '2023-12-31'
   },
-  "3": {
+  '3': {
     id: 3,
-    title: "Limited Offers",
-    description: "Special deals for a limited time only",
-    image: "/placeholder.svg?height=600&width=1200",
-    link: "/products?tag=limited",
-    buttonText: "View Offers",
+    title: 'Limited Offers',
+    description: 'Special deals for a limited time only',
+    image: '/placeholder.svg?height=600&width=1200',
+    link: '/products?tag=limited',
+    buttonText: 'View Offers',
     active: false,
     order: 3,
-    startDate: "2023-07-01",
-    endDate: "2023-07-15",
-  },
+    startDate: '2023-07-01',
+    endDate: '2023-07-15'
+  }
 };
 
 export default function EditBannerPage() {
@@ -78,18 +78,18 @@ export default function EditBannerPage() {
     register,
     handleSubmit,
     formState: { errors },
-    reset,
+    reset
   } = useForm<BannerFormValues>({
     resolver: zodResolver(bannerSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      link: "",
-      buttonText: "",
-      startDate: "",
-      endDate: "",
-      active: true,
-    },
+      title: '',
+      description: '',
+      link: '',
+      buttonText: '',
+      startDate: '',
+      endDate: '',
+      active: true
+    }
   });
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export default function EditBannerPage() {
         buttonText: banner.buttonText,
         startDate: banner.startDate,
         endDate: banner.endDate,
-        active: banner.active,
+        active: banner.active
       });
       setImage(banner.image);
     }
@@ -110,7 +110,7 @@ export default function EditBannerPage() {
   if (!banner) {
     return (
       <Container>
-        <div className="flex items-center gap-4 mb-6">
+        <div className="mb-6 flex items-center gap-4">
           <Link href="/admin/banners">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
@@ -144,9 +144,9 @@ export default function EditBannerPage() {
   const onSubmit = async (data: BannerFormValues) => {
     if (!image) {
       toast({
-        title: "Image required",
-        description: "Please upload a banner image.",
-        variant: "destructive",
+        title: 'Image required',
+        description: 'Please upload a banner image.',
+        variant: 'destructive'
       });
       return;
     }
@@ -157,11 +157,11 @@ export default function EditBannerPage() {
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
     toast({
-      title: "Banner updated",
-      description: "Your banner has been updated successfully.",
+      title: 'Banner updated',
+      description: 'Your banner has been updated successfully.'
     });
 
-    router.push("/admin/banners");
+    router.push('/admin/banners');
   };
 
   return (
@@ -183,7 +183,7 @@ export default function EditBannerPage() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>Banner Content</CardTitle>
@@ -199,7 +199,7 @@ export default function EditBannerPage() {
                   <Input
                     id="title"
                     placeholder="e.g., Summer Collection"
-                    {...register("title")}
+                    {...register('title')}
                   />
                   {errors.title && (
                     <p className="text-sm text-red-500">
@@ -216,7 +216,7 @@ export default function EditBannerPage() {
                     id="description"
                     placeholder="e.g., Discover our new summer collection with up to 50% off"
                     rows={3}
-                    {...register("description")}
+                    {...register('description')}
                   />
                   {errors.description && (
                     <p className="text-sm text-red-500">
@@ -232,7 +232,7 @@ export default function EditBannerPage() {
                   <Input
                     id="link"
                     placeholder="e.g., https://yourstore.com/products?category=summer"
-                    {...register("link")}
+                    {...register('link')}
                   />
                   {errors.link && (
                     <p className="text-sm text-red-500">
@@ -248,7 +248,7 @@ export default function EditBannerPage() {
                   <Input
                     id="buttonText"
                     placeholder="e.g., Shop Now"
-                    {...register("buttonText")}
+                    {...register('buttonText')}
                   />
                   {errors.buttonText && (
                     <p className="text-sm text-red-500">
@@ -265,7 +265,7 @@ export default function EditBannerPage() {
                     <Input
                       id="startDate"
                       type="date"
-                      {...register("startDate")}
+                      {...register('startDate')}
                     />
                     {errors.startDate && (
                       <p className="text-sm text-red-500">
@@ -278,7 +278,7 @@ export default function EditBannerPage() {
                     <Label htmlFor="endDate">
                       End Date <span className="text-red-500">*</span>
                     </Label>
-                    <Input id="endDate" type="date" {...register("endDate")} />
+                    <Input id="endDate" type="date" {...register('endDate')} />
                     {errors.endDate && (
                       <p className="text-sm text-red-500">
                         {errors.endDate.message}
@@ -294,7 +294,7 @@ export default function EditBannerPage() {
                       Display this banner on your store.
                     </p>
                   </div>
-                  <Switch id="active" {...register("active")} />
+                  <Switch id="active" {...register('active')} />
                 </div>
               </CardContent>
             </Card>
@@ -307,17 +307,17 @@ export default function EditBannerPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="border rounded-md aspect-[2/1] relative overflow-hidden bg-muted">
+                <div className="relative aspect-[2/1] overflow-hidden rounded-md border bg-muted">
                   {image ? (
                     <Image
-                      src={image || "/placeholder.svg"}
+                      src={image || '/placeholder.svg'}
                       alt="Banner preview"
                       fill
                       className="object-cover"
                     />
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-                      <Upload className="h-10 w-10 mb-2" />
+                    <div className="flex h-full flex-col items-center justify-center text-muted-foreground">
+                      <Upload className="mb-2 h-10 w-10" />
                       <p>No image uploaded</p>
                     </div>
                   )}
@@ -338,33 +338,33 @@ export default function EditBannerPage() {
                 </div>
 
                 <div className="pt-4">
-                  <h4 className="text-sm font-medium mb-2">Banner Preview</h4>
-                  <div className="border rounded-md p-4 bg-muted/50">
-                    <div className="relative h-[150px] rounded-md overflow-hidden">
+                  <h4 className="mb-2 text-sm font-medium">Banner Preview</h4>
+                  <div className="rounded-md border bg-muted/50 p-4">
+                    <div className="relative h-[150px] overflow-hidden rounded-md">
                       {image ? (
                         <>
                           <Image
-                            src={image || "/placeholder.svg"}
+                            src={image || '/placeholder.svg'}
                             alt="Banner preview"
                             fill
                             className="object-cover"
                           />
-                          <div className="absolute inset-0 bg-black/40 flex items-center">
+                          <div className="absolute inset-0 flex items-center bg-black/40">
                             <div className="container px-4">
-                              <h3 className="text-xl font-bold text-white mb-2">
+                              <h3 className="mb-2 text-xl font-bold text-white">
                                 {banner.title}
                               </h3>
-                              <p className="text-sm text-white/90 mb-4">
+                              <p className="mb-4 text-sm text-white/90">
                                 {banner.description}
                               </p>
-                              <button className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium">
+                              <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
                                 {banner.buttonText}
                               </button>
                             </div>
                           </div>
                         </>
                       ) : (
-                        <div className="flex items-center justify-center h-full text-muted-foreground">
+                        <div className="flex h-full items-center justify-center text-muted-foreground">
                           Banner preview will appear here
                         </div>
                       )}
@@ -375,7 +375,7 @@ export default function EditBannerPage() {
             </Card>
           </div>
 
-          <div className="flex justify-end gap-4 mt-6">
+          <div className="mt-6 flex justify-end gap-4">
             <Button variant="outline" asChild>
               <Link href="/admin/banners">Cancel</Link>
             </Button>
@@ -386,7 +386,7 @@ export default function EditBannerPage() {
                   Updating...
                 </>
               ) : (
-                "Update Banner"
+                'Update Banner'
               )}
             </Button>
           </div>

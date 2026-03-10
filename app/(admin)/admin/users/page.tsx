@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { UserPlus } from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
-import { toast } from "@/components/ui/use-toast";
-import { useSearchParams, useRouter } from "next/navigation";
-import { DataTable } from "@/components/tables/data-table";
-import { createUserColumns, User } from "@/components/tables/user/columns";
-import { PaginationInfo } from "@/types";
+  CardTitle
+} from '@/components/ui/card';
+import { UserPlus } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { toast } from '@/components/ui/use-toast';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { DataTable } from '@/components/tables/data-table';
+import { createUserColumns, User } from '@/components/tables/user/columns';
+import { PaginationInfo } from '@/types';
 
 export default function UsersPage() {
   const router = useRouter();
@@ -28,14 +28,14 @@ export default function UsersPage() {
     total: 0,
     totalPages: 0,
     hasNext: false,
-    hasPrev: false,
+    hasPrev: false
   });
 
-  const searchTerm = searchParams.get("search") || "";
-  const statusFilter = searchParams.get("status") || "all";
-  const roleFilter = searchParams.get("role") || "all";
-  const currentPage = Number.parseInt(searchParams.get("page") || "1");
-  const currentPageSize = Number.parseInt(searchParams.get("pageSize") || "10");
+  const searchTerm = searchParams.get('search') || '';
+  const statusFilter = searchParams.get('status') || 'all';
+  const roleFilter = searchParams.get('role') || 'all';
+  const currentPage = Number.parseInt(searchParams.get('page') || '1');
+  const currentPageSize = Number.parseInt(searchParams.get('pageSize') || '10');
 
   const isFetchingRef = useRef(false);
 
@@ -48,19 +48,19 @@ export default function UsersPage() {
       try {
         const params = new URLSearchParams({
           page: page.toString(),
-          limit: pageSize.toString(),
+          limit: pageSize.toString()
         });
 
-        if (searchTerm) params.append("search", searchTerm);
-        if (statusFilter && statusFilter !== "all") {
-          params.append("status", statusFilter);
+        if (searchTerm) params.append('search', searchTerm);
+        if (statusFilter && statusFilter !== 'all') {
+          params.append('status', statusFilter);
         }
-        if (roleFilter && roleFilter !== "all") {
-          params.append("role", roleFilter);
+        if (roleFilter && roleFilter !== 'all') {
+          params.append('role', roleFilter);
         }
 
         const response = await fetch(`/api/admin/users?${params}`, {
-          credentials: "include",
+          credentials: 'include'
         });
 
         if (response.ok) {
@@ -73,25 +73,25 @@ export default function UsersPage() {
               total: 0,
               totalPages: 0,
               hasNext: false,
-              hasPrev: false,
-            },
+              hasPrev: false
+            }
           );
         } else {
-          throw new Error("Failed to fetch users");
+          throw new Error('Failed to fetch users');
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
         toast({
-          title: "Error",
-          description: "Failed to load users. Please try again.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'Failed to load users. Please try again.',
+          variant: 'destructive'
         });
       } finally {
         setIsLoading(false);
         isFetchingRef.current = false;
       }
     },
-    [searchTerm, statusFilter, roleFilter],
+    [searchTerm, statusFilter, roleFilter]
   );
 
   useEffect(() => {
@@ -101,39 +101,39 @@ export default function UsersPage() {
   const handleStatusUpdate = async (
     userId: string,
     currentStatus: string,
-    userName: string,
+    userName: string
   ) => {
     try {
-      const newStatus = currentStatus === "active" ? "inactive" : "active";
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
 
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        credentials: "include",
-        body: JSON.stringify({ status: newStatus }),
+        credentials: 'include',
+        body: JSON.stringify({ status: newStatus })
       });
 
       if (response.ok) {
         toast({
-          title: "Status updated",
+          title: 'Status updated',
           description: `User "${userName}" has been ${
-            newStatus === "active" ? "activated" : "deactivated"
-          }.`,
+            newStatus === 'active' ? 'activated' : 'deactivated'
+          }.`
         });
         fetchUsers(currentPage, currentPageSize);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update user status");
+        throw new Error(errorData.error || 'Failed to update user status');
       }
     } catch (error: any) {
-      console.error("Error updating user status:", error);
+      console.error('Error updating user status:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to update user status. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to update user status. Please try again.',
+        variant: 'destructive'
       });
     }
   };
@@ -141,7 +141,7 @@ export default function UsersPage() {
   const handleDeleteUser = async (userId: string, userName: string) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${userName}"? This action cannot be undone.`,
+        `Are you sure you want to delete "${userName}"? This action cannot be undone.`
       )
     ) {
       return;
@@ -149,59 +149,59 @@ export default function UsersPage() {
 
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "DELETE",
-        credentials: "include",
+        method: 'DELETE',
+        credentials: 'include'
       });
 
       if (response.ok) {
         toast({
-          title: "User deleted",
-          description: `User "${userName}" has been deleted successfully.`,
+          title: 'User deleted',
+          description: `User "${userName}" has been deleted successfully.`
         });
         fetchUsers(currentPage, currentPageSize);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete user");
+        throw new Error(errorData.error || 'Failed to delete user');
       }
     } catch (error: any) {
-      console.error("Error deleting user:", error);
+      console.error('Error deleting user:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to delete user. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to delete user. Please try again.',
+        variant: 'destructive'
       });
     }
   };
 
   const columns = createUserColumns({
     onStatusUpdate: handleStatusUpdate,
-    onDeleteUser: handleDeleteUser,
+    onDeleteUser: handleDeleteUser
   });
 
   const filterOptions = [
     {
-      name: "status",
-      label: "Status",
+      name: 'status',
+      label: 'Status',
       options: [
-        { value: "all", label: "All Status" },
-        { value: "active", label: "Active" },
-        { value: "inactive", label: "Inactive" },
-        { value: "suspended", label: "Suspended" },
-        { value: "pending", label: "Pending" },
-      ],
+        { value: 'all', label: 'All Status' },
+        { value: 'active', label: 'Active' },
+        { value: 'inactive', label: 'Inactive' },
+        { value: 'suspended', label: 'Suspended' },
+        { value: 'pending', label: 'Pending' }
+      ]
     },
     {
-      name: "role",
-      label: "Role",
+      name: 'role',
+      label: 'Role',
       options: [
-        { value: "all", label: "All Roles" },
-        { value: "user", label: "User" },
-        { value: "admin", label: "Admin" },
-        { value: "moderator", label: "Moderator" },
-        { value: "support", label: "Support" },
-      ],
-    },
+        { value: 'all', label: 'All Roles' },
+        { value: 'user', label: 'User' },
+        { value: 'admin', label: 'Admin' },
+        { value: 'moderator', label: 'Moderator' },
+        { value: 'support', label: 'Support' }
+      ]
+    }
   ];
 
   return (
@@ -240,7 +240,7 @@ export default function UsersPage() {
               total: pagination.total,
               pageCount: pagination.totalPages,
               page: pagination.page,
-              pageSize: pagination.limit,
+              pageSize: pagination.limit
             }}
           />
         </CardContent>

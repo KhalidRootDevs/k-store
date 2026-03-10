@@ -1,9 +1,9 @@
-import { type NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from 'next/server';
 
-import { Category } from "@/models/Category";
-import { verifyToken } from "@/lib/auth";
-import { uploadToCloudinary } from "@/lib/cloudinary";
-import connectDB from "@/lib/database";
+import { Category } from '@/models/Category';
+import { verifyToken } from '@/lib/auth';
+import { uploadToCloudinary } from '@/lib/cloudinary';
+import connectDB from '@/lib/database';
 
 export async function GET(
   request: NextRequest,
@@ -16,16 +16,16 @@ export async function GET(
 
     if (!category) {
       return NextResponse.json(
-        { error: "Category not found" },
+        { error: 'Category not found' },
         { status: 404 }
       );
     }
 
     return NextResponse.json({ category });
   } catch (error) {
-    console.error("Get category error:", error);
+    console.error('Get category error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -38,34 +38,34 @@ export async function PUT(
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     verifyToken(token); // Verify but don't use decoded for now
 
     const formData = await request.formData();
 
-    const name = formData.get("name") as string;
-    const description = formData.get("description") as string;
-    const featured = formData.get("featured") === "true";
-    const active = formData.get("active") === "true";
-    const imageFile = formData.get("image") as Blob | null;
-    const parentId = formData.get("parentId") as string | null;
+    const name = formData.get('name') as string;
+    const description = formData.get('description') as string;
+    const featured = formData.get('featured') === 'true';
+    const active = formData.get('active') === 'true';
+    const imageFile = formData.get('image') as Blob | null;
+    const parentId = formData.get('parentId') as string | null;
 
     const category = await Category.findById(params.id);
     if (!category) {
       return NextResponse.json(
-        { error: "Category not found" },
+        { error: 'Category not found' },
         { status: 404 }
       );
     }
 
-    if (parentId && parentId !== "none") {
+    if (parentId && parentId !== 'none') {
       if (parentId === params.id) {
         return NextResponse.json(
-          { error: "A category cannot be its own parent" },
+          { error: 'A category cannot be its own parent' },
           { status: 400 }
         );
       }
@@ -73,7 +73,7 @@ export async function PUT(
       const parentCategory = await Category.findById(parentId);
       if (!parentCategory) {
         return NextResponse.json(
-          { error: "Parent category not found" },
+          { error: 'Parent category not found' },
           { status: 404 }
         );
       }
@@ -82,7 +82,7 @@ export async function PUT(
         return NextResponse.json(
           {
             error:
-              "Circular reference detected: parent category cannot be a child of this category",
+              'Circular reference detected: parent category cannot be a child of this category'
           },
           { status: 400 }
         );
@@ -92,12 +92,12 @@ export async function PUT(
     if (name && name !== category.name) {
       const existingCategory = await Category.findOne({
         name,
-        _id: { $ne: params.id },
+        _id: { $ne: params.id }
       });
 
       if (existingCategory) {
         return NextResponse.json(
-          { error: "Category name already exists" },
+          { error: 'Category name already exists' },
           { status: 409 }
         );
       }
@@ -110,9 +110,9 @@ export async function PUT(
         const uploadResult = await uploadToCloudinary(imageFile);
         imageUrl = uploadResult.secure_url;
       } catch (uploadError) {
-        console.error("Image upload error:", uploadError);
+        console.error('Image upload error:', uploadError);
         return NextResponse.json(
-          { error: "Failed to upload image" },
+          { error: 'Failed to upload image' },
           { status: 500 }
         );
       }
@@ -126,25 +126,25 @@ export async function PUT(
         image: imageUrl,
         featured,
         active,
-        parentId: parentId && parentId !== "none" ? parentId : null,
+        parentId: parentId && parentId !== 'none' ? parentId : null
       },
       { new: true, runValidators: true }
     );
 
     return NextResponse.json({
-      message: "Category updated successfully",
-      category: updatedCategory,
+      message: 'Category updated successfully',
+      category: updatedCategory
     });
   } catch (error: any) {
-    console.error("Update category error:", error);
+    console.error('Update category error:', error);
 
-    if (error.name === "ValidationError") {
+    if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map((err: any) => err.message);
-      return NextResponse.json({ error: errors.join(", ") }, { status: 400 });
+      return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -157,9 +157,9 @@ export async function DELETE(
   try {
     await connectDB();
 
-    const token = request.cookies.get("token")?.value;
+    const token = request.cookies.get('token')?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
     verifyToken(token); // Verify but don't use decoded for now
@@ -167,7 +167,7 @@ export async function DELETE(
     const category = await Category.findById(params.id);
     if (!category) {
       return NextResponse.json(
-        { error: "Category not found" },
+        { error: 'Category not found' },
         { status: 404 }
       );
     }
@@ -175,12 +175,12 @@ export async function DELETE(
     await Category.findByIdAndDelete(params.id);
 
     return NextResponse.json({
-      message: "Category deleted successfully",
+      message: 'Category deleted successfully'
     });
   } catch (error) {
-    console.error("Delete category error:", error);
+    console.error('Delete category error:', error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

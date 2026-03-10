@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import type React from "react";
+import type React from 'react';
 
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Slider } from "@/components/ui/slider";
-import { ChevronDown, ChevronUp, Search } from "lucide-react";
-import { useState } from "react";
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Slider } from '@/components/ui/slider';
+import { ChevronDown, ChevronUp, Search } from 'lucide-react';
+import { useState } from 'react';
 
 interface Category {
   id: string;
@@ -52,26 +52,26 @@ export function ProductFilterSidebar({
   onSearchChange,
   onSearchSubmit,
   onResetFilters,
-  onApplyFilters,
+  onApplyFilters
 }: ProductFilterSidebarProps) {
   const [expandedFilters, setExpandedFilters] = useState({
     categories: true,
     brands: true,
     price: true,
-    rating: true,
+    rating: true
   });
 
   const toggleFilterSection = (section: keyof typeof expandedFilters) => {
     setExpandedFilters((prev) => ({
       ...prev,
-      [section]: !prev[section],
+      [section]: !prev[section]
     }));
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="font-medium mb-2">Search</h3>
+        <h3 className="mb-2 font-medium">Search</h3>
         <form onSubmit={onSearchSubmit} className="flex gap-2">
           <Input
             placeholder="Search products..."
@@ -88,8 +88,8 @@ export function ProductFilterSidebar({
 
       <div>
         <div
-          className="flex items-center justify-between cursor-pointer"
-          onClick={() => toggleFilterSection("categories")}
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleFilterSection('categories')}
         >
           <h3 className="font-medium">Categories</h3>
           {expandedFilters.categories ? (
@@ -113,7 +113,7 @@ export function ProductFilterSidebar({
                   htmlFor={`category-${category.id}`}
                   className="flex-1 cursor-pointer text-sm"
                 >
-                  {category.name}{" "}
+                  {category.name}{' '}
                   <span className="text-muted-foreground">
                     ({category.count})
                   </span>
@@ -126,8 +126,8 @@ export function ProductFilterSidebar({
 
       <div>
         <div
-          className="flex items-center justify-between cursor-pointer"
-          onClick={() => toggleFilterSection("brands")}
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleFilterSection('brands')}
         >
           <h3 className="font-medium">Brands</h3>
           {expandedFilters.brands ? (
@@ -151,7 +151,7 @@ export function ProductFilterSidebar({
                   htmlFor={`brand-${brand.id}`}
                   className="flex-1 cursor-pointer text-sm"
                 >
-                  {brand.name}{" "}
+                  {brand.name}{' '}
                   <span className="text-muted-foreground">({brand.count})</span>
                 </Label>
               </div>
@@ -162,8 +162,8 @@ export function ProductFilterSidebar({
 
       <div>
         <div
-          className="flex items-center justify-between cursor-pointer"
-          onClick={() => toggleFilterSection("price")}
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleFilterSection('price')}
         >
           <h3 className="font-medium">Price Range</h3>
           {expandedFilters.price ? (
@@ -193,8 +193,8 @@ export function ProductFilterSidebar({
 
       <div>
         <div
-          className="flex items-center justify-between cursor-pointer"
-          onClick={() => toggleFilterSection("rating")}
+          className="flex cursor-pointer items-center justify-between"
+          onClick={() => toggleFilterSection('rating')}
         >
           <h3 className="font-medium">Rating</h3>
           {expandedFilters.rating ? (

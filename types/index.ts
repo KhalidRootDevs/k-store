@@ -22,7 +22,7 @@ export interface TimelineEvent {
 // ADDRESS TYPES
 // ============================================================================
 
-export type AddressLabel = "Home" | "Work" | "Office" | "Other";
+export type AddressLabel = 'Home' | 'Work' | 'Office' | 'Other';
 
 export interface Address {
   _id?: string;
@@ -83,7 +83,7 @@ export interface CategorySummary {
 // CONTACT TYPES
 // ============================================================================
 
-export type ContactSubmissionStatus = "new" | "read" | "replied" | "archived";
+export type ContactSubmissionStatus = 'new' | 'read' | 'replied' | 'archived';
 
 export interface ContactSubmission {
   id: number;
@@ -100,18 +100,18 @@ export interface ContactSubmission {
 // ============================================================================
 
 export type OrderStatus =
-  | "pending"
-  | "processing"
-  | "shipped"
-  | "delivered"
-  | "cancelled"
-  | "refunded";
+  | 'pending'
+  | 'processing'
+  | 'shipped'
+  | 'delivered'
+  | 'cancelled'
+  | 'refunded';
 export type PaymentMethod =
-  | "credit_card"
-  | "debit_card"
-  | "paypal"
-  | "cash_on_delivery";
-export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
+  | 'credit_card'
+  | 'debit_card'
+  | 'paypal'
+  | 'cash_on_delivery';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface OrderItem {
   id: number;
@@ -279,8 +279,8 @@ export interface Review {
 // USER TYPES
 // ============================================================================
 
-export type UserRole = "user" | "admin" | "moderator" | "support";
-export type UserStatus = "active" | "inactive" | "suspended" | "pending";
+export type UserRole = 'user' | 'admin' | 'moderator' | 'support';
+export type UserStatus = 'active' | 'inactive' | 'suspended' | 'pending';
 
 export interface UserAddress {
   _id: string;

@@ -1,17 +1,17 @@
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAuth } from "@/context/auth-context";
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/context/auth-context';
 import {
   AdminLoginFormValues,
-  adminLoginSchema,
-} from "@/lib/validations/index";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+  adminLoginSchema
+} from '@/lib/validations/index';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
 export default function AdminLoginForm() {
   const { login, isLoading } = useAuth();
@@ -21,13 +21,13 @@ export default function AdminLoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<AdminLoginFormValues>({
     resolver: zodResolver(adminLoginSchema),
     defaultValues: {
-      email: "",
-      password: "",
-    },
+      email: '',
+      password: ''
+    }
   });
 
   const onSubmit = async (data: AdminLoginFormValues) => {
@@ -35,9 +35,9 @@ export default function AdminLoginForm() {
     const success = await login(data.email, data.password);
 
     if (!success) {
-      setError("Invalid email or password. Please try again.");
+      setError('Invalid email or password. Please try again.');
     } else {
-      router.push("/admin/dashboard");
+      router.push('/admin/dashboard');
     }
   };
 
@@ -46,9 +46,9 @@ export default function AdminLoginForm() {
       {error && (
         <Alert
           variant="destructive"
-          className="bg-red-500/10 border-red-500/20"
+          className="border-red-500/20 bg-red-500/10"
         >
-          <AlertDescription className="text-red-400 text-sm">
+          <AlertDescription className="text-sm text-red-400">
             {error}
           </AlertDescription>
         </Alert>
@@ -61,11 +61,11 @@ export default function AdminLoginForm() {
           id="email"
           type="email"
           placeholder="admin@example.com"
-          className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 h-11 focus:border-purple-500 transition-colors"
-          {...register("email")}
+          className="h-11 border-slate-700 bg-slate-900/50 text-white transition-colors placeholder:text-slate-500 focus:border-purple-500"
+          {...register('email')}
         />
         {errors.email && (
-          <p className="text-sm text-red-400 mt-1">{errors.email.message}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
         )}
       </div>
 
@@ -79,16 +79,16 @@ export default function AdminLoginForm() {
         <div className="relative">
           <Input
             id="password"
-            type={showPassword ? "text" : "password"}
+            type={showPassword ? 'text' : 'password'}
             placeholder="Enter your password"
-            className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 h-11 focus:border-purple-500 transition-colors pr-10"
-            {...register("password")}
+            className="h-11 border-slate-700 bg-slate-900/50 pr-10 text-white transition-colors placeholder:text-slate-500 focus:border-purple-500"
+            {...register('password')}
           />
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-slate-400 hover:text-slate-300"
+            className="absolute right-0 top-0 h-full px-3 py-2 text-slate-400 hover:bg-transparent hover:text-slate-300"
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? (
@@ -99,13 +99,13 @@ export default function AdminLoginForm() {
           </Button>
         </div>
         {errors.password && (
-          <p className="text-sm text-red-400 mt-1">{errors.password.message}</p>
+          <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
         )}
       </div>
 
       <Button
         type="submit"
-        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white h-11 font-medium transition-all duration-200 shadow-lg shadow-purple-500/25"
+        className="h-11 w-full bg-gradient-to-r from-purple-600 to-blue-600 font-medium text-white shadow-lg shadow-purple-500/25 transition-all duration-200 hover:from-purple-700 hover:to-blue-700"
         disabled={isLoading}
       >
         {isLoading ? (
@@ -114,7 +114,7 @@ export default function AdminLoginForm() {
             Signing in...
           </>
         ) : (
-          "Sign in to Admin"
+          'Sign in to Admin'
         )}
       </Button>
     </form>

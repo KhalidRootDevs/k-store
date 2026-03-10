@@ -1,13 +1,13 @@
-import nodemailer from "nodemailer";
+import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransporter({
   host: process.env.SMTP_HOST,
-  port: parseInt(process.env.SMTP_PORT || "587"),
+  port: parseInt(process.env.SMTP_PORT || '587'),
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
+    pass: process.env.SMTP_PASS
+  }
 });
 
 export async function sendWelcomeEmail(
@@ -17,9 +17,9 @@ export async function sendWelcomeEmail(
 ) {
   try {
     const mailOptions = {
-      from: process.env.SMTP_FROM || "noreply@yourstore.com",
+      from: process.env.SMTP_FROM || 'noreply@yourstore.com',
       to: email,
-      subject: "Welcome to Our Store - Your Account Details",
+      subject: 'Welcome to Our Store - Your Account Details',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #333;">Welcome to Our Store, ${name}!</h2>
@@ -50,13 +50,13 @@ export async function sendWelcomeEmail(
             If you didn't place this order, please contact us immediately.
           </p>
         </div>
-      `,
+      `
     };
 
     await transporter.sendMail(mailOptions);
     console.log(`✅ Welcome email sent to: ${email}`);
   } catch (error) {
-    console.error("❌ Failed to send welcome email:", error);
+    console.error('❌ Failed to send welcome email:', error);
     // Don't throw error - order should still be created even if email fails
   }
 }

@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useModal } from "@/context/modal-context";
-import UserLoginForm from "../forms/auth/user-login-form";
-import UserRegisterForm from "../forms/auth/user-register-form";
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { useModal } from '@/context/modal-context';
+import UserLoginForm from '../forms/auth/user-login-form';
+import UserRegisterForm from '../forms/auth/user-register-form';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "../ui/card";
+  CardTitle
+} from '../ui/card';
 
 export function LoginModal() {
   const { isLoginModalOpen, authMode, closeAuthModal } = useModal();
 
   // Theme-aware styles
-  const dialogContentClass = "sm:max-w-[480px] p-0 gap-0 bg-background border";
-  const cardClass = "bg-transparent border shadow-none";
-  const textMutedClass = "text-muted-foreground";
-  const textPrimaryClass = "text-foreground";
+  const dialogContentClass = 'sm:max-w-[480px] p-0 gap-0 bg-background border';
+  const cardClass = 'bg-transparent border shadow-none';
+  const textMutedClass = 'text-muted-foreground';
+  const textPrimaryClass = 'text-foreground';
 
   return (
     <Dialog
@@ -27,9 +27,9 @@ export function LoginModal() {
       onOpenChange={(open) => !open && closeAuthModal()}
     >
       <DialogContent className={dialogContentClass}>
-        {authMode === "login" ? (
+        {authMode === 'login' ? (
           <Card className={cardClass}>
-            <CardHeader className="text-center pb-6">
+            <CardHeader className="pb-6 text-center">
               <CardTitle className={`text-xl ${textPrimaryClass}`}>
                 Welcome back
               </CardTitle>
@@ -43,7 +43,7 @@ export function LoginModal() {
           </Card>
         ) : (
           <Card className={cardClass}>
-            <CardHeader className="text-center pb-6">
+            <CardHeader className="pb-6 text-center">
               <CardTitle className={`text-xl ${textPrimaryClass}`}>
                 Create an account
               </CardTitle>

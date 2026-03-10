@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import type React from "react";
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import type React from 'react';
 
 import {
   Sidebar,
@@ -16,13 +16,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+  SidebarTrigger
+} from '@/components/ui/sidebar';
 
-import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
+import { Button } from '@/components/ui/button';
+import { Container } from '@/components/ui/container';
 
-import { useAuth } from "@/context/auth-context";
+import { useAuth } from '@/context/auth-context';
 import {
   BarChart3,
   Box,
@@ -35,87 +35,87 @@ import {
   Package,
   Settings,
   ShoppingBag,
-  Users,
-} from "lucide-react";
-import { useEffect } from "react";
+  Users
+} from 'lucide-react';
+import { useEffect } from 'react';
 
 // 🧭 Sidebar configuration (single source of truth)
 const sidebarConfig = [
   {
-    label: "Dashboard",
+    label: 'Dashboard',
     items: [
       {
-        title: "Dashboard",
-        href: "/admin/dashboard",
-        icon: LayoutDashboard,
+        title: 'Dashboard',
+        href: '/admin/dashboard',
+        icon: LayoutDashboard
       },
       {
-        title: "Analytics",
-        href: "/admin/analytics",
-        icon: BarChart3,
-      },
-    ],
+        title: 'Analytics',
+        href: '/admin/analytics',
+        icon: BarChart3
+      }
+    ]
   },
   {
-    label: "Store Management",
+    label: 'Store Management',
     items: [
       {
-        title: "Products",
-        href: "/admin/products",
-        icon: Package,
+        title: 'Products',
+        href: '/admin/products',
+        icon: Package
       },
       {
-        title: "Categories",
-        href: "/admin/categories",
-        icon: Box,
+        title: 'Categories',
+        href: '/admin/categories',
+        icon: Box
       },
       {
-        title: "Users",
-        href: "/admin/users",
-        icon: Users,
-      },
-    ],
+        title: 'Users',
+        href: '/admin/users',
+        icon: Users
+      }
+    ]
   },
 
   {
-    label: "Order Management",
+    label: 'Order Management',
     items: [
       {
-        title: "Orders",
-        href: "/admin/orders",
-        icon: ShoppingBag,
+        title: 'Orders',
+        href: '/admin/orders',
+        icon: ShoppingBag
       },
       {
-        title: "Payments",
-        href: "/admin/payments",
-        icon: DollarSign,
-      },
-    ],
+        title: 'Payments',
+        href: '/admin/payments',
+        icon: DollarSign
+      }
+    ]
   },
   {
-    label: "Content",
+    label: 'Content',
     items: [
       {
-        title: "Contact Submissions",
-        href: "/admin/contact-submissions",
-        icon: MessageSquare,
+        title: 'Contact Submissions',
+        href: '/admin/contact-submissions',
+        icon: MessageSquare
       },
       {
-        title: "Banners",
-        href: "/admin/banners",
-        icon: LayoutDashboard,
+        title: 'Banners',
+        href: '/admin/banners',
+        icon: LayoutDashboard
       },
       {
-        title: "Settings",
-        href: "/admin/settings",
-        icon: Settings,
-      },
-    ],
-  },
+        title: 'Settings',
+        href: '/admin/settings',
+        icon: Settings
+      }
+    ]
+  }
 ];
 
 export default function AdminLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -125,16 +125,16 @@ export default function AdminLayout({
 
   // Check if user has admin role
   const isAdmin =
-    user?.role === "admin" ||
-    user?.role === "moderator" ||
-    user?.role === "support";
+    user?.role === 'admin' ||
+    user?.role === 'moderator' ||
+    user?.role === 'support';
 
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-500 mx-auto" />
+      <div className="flex min-h-screen items-center justify-center bg-slate-900">
+        <div className="space-y-4 text-center">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-purple-500" />
           <p className="text-slate-400">Verifying admin access...</p>
         </div>
       </div>
@@ -146,13 +146,13 @@ export default function AdminLayout({
     if (!isLoading) {
       // If no user is logged in, redirect to home
       if (!user) {
-        router.push("/");
+        router.push('/');
         return;
       }
 
       // If user is logged in but doesn't have admin role, redirect to home
       if (user && !isAdmin) {
-        router.push("/");
+        router.push('/');
         return;
       }
     }
@@ -165,7 +165,7 @@ export default function AdminLayout({
 
   const handleLogout = () => {
     logout();
-    router.push("/");
+    router.push('/');
   };
 
   return (
@@ -176,7 +176,7 @@ export default function AdminLayout({
           <SidebarHeader>
             <div className="flex items-center gap-2 px-4 py-2">
               <ShoppingBag className="h-6 w-6" />
-              <span className="font-bold text-xl">OneVendor</span>
+              <span className="text-xl font-bold">OneVendor</span>
             </div>
           </SidebarHeader>
 
@@ -190,7 +190,7 @@ export default function AdminLayout({
                       const Icon = item.icon;
                       const isActive =
                         pathname === item.href ||
-                        pathname.startsWith(item.href + "/");
+                        pathname.startsWith(item.href + '/');
 
                       return (
                         <SidebarMenuItem key={item.href}>
@@ -217,7 +217,7 @@ export default function AdminLayout({
                 </div>
                 <div className="flex-1 truncate">
                   <div className="text-sm font-medium">Admin User</div>
-                  <div className="text-xs text-muted-foreground truncate">
+                  <div className="truncate text-xs text-muted-foreground">
                     admin@example.com
                   </div>
                 </div>
@@ -239,12 +239,12 @@ export default function AdminLayout({
         <div className="flex-1">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:h-16 sm:px-6 lg:px-8">
             <SidebarTrigger />
-            <Container className="flex-1 flex items-center justify-between">
+            <Container className="flex flex-1 items-center justify-between">
               <h1 className="text-lg font-semibold">Admin Dashboard</h1>
               <div className="flex items-center gap-4">
                 <Link href="/" target="_blank">
                   <Button variant="outline" size="sm">
-                    <Home className="h-4 w-4 mr-2" />
+                    <Home className="mr-2 h-4 w-4" />
                     View Store
                   </Button>
                 </Link>

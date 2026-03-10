@@ -1,5 +1,5 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -11,24 +11,24 @@ export function cn(...inputs: ClassValue[]) {
  * @returns The public ID or null if not a valid Cloudinary URL
  */
 export function extractPublicIdFromUrl(url: string): string | null {
-  if (!url || typeof url !== "string") {
+  if (!url || typeof url !== 'string') {
     return null;
   }
 
   try {
     // Remove URL parameters if any
-    const cleanUrl = url.split("?")[0];
+    const cleanUrl = url.split('?')[0];
 
     // Check if it's a Cloudinary URL
-    if (!cleanUrl.includes("res.cloudinary.com")) {
+    if (!cleanUrl.includes('res.cloudinary.com')) {
       return null;
     }
 
     // Split the URL by slashes
-    const parts = cleanUrl.split("/");
+    const parts = cleanUrl.split('/');
 
     // Find the index of 'upload' in the path
-    const uploadIndex = parts.indexOf("upload");
+    const uploadIndex = parts.indexOf('upload');
 
     if (uploadIndex === -1) {
       return null;
@@ -66,17 +66,17 @@ export function extractPublicIdFromUrl(url: string): string | null {
     }
 
     // Reconstruct the public ID and remove file extension
-    let publicId = publicIdParts.join("/");
+    let publicId = publicIdParts.join('/');
 
     // Remove file extension
-    const lastDotIndex = publicId.lastIndexOf(".");
+    const lastDotIndex = publicId.lastIndexOf('.');
     if (lastDotIndex !== -1) {
       publicId = publicId.substring(0, lastDotIndex);
     }
 
     return publicId || null;
   } catch (error) {
-    console.error("Error extracting public ID from URL:", error);
+    console.error('Error extracting public ID from URL:', error);
     return null;
   }
 }
@@ -92,10 +92,10 @@ export default function objectToFormData(
   }
 
   Object.keys(obj).forEach((key: any) => {
-    if (!ignore.includes(key) && obj[key] !== "") {
+    if (!ignore.includes(key) && obj[key] !== '') {
       if (Array.isArray(obj[key])) {
         obj[key].forEach((item: any, index: number) => {
-          if (typeof item === "object" && item !== null) {
+          if (typeof item === 'object' && item !== null) {
             Object.keys(item).forEach((subKey) => {
               formData.append(`${key}[${index}][${subKey}]`, item[subKey]);
             });

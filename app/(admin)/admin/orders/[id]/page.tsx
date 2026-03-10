@@ -1,30 +1,30 @@
-"use client";
+'use client';
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+  CardTitle
+} from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "@/components/ui/use-toast";
+  SelectValue
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/use-toast';
 import {
   ArrowLeft,
   Calendar,
@@ -36,26 +36,24 @@ import {
   Send,
   Truck,
   User,
-  Loader2,
-} from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { Container } from "@/components/ui/container";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import { Customer, Order, OrderItem, TimelineEvent } from "@/types";
-
-
+  Loader2
+} from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Container } from '@/components/ui/container';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { Customer, Order, OrderItem, TimelineEvent } from '@/types';
 
 // Helper function to normalize customer data
 const normalizeCustomer = (customer: any): Customer => {
   if (!customer) {
     return {
-      id: "unknown",
-      name: "Unknown Customer",
-      email: "unknown@example.com",
-      phone: "N/A",
-      address: "N/A",
+      id: 'unknown',
+      name: 'Unknown Customer',
+      email: 'unknown@example.com',
+      phone: 'N/A',
+      address: 'N/A'
     };
   }
 
@@ -64,20 +62,20 @@ const normalizeCustomer = (customer: any): Customer => {
     return {
       id: customer._id.toString(),
       _id: customer._id.toString(),
-      name: customer.name || "Unknown Customer",
-      email: customer.email || "unknown@example.com",
-      phone: customer.phone || "N/A",
-      address: customer.address || "N/A",
+      name: customer.name || 'Unknown Customer',
+      email: customer.email || 'unknown@example.com',
+      phone: customer.phone || 'N/A',
+      address: customer.address || 'N/A'
     };
   }
 
   // If customer already has id field
   return {
-    id: customer.id || "unknown",
-    name: customer.name || "Unknown Customer",
-    email: customer.email || "unknown@example.com",
-    phone: customer.phone || "N/A",
-    address: customer.address || "N/A",
+    id: customer.id || 'unknown',
+    name: customer.name || 'Unknown Customer',
+    email: customer.email || 'unknown@example.com',
+    phone: customer.phone || 'N/A',
+    address: customer.address || 'N/A'
   };
 };
 
@@ -89,7 +87,7 @@ const normalizeTimeline = (timeline: any[]): TimelineEvent[] => {
     status: event.status,
     date: event.date,
     description: event.description,
-    updatedBy: event.updatedBy, // Keep as is, we'll handle rendering separately
+    updatedBy: event.updatedBy // Keep as is, we'll handle rendering separately
   }));
 };
 
@@ -105,55 +103,55 @@ const normalizeOrderItems = (items: any[]): OrderItem[] => {
     image: item.image,
     variant: item.variant,
     productId: item.productId, // Keep as is
-    sku: item.sku,
+    sku: item.sku
   }));
 };
 
 // Status badge colors
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "delivered":
-      return "bg-green-100 text-green-800 border-green-200";
-    case "shipped":
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    case "processing":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "pending":
-      return "bg-orange-100 text-orange-800 border-orange-200";
-    case "cancelled":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "refunded":
-      return "bg-purple-100 text-purple-800 border-purple-200";
+    case 'delivered':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'shipped':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'processing':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'pending':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'cancelled':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'refunded':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
 const getPaymentStatusColor = (status: string) => {
   switch (status) {
-    case "paid":
-      return "bg-green-100 text-green-800 border-green-200";
-    case "pending":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "failed":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "refunded":
-      return "bg-purple-100 text-purple-800 border-purple-200";
+    case 'paid':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'failed':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'refunded':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
 const getPaymentMethodText = (method: string) => {
   switch (method) {
-    case "credit_card":
-      return "Credit Card";
-    case "debit_card":
-      return "Debit Card";
-    case "paypal":
-      return "PayPal";
-    case "cash_on_delivery":
-      return "Cash on Delivery";
+    case 'credit_card':
+      return 'Credit Card';
+    case 'debit_card':
+      return 'Debit Card';
+    case 'paypal':
+      return 'PayPal';
+    case 'cash_on_delivery':
+      return 'Cash on Delivery';
     default:
       return method;
   }
@@ -161,18 +159,18 @@ const getPaymentMethodText = (method: string) => {
 
 const getStatusText = (status: string) => {
   switch (status) {
-    case "pending":
-      return "Pending";
-    case "processing":
-      return "Processing";
-    case "shipped":
-      return "Shipped";
-    case "delivered":
-      return "Delivered";
-    case "cancelled":
-      return "Cancelled";
-    case "refunded":
-      return "Refunded";
+    case 'pending':
+      return 'Pending';
+    case 'processing':
+      return 'Processing';
+    case 'shipped':
+      return 'Shipped';
+    case 'delivered':
+      return 'Delivered';
+    case 'cancelled':
+      return 'Cancelled';
+    case 'refunded':
+      return 'Refunded';
     default:
       return status;
   }
@@ -185,11 +183,11 @@ export default function OrderDetailsPage() {
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState('');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
-  const [internalNote, setInternalNote] = useState("");
+  const [internalNote, setInternalNote] = useState('');
 
   useEffect(() => {
     fetchOrder();
@@ -202,7 +200,7 @@ export default function OrderDetailsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch order");
+        throw new Error(data.error || 'Failed to fetch order');
       }
 
       // Normalize the order data to handle MongoDB populated objects
@@ -211,18 +209,18 @@ export default function OrderDetailsPage() {
         ...orderData,
         customer: normalizeCustomer(orderData.customer),
         timeline: normalizeTimeline(orderData.timeline),
-        items: normalizeOrderItems(orderData.items),
+        items: normalizeOrderItems(orderData.items)
       };
 
       setOrder(normalizedOrder);
       setStatus(normalizedOrder.status);
-      setInternalNote(normalizedOrder.notes || "");
+      setInternalNote(normalizedOrder.notes || '');
     } catch (error: any) {
-      console.error("Error fetching order:", error);
+      console.error('Error fetching order:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to load order",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to load order',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -242,7 +240,7 @@ export default function OrderDetailsPage() {
   if (!order) {
     return (
       <Container>
-        <div className="flex items-center gap-4 mb-6">
+        <div className="mb-6 flex items-center gap-4">
           <Link href="/admin/orders">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
@@ -265,12 +263,12 @@ export default function OrderDetailsPage() {
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
@@ -281,20 +279,20 @@ export default function OrderDetailsPage() {
     setIsUpdatingStatus(true);
     try {
       const response = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           status,
-          notes: internalNote,
-        }),
+          notes: internalNote
+        })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to update order");
+        throw new Error(data.error || 'Failed to update order');
       }
 
       // Normalize the updated order data
@@ -302,22 +300,22 @@ export default function OrderDetailsPage() {
         ...data.order,
         customer: normalizeCustomer(data.order.customer),
         timeline: normalizeTimeline(data.order.timeline),
-        items: normalizeOrderItems(data.order.items),
+        items: normalizeOrderItems(data.order.items)
       };
 
       setOrder(normalizedOrder);
       toast({
-        title: "Status updated",
+        title: 'Status updated',
         description: `Order status has been updated to ${getStatusText(
           status
-        )}.`,
+        )}.`
       });
     } catch (error: any) {
-      console.error("Error updating order:", error);
+      console.error('Error updating order:', error);
       toast({
-        title: "Update failed",
-        description: error.message || "Failed to update order status",
-        variant: "destructive",
+        title: 'Update failed',
+        description: error.message || 'Failed to update order status',
+        variant: 'destructive'
       });
     } finally {
       setIsUpdatingStatus(false);
@@ -328,9 +326,9 @@ export default function OrderDetailsPage() {
   const handleSendEmail = async () => {
     if (!note.trim()) {
       toast({
-        title: "Note required",
-        description: "Please enter a note to send to the customer.",
-        variant: "destructive",
+        title: 'Note required',
+        description: 'Please enter a note to send to the customer.',
+        variant: 'destructive'
       });
       return;
     }
@@ -341,15 +339,15 @@ export default function OrderDetailsPage() {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       toast({
-        title: "Email sent",
-        description: "Your note has been sent to the customer.",
+        title: 'Email sent',
+        description: 'Your note has been sent to the customer.'
       });
-      setNote("");
+      setNote('');
     } catch (error) {
       toast({
-        title: "Email failed",
-        description: "Failed to send email to customer.",
-        variant: "destructive",
+        title: 'Email failed',
+        description: 'Failed to send email to customer.',
+        variant: 'destructive'
       });
     } finally {
       setIsSendingEmail(false);
@@ -362,19 +360,19 @@ export default function OrderDetailsPage() {
 
     try {
       const response = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          notes: internalNote,
-        }),
+          notes: internalNote
+        })
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to update notes");
+        throw new Error(data.error || 'Failed to update notes');
       }
 
       // Normalize the updated order data
@@ -382,20 +380,20 @@ export default function OrderDetailsPage() {
         ...data.order,
         customer: normalizeCustomer(data.order.customer),
         timeline: normalizeTimeline(data.order.timeline),
-        items: normalizeOrderItems(data.order.items),
+        items: normalizeOrderItems(data.order.items)
       };
 
       setOrder(normalizedOrder);
       toast({
-        title: "Notes updated",
-        description: "Internal notes have been updated.",
+        title: 'Notes updated',
+        description: 'Internal notes have been updated.'
       });
     } catch (error: any) {
-      console.error("Error updating notes:", error);
+      console.error('Error updating notes:', error);
       toast({
-        title: "Update failed",
-        description: error.message || "Failed to update notes",
-        variant: "destructive",
+        title: 'Update failed',
+        description: error.message || 'Failed to update notes',
+        variant: 'destructive'
       });
     }
   };
@@ -408,23 +406,23 @@ export default function OrderDetailsPage() {
 
     // Add company logo and information
     doc.setFontSize(20);
-    doc.setFont("helvetica", "bold");
-    doc.text("BOLT COMMERCE", 14, 22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('BOLT COMMERCE', 14, 22);
 
     doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("123 E-Commerce Street", 14, 30);
-    doc.text("New York, NY 10001", 14, 35);
-    doc.text("support@boltcommerce.com", 14, 40);
-    doc.text("(555) 123-4567", 14, 45);
+    doc.setFont('helvetica', 'normal');
+    doc.text('123 E-Commerce Street', 14, 30);
+    doc.text('New York, NY 10001', 14, 35);
+    doc.text('support@boltcommerce.com', 14, 40);
+    doc.text('(555) 123-4567', 14, 45);
 
     // Add invoice title and details
     doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("INVOICE", 140, 22);
+    doc.setFont('helvetica', 'bold');
+    doc.text('INVOICE', 140, 22);
 
     doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
+    doc.setFont('helvetica', 'normal');
     doc.text(`Invoice #: INV-${order.orderNumber}`, 140, 30);
     doc.text(`Order #: ${order.orderNumber}`, 140, 35);
     doc.text(`Date: ${formatDate(order.createdAt)}`, 140, 40);
@@ -432,11 +430,11 @@ export default function OrderDetailsPage() {
 
     // Add customer information
     doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Bill To:", 14, 60);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Bill To:', 14, 60);
 
     doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
+    doc.setFont('helvetica', 'normal');
     doc.text(order.shippingAddress.fullName, 14, 67);
     doc.text(order.shippingAddress.address, 14, 72);
     doc.text(
@@ -450,14 +448,14 @@ export default function OrderDetailsPage() {
 
     // Add payment information
     doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("Payment Method:", 140, 60);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Payment Method:', 140, 60);
 
     doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
+    doc.setFont('helvetica', 'normal');
     doc.text(getPaymentMethodText(order.paymentMethod), 140, 67);
 
-    if (order.paymentMethod === "credit_card" && order.cardDetails) {
+    if (order.paymentMethod === 'credit_card' && order.cardDetails) {
       doc.text(
         `${order.cardDetails.type} ending in ${order.cardDetails.last4}`,
         140,
@@ -468,62 +466,62 @@ export default function OrderDetailsPage() {
     doc.text(`Payment Status: ${order.paymentStatus}`, 140, 77);
 
     // Add order items table
-    const tableColumn = ["Item", "Price", "Qty", "Total"];
+    const tableColumn = ['Item', 'Price', 'Qty', 'Total'];
     const tableRows = order.items.map((item) => [
       `${item.name}\n${
         item.variant?.attributes
-          ? Object.values(item.variant.attributes).join(", ")
-          : ""
+          ? Object.values(item.variant.attributes).join(', ')
+          : ''
       }`,
       `$${item.price.toFixed(2)}`,
       item.quantity,
-      `$${(item.price * item.quantity).toFixed(2)}`,
+      `$${(item.price * item.quantity).toFixed(2)}`
     ]);
 
     autoTable(doc, {
       startY: 100,
       head: [tableColumn],
       body: tableRows,
-      theme: "striped",
+      theme: 'striped',
       headStyles: { fillColor: [66, 66, 66] },
       columnStyles: {
-        0: { cellWidth: "auto" },
-        1: { cellWidth: 30, halign: "right" },
-        2: { cellWidth: 30, halign: "center" },
-        3: { cellWidth: 30, halign: "right" },
+        0: { cellWidth: 'auto' },
+        1: { cellWidth: 30, halign: 'right' },
+        2: { cellWidth: 30, halign: 'center' },
+        3: { cellWidth: 30, halign: 'right' }
       },
-      styles: { overflow: "linebreak" },
-      margin: { left: 14, right: 14 },
+      styles: { overflow: 'linebreak' },
+      margin: { left: 14, right: 14 }
     });
 
     const finalY = (doc as any).lastAutoTable.finalY + 10;
 
     // Add order summary
     doc.setFontSize(10);
-    doc.text("Subtotal:", 130, finalY);
-    doc.text(`$${order.subtotal.toFixed(2)}`, 175, finalY, { align: "right" });
+    doc.text('Subtotal:', 130, finalY);
+    doc.text(`$${order.subtotal.toFixed(2)}`, 175, finalY, { align: 'right' });
 
     if (order.discount) {
-      doc.text("Discount:", 130, finalY + 7);
+      doc.text('Discount:', 130, finalY + 7);
       doc.text(`-$${order.discount.toFixed(2)}`, 175, finalY + 7, {
-        align: "right",
+        align: 'right'
       });
     }
 
-    doc.text("Tax:", 130, finalY + (order.discount ? 14 : 7));
+    doc.text('Tax:', 130, finalY + (order.discount ? 14 : 7));
     doc.text(
       `$${order.tax.toFixed(2)}`,
       175,
       finalY + (order.discount ? 14 : 7),
-      { align: "right" }
+      { align: 'right' }
     );
 
-    doc.text("Shipping:", 130, finalY + (order.discount ? 21 : 14));
+    doc.text('Shipping:', 130, finalY + (order.discount ? 21 : 14));
     doc.text(
-      order.shipping === 0 ? "Free" : `$${order.shipping.toFixed(2)}`,
+      order.shipping === 0 ? 'Free' : `$${order.shipping.toFixed(2)}`,
       175,
       finalY + (order.discount ? 21 : 14),
-      { align: "right" }
+      { align: 'right' }
     );
 
     doc.setLineWidth(0.5);
@@ -534,23 +532,23 @@ export default function OrderDetailsPage() {
       finalY + (order.discount ? 24 : 17)
     );
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Total:", 130, finalY + (order.discount ? 31 : 24));
+    doc.setFont('helvetica', 'bold');
+    doc.text('Total:', 130, finalY + (order.discount ? 31 : 24));
     doc.text(
       `$${order.total.toFixed(2)}`,
       175,
       finalY + (order.discount ? 31 : 24),
       {
-        align: "right",
+        align: 'right'
       }
     );
 
     // Add shipping information
     doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("Shipping Information:", 14, finalY);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Shipping Information:', 14, finalY);
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont('helvetica', 'normal');
     doc.text(`Method: ${order.shippingMethod}`, 14, finalY + 7);
 
     if (order.trackingNumber) {
@@ -559,26 +557,26 @@ export default function OrderDetailsPage() {
 
     // Add footer
     doc.setFontSize(8);
-    doc.text("Thank you for your business!", 105, finalY + 40, {
-      align: "center",
+    doc.text('Thank you for your business!', 105, finalY + 40, {
+      align: 'center'
     });
     doc.text(
-      "For questions about this invoice, please contact our customer service.",
+      'For questions about this invoice, please contact our customer service.',
       105,
       finalY + 45,
       {
-        align: "center",
+        align: 'center'
       }
     );
 
     doc.save(`Invoice-${order.orderNumber}.pdf`);
   };
 
-  const getVariantText = (variant: OrderItem["variant"]) => {
-    if (!variant?.attributes) return "";
+  const getVariantText = (variant: OrderItem['variant']) => {
+    if (!variant?.attributes) return '';
     return Object.entries(variant.attributes)
       .map(([key, value]) => `${key}: ${value}`)
-      .join(", ");
+      .join(', ');
   };
 
   // Safely render customer information
@@ -588,27 +586,27 @@ export default function OrderDetailsPage() {
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
             <User className="h-5 w-5 text-primary" />
           </div>
           <div>
             <div className="font-medium">
-              {order.shippingAddress?.fullName || order.customer.name || "N/A"}
+              {order.shippingAddress?.fullName || order.customer.name || 'N/A'}
             </div>
             <div className="text-sm text-muted-foreground">
-              Customer ID: {order.customer.id || "N/A"}
+              Customer ID: {order.customer.id || 'N/A'}
             </div>
           </div>
         </div>
         <Separator />
         <div className="space-y-2">
           <div className="text-sm">
-            <span className="font-medium">Email:</span>{" "}
-            {order.customer.email || "N/A"}
+            <span className="font-medium">Email:</span>{' '}
+            {order.customer.email || 'N/A'}
           </div>
           <div className="text-sm">
-            <span className="font-medium">Phone:</span>{" "}
-            {order.shippingAddress?.phone || order.customer.phone || "N/A"}
+            <span className="font-medium">Phone:</span>{' '}
+            {order.shippingAddress?.phone || order.customer.phone || 'N/A'}
           </div>
         </div>
         <div className="flex justify-end">
@@ -626,7 +624,7 @@ export default function OrderDetailsPage() {
   return (
     <Container>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <Link href="/admin/orders">
               <Button variant="outline" size="icon">
@@ -656,8 +654,8 @@ export default function OrderDetailsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="space-y-6 md:col-span-2">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle>Order Summary</CardTitle>
@@ -690,9 +688,9 @@ export default function OrderDetailsPage() {
                           <tr key={item.id}>
                             <td className="px-4 py-4 text-sm">
                               <div className="flex items-center gap-3">
-                                <div className="relative h-10 w-10 rounded-md overflow-hidden flex-shrink-0">
+                                <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-md">
                                   <Image
-                                    src={item.image || "/placeholder.svg"}
+                                    src={item.image || '/placeholder.svg'}
                                     alt={item.name}
                                     fill
                                     className="object-cover"
@@ -719,7 +717,7 @@ export default function OrderDetailsPage() {
                             <td className="px-4 py-4 text-sm">
                               {item.quantity}
                             </td>
-                            <td className="px-4 py-4 text-sm text-right">
+                            <td className="px-4 py-4 text-right text-sm">
                               ${(item.price * item.quantity).toFixed(2)}
                             </td>
                           </tr>
@@ -770,7 +768,7 @@ export default function OrderDetailsPage() {
                           </th>
                           <td className="px-4 py-3.5 text-right text-sm">
                             {order.shipping === 0
-                              ? "Free"
+                              ? 'Free'
                               : `$${order.shipping.toFixed(2)}`}
                           </td>
                         </tr>
@@ -807,10 +805,10 @@ export default function OrderDetailsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="relative pl-6 border-l">
+                    <div className="relative border-l pl-6">
                       {order.timeline.map((event, index) => (
                         <div key={index} className="mb-8 last:mb-0">
-                          <div className="absolute w-3 h-3 bg-primary rounded-full -left-[6.5px]"></div>
+                          <div className="absolute -left-[6.5px] h-3 w-3 rounded-full bg-primary"></div>
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
                               <Badge
@@ -855,11 +853,11 @@ export default function OrderDetailsPage() {
                     >
                       {isUpdatingStatus ? (
                         <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Updating...
                         </>
                       ) : (
-                        "Update Status"
+                        'Update Status'
                       )}
                     </Button>
                   </CardFooter>
@@ -921,7 +919,7 @@ export default function OrderDetailsPage() {
                     <Button onClick={handleSendEmail} disabled={isSendingEmail}>
                       {isSendingEmail ? (
                         <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Sending...
                         </>
                       ) : (
@@ -952,7 +950,7 @@ export default function OrderDetailsPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/10">
                       <MapPin className="h-5 w-5 text-primary" />
                     </div>
                     <div>
@@ -962,8 +960,8 @@ export default function OrderDetailsPage() {
                         <br />
                         {order.shippingAddress.address}
                         <br />
-                        {order.shippingAddress.city},{" "}
-                        {order.shippingAddress.state}{" "}
+                        {order.shippingAddress.city},{' '}
+                        {order.shippingAddress.state}{' '}
                         {order.shippingAddress.zipCode}
                         <br />
                         {order.shippingAddress.country}
@@ -973,12 +971,12 @@ export default function OrderDetailsPage() {
                   <Separator />
                   <div className="space-y-2">
                     <div className="text-sm">
-                      <span className="font-medium">Shipping Method:</span>{" "}
+                      <span className="font-medium">Shipping Method:</span>{' '}
                       {order.shippingMethod}
                     </div>
                     {order.trackingNumber && (
                       <div className="text-sm">
-                        <span className="font-medium">Tracking Number:</span>{" "}
+                        <span className="font-medium">Tracking Number:</span>{' '}
                         {order.trackingNumber}
                       </div>
                     )}
@@ -1002,7 +1000,7 @@ export default function OrderDetailsPage() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
                       <CreditCard className="h-5 w-5 text-primary" />
                     </div>
                     <div>
@@ -1019,11 +1017,11 @@ export default function OrderDetailsPage() {
                   </div>
                   <Separator />
                   <div className="space-y-2">
-                    {order.paymentMethod === "credit_card" &&
+                    {order.paymentMethod === 'credit_card' &&
                       order.cardDetails && (
                         <div className="text-sm">
-                          <span className="font-medium">Card:</span>{" "}
-                          {order.cardDetails.type} ending in{" "}
+                          <span className="font-medium">Card:</span>{' '}
+                          {order.cardDetails.type} ending in{' '}
                           {order.cardDetails.last4}
                         </div>
                       )}
@@ -1046,7 +1044,7 @@ export default function OrderDetailsPage() {
                     <div>{order.billingAddress.fullName}</div>
                     <div>{order.billingAddress.address}</div>
                     <div>
-                      {order.billingAddress.city}, {order.billingAddress.state}{" "}
+                      {order.billingAddress.city}, {order.billingAddress.state}{' '}
                       {order.billingAddress.zipCode}
                     </div>
                     <div>{order.billingAddress.country}</div>

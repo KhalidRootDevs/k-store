@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { RefreshCw } from "lucide-react";
-import { useState, useEffect, useCallback, useRef } from "react";
-import { toast } from "@/components/ui/use-toast";
-import { useSearchParams, useRouter } from "next/navigation";
-import { DataTable } from "@/components/tables/data-table";
-import { createOrderColumns, Order } from "@/components/tables/order/columns";
-import { PaginationInfo } from "@/types";
+  CardTitle
+} from '@/components/ui/card';
+import { RefreshCw } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { toast } from '@/components/ui/use-toast';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { DataTable } from '@/components/tables/data-table';
+import { createOrderColumns, Order } from '@/components/tables/order/columns';
+import { PaginationInfo } from '@/types';
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -28,14 +28,14 @@ export default function OrdersPage() {
     total: 0,
     totalPages: 0,
     hasNext: false,
-    hasPrev: false,
+    hasPrev: false
   });
 
-  const searchTerm = searchParams.get("search") || "";
-  const statusFilter = searchParams.get("status") || "all";
-  const paymentFilter = searchParams.get("paymentStatus") || "all";
-  const currentPage = Number.parseInt(searchParams.get("page") || "1");
-  const currentPageSize = Number.parseInt(searchParams.get("pageSize") || "10");
+  const searchTerm = searchParams.get('search') || '';
+  const statusFilter = searchParams.get('status') || 'all';
+  const paymentFilter = searchParams.get('paymentStatus') || 'all';
+  const currentPage = Number.parseInt(searchParams.get('page') || '1');
+  const currentPageSize = Number.parseInt(searchParams.get('pageSize') || '10');
 
   const isFetchingRef = useRef(false);
 
@@ -48,19 +48,19 @@ export default function OrdersPage() {
       try {
         const params = new URLSearchParams({
           page: page.toString(),
-          limit: pageSize.toString(),
+          limit: pageSize.toString()
         });
 
-        if (searchTerm) params.append("search", searchTerm);
-        if (statusFilter && statusFilter !== "all") {
-          params.append("status", statusFilter);
+        if (searchTerm) params.append('search', searchTerm);
+        if (statusFilter && statusFilter !== 'all') {
+          params.append('status', statusFilter);
         }
-        if (paymentFilter && paymentFilter !== "all") {
-          params.append("paymentStatus", paymentFilter);
+        if (paymentFilter && paymentFilter !== 'all') {
+          params.append('paymentStatus', paymentFilter);
         }
 
         const response = await fetch(`/api/admin/orders?${params}`, {
-          credentials: "include",
+          credentials: 'include'
         });
 
         if (response.ok) {
@@ -73,18 +73,18 @@ export default function OrdersPage() {
               total: 0,
               totalPages: 0,
               hasNext: false,
-              hasPrev: false,
-            },
+              hasPrev: false
+            }
           );
         } else {
-          throw new Error("Failed to fetch orders");
+          throw new Error('Failed to fetch orders');
         }
       } catch (error: any) {
-        console.error("Error fetching orders:", error);
+        console.error('Error fetching orders:', error);
         toast({
-          title: "Error",
-          description: error.message || "Failed to load orders",
-          variant: "destructive",
+          title: 'Error',
+          description: error.message || 'Failed to load orders',
+          variant: 'destructive'
         });
       } finally {
         setIsLoading(false);
@@ -92,7 +92,7 @@ export default function OrdersPage() {
         isFetchingRef.current = false;
       }
     },
-    [searchTerm, statusFilter, paymentFilter],
+    [searchTerm, statusFilter, paymentFilter]
   );
 
   useEffect(() => {
@@ -107,19 +107,19 @@ export default function OrdersPage() {
   const handleStatusUpdate = async (
     orderId: string,
     currentStatus: string,
-    orderNumber: string,
+    orderNumber: string
   ) => {
     // Implement order status update logic here
     toast({
-      title: "Update Status",
-      description: `Update status for order ${orderNumber}`,
+      title: 'Update Status',
+      description: `Update status for order ${orderNumber}`
     });
   };
 
   const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
     if (
       !confirm(
-        `Are you sure you want to cancel order "${orderNumber}"? This action cannot be undone.`,
+        `Are you sure you want to cancel order "${orderNumber}"? This action cannot be undone.`
       )
     ) {
       return;
@@ -127,61 +127,61 @@ export default function OrdersPage() {
 
     try {
       const response = await fetch(`/api/admin/orders/${orderId}`, {
-        method: "DELETE",
-        credentials: "include",
+        method: 'DELETE',
+        credentials: 'include'
       });
 
       if (response.ok) {
         toast({
-          title: "Order cancelled",
-          description: `Order "${orderNumber}" has been cancelled successfully.`,
+          title: 'Order cancelled',
+          description: `Order "${orderNumber}" has been cancelled successfully.`
         });
         fetchOrders(currentPage, currentPageSize);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to cancel order");
+        throw new Error(errorData.error || 'Failed to cancel order');
       }
     } catch (error: any) {
-      console.error("Error cancelling order:", error);
+      console.error('Error cancelling order:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to cancel order. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to cancel order. Please try again.',
+        variant: 'destructive'
       });
     }
   };
 
   const columns = createOrderColumns({
     onStatusUpdate: handleStatusUpdate,
-    onDeleteOrder: handleDeleteOrder,
+    onDeleteOrder: handleDeleteOrder
   });
 
   const filterOptions = [
     {
-      label: "Status",
-      name: "status",
+      label: 'Status',
+      name: 'status',
       options: [
-        { value: "all", label: "All Status" },
-        { value: "pending", label: "Pending" },
-        { value: "processing", label: "Processing" },
-        { value: "shipped", label: "Shipped" },
-        { value: "delivered", label: "Delivered" },
-        { value: "cancelled", label: "Cancelled" },
-        { value: "refunded", label: "Refunded" },
-      ],
+        { value: 'all', label: 'All Status' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'processing', label: 'Processing' },
+        { value: 'shipped', label: 'Shipped' },
+        { value: 'delivered', label: 'Delivered' },
+        { value: 'cancelled', label: 'Cancelled' },
+        { value: 'refunded', label: 'Refunded' }
+      ]
     },
     {
-      label: "Payment Status",
-      name: "paymentStatus",
+      label: 'Payment Status',
+      name: 'paymentStatus',
       options: [
-        { value: "all", label: "All Payments" },
-        { value: "paid", label: "Paid" },
-        { value: "pending", label: "Pending" },
-        { value: "failed", label: "Failed" },
-        { value: "refunded", label: "Refunded" },
-      ],
-    },
+        { value: 'all', label: 'All Payments' },
+        { value: 'paid', label: 'Paid' },
+        { value: 'pending', label: 'Pending' },
+        { value: 'failed', label: 'Failed' },
+        { value: 'refunded', label: 'Refunded' }
+      ]
+    }
   ];
 
   return (
@@ -199,7 +199,7 @@ export default function OrdersPage() {
           variant="outline"
         >
           <RefreshCw
-            className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
+            className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
           />
           Refresh
         </Button>
@@ -224,7 +224,7 @@ export default function OrdersPage() {
               total: pagination.total,
               pageCount: pagination.totalPages,
               page: pagination.page,
-              pageSize: pagination.limit,
+              pageSize: pagination.limit
             }}
           />
         </CardContent>

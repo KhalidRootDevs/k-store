@@ -1,27 +1,27 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { routes } from "@/lib/routes";
-import objectToFormData from "@/lib/utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import InputField from "../custom/input";
+  CardTitle
+} from '@/components/ui/card';
+import { routes } from '@/lib/routes';
+import objectToFormData from '@/lib/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import InputField from '../custom/input';
 
-import { Category } from "@/types";
-import { CategoryFormValues, categorySchema } from "@/lib/validations/index";
+import { Category } from '@/types';
+import { CategoryFormValues, categorySchema } from '@/lib/validations/index';
 
 interface CategoryFormProps {
   category?: Category | null;
@@ -30,7 +30,7 @@ interface CategoryFormProps {
 
 export function CategoryForm({
   category,
-  isEditing = false,
+  isEditing = false
 }: CategoryFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,21 +40,21 @@ export function CategoryForm({
   const methods = useForm<CategoryFormValues>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
-      name: "",
+      name: '',
       image: undefined,
-      description: "",
+      description: '',
       featured: false,
       active: true,
-      parentId: "none",
-    },
+      parentId: 'none'
+    }
   });
 
   const { handleSubmit, reset } = methods;
 
   const fetchParentCategories = async () => {
     try {
-      const response = await fetch("/api/admin/categories?limit=100", {
-        credentials: "include",
+      const response = await fetch('/api/admin/categories?limit=100', {
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -62,15 +62,15 @@ export function CategoryForm({
         const categories =
           isEditing && category
             ? data.categories.filter(
-                (cat: Category) => cat._id !== category._id,
+                (cat: Category) => cat._id !== category._id
               )
             : data.categories;
         setParentCategories(categories || []);
       } else {
-        throw new Error("Failed to fetch categories");
+        throw new Error('Failed to fetch categories');
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error('Error fetching categories:', error);
     } finally {
       setIsLoadingCategories(false);
     }
@@ -81,18 +81,18 @@ export function CategoryForm({
 
     if (category && isEditing) {
       const parentIdValue = category.parentId
-        ? typeof category.parentId === "string"
+        ? typeof category.parentId === 'string'
           ? category.parentId
           : category.parentId._id
-        : "none";
+        : 'none';
 
       reset({
         name: category.name,
-        description: category.description || "",
+        description: category.description || '',
         featured: category.featured,
         active: category.active,
         image: category.image,
-        parentId: parentIdValue,
+        parentId: parentIdValue
       });
     }
   }, [category, isEditing, reset]);
@@ -106,27 +106,27 @@ export function CategoryForm({
       if (data.image instanceof File) {
         formData = objectToFormData(data);
       } else {
-        formData = objectToFormData(data, ["image"]);
+        formData = objectToFormData(data, ['image']);
       }
 
       const url =
         isEditing && category
           ? `/api/admin/categories/${category._id}`
-          : "/api/admin/categories";
+          : '/api/admin/categories';
 
-      const method = isEditing ? "PUT" : "POST";
+      const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
         body: formData,
-        credentials: "include",
+        credentials: 'include'
       });
 
       if (response.ok) {
         const result = await response.json();
 
         toast.success(
-          `Category has been ${isEditing ? "updated" : "created"} successfully!`,
+          `Category has been ${isEditing ? 'updated' : 'created'} successfully!`
         );
 
         reset();
@@ -135,13 +135,13 @@ export function CategoryForm({
         const errorData = await response.json();
         throw new Error(
           errorData.error ||
-            `Failed to ${isEditing ? "update" : "create"} category`,
+            `Failed to ${isEditing ? 'update' : 'create'} category`
         );
       }
     } catch (error: any) {
       console.error(
-        `Error ${isEditing ? "updating" : "creating"} category:`,
-        error,
+        `Error ${isEditing ? 'updating' : 'creating'} category:`,
+        error
       );
 
       toast.error(error.message);
@@ -150,21 +150,21 @@ export function CategoryForm({
     }
   };
 
-  const pageTitle = isEditing ? "Edit Category" : "Create Category";
+  const pageTitle = isEditing ? 'Edit Category' : 'Create Category';
   const pageDescription = isEditing
-    ? "Update the category information."
-    : "Add a new category to organize your products.";
-  const submitButtonText = isEditing ? "Update Category" : "Create Category";
+    ? 'Update the category information.'
+    : 'Add a new category to organize your products.';
+  const submitButtonText = isEditing ? 'Update Category' : 'Create Category';
 
   // Prepare options for parent category select
   const parentCategoryOptions = [
-    { value: "none", label: "None (Top Level)" },
+    { value: 'none', label: 'None (Top Level)' },
     ...parentCategories
       .filter((cat) => !cat.parentId)
       .map((cat) => ({
         value: cat._id,
-        label: cat.name,
-      })),
+        label: cat.name
+      }))
   ];
 
   return (
@@ -184,7 +184,7 @@ export function CategoryForm({
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-6 grid-cols-1 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Card className="md:col-span-1">
               <CardHeader>
                 <CardTitle>Category Details</CardTitle>
@@ -209,13 +209,13 @@ export function CategoryForm({
                   label="Parent Category"
                   placeholder={
                     isLoadingCategories
-                      ? "Loading categories..."
-                      : "Select parent category (optional)"
+                      ? 'Loading categories...'
+                      : 'Select parent category (optional)'
                   }
                   options={parentCategoryOptions}
                   disabled={isLoadingCategories}
                 />
-                <p className="text-sm text-muted-foreground -mt-2">
+                <p className="-mt-2 text-sm text-muted-foreground">
                   Select a parent category to create a sub-category. Leave as
                   "None" for a top-level category.
                 </p>

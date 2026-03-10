@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Settings } from "@/models/Settings";
-import connectDB from "@/lib/database";
+import { NextRequest, NextResponse } from 'next/server';
+import { Settings } from '@/models/Settings';
+import connectDB from '@/lib/database';
 
 export async function PATCH(
   request: NextRequest,
@@ -15,24 +15,24 @@ export async function PATCH(
 
     if (!sectionData) {
       return NextResponse.json(
-        { error: "Section data is required" },
+        { error: 'Section data is required' },
         { status: 400 }
       );
     }
 
     // Valid sections
     const validSections = [
-      "general",
-      "payment",
-      "shipping",
-      "email",
-      "cms",
-      "advanced",
+      'general',
+      'payment',
+      'shipping',
+      'email',
+      'cms',
+      'advanced'
     ];
 
     if (!validSections.includes(section)) {
       return NextResponse.json(
-        { error: "Invalid settings section" },
+        { error: 'Invalid settings section' },
         { status: 400 }
       );
     }
@@ -52,20 +52,20 @@ export async function PATCH(
       settings: safeSettings,
       message: `${
         section.charAt(0).toUpperCase() + section.slice(1)
-      } settings updated successfully`,
+      } settings updated successfully`
     });
   } catch (error) {
     console.error(`Update ${params.section} settings error:`, error);
 
     if (error instanceof mongoose.Error.ValidationError) {
       return NextResponse.json(
-        { error: "Validation error", details: error.errors },
+        { error: 'Validation error', details: error.errors },
         { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

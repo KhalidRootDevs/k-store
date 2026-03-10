@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ChangePasswordForm } from "@/components/forms/auth/change-password-form";
-import { ChangeEmailForm } from "@/components/forms/auth/change-email-form";
+  CardTitle
+} from '@/components/ui/card';
+import { Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ChangePasswordForm } from '@/components/forms/auth/change-password-form';
+import { ChangeEmailForm } from '@/components/forms/auth/change-email-form';
 
 export default function SecurityPage() {
   const handleSuccess = () => {
@@ -31,7 +31,7 @@ export default function SecurityPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="flex items-center gap-3">
               <Shield className="h-5 w-5 text-muted-foreground" />
               <div>

@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Plus } from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect, useCallback, useRef } from "react";
-import { toast } from "@/components/ui/use-toast";
-import { useSearchParams, useRouter } from "next/navigation";
-import { DataTable } from "@/components/tables/data-table";
-import { createProductColumns } from "@/components/tables/product/column";
-import { Category, PaginationInfo, Product } from "@/types";
+  CardTitle
+} from '@/components/ui/card';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { toast } from '@/components/ui/use-toast';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { DataTable } from '@/components/tables/data-table';
+import { createProductColumns } from '@/components/tables/product/column';
+import { Category, PaginationInfo, Product } from '@/types';
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -29,38 +29,38 @@ export default function ProductsPage() {
     total: 0,
     totalPages: 0,
     hasNext: false,
-    hasPrev: false,
+    hasPrev: false
   });
 
-  const searchTerm = searchParams.get("search") || "";
-  const categoryFilter = searchParams.get("category") || "all";
-  const statusFilter = searchParams.get("status") || "all";
-  const featuredFilter = searchParams.get("featured") || "all";
-  const minPrice = searchParams.get("minPrice") || "";
-  const maxPrice = searchParams.get("maxPrice") || "";
-  const currentPage = Number.parseInt(searchParams.get("page") || "1");
-  const currentPageSize = Number.parseInt(searchParams.get("pageSize") || "10");
+  const searchTerm = searchParams.get('search') || '';
+  const categoryFilter = searchParams.get('category') || 'all';
+  const statusFilter = searchParams.get('status') || 'all';
+  const featuredFilter = searchParams.get('featured') || 'all';
+  const minPrice = searchParams.get('minPrice') || '';
+  const maxPrice = searchParams.get('maxPrice') || '';
+  const currentPage = Number.parseInt(searchParams.get('page') || '1');
+  const currentPageSize = Number.parseInt(searchParams.get('pageSize') || '10');
 
   const isFetchingRef = useRef(false);
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("/api/admin/categories?limit=100", {
-        credentials: "include",
+      const response = await fetch('/api/admin/categories?limit=100', {
+        credentials: 'include'
       });
 
       if (response.ok) {
         const data = await response.json();
         setCategories(data.categories || []);
       } else {
-        throw new Error("Failed to fetch categories");
+        throw new Error('Failed to fetch categories');
       }
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      console.error('Error fetching categories:', error);
       toast({
-        title: "Error",
-        description: "Failed to load categories.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to load categories.',
+        variant: 'destructive'
       });
     }
   };
@@ -74,39 +74,39 @@ export default function ProductsPage() {
       try {
         const params = new URLSearchParams({
           page: page.toString(),
-          limit: pageSize.toString(),
+          limit: pageSize.toString()
         });
 
-        if (searchTerm) params.append("search", searchTerm);
+        if (searchTerm) params.append('search', searchTerm);
 
-        if (categoryFilter && categoryFilter !== "all") {
-          params.append("category", categoryFilter);
+        if (categoryFilter && categoryFilter !== 'all') {
+          params.append('category', categoryFilter);
         }
 
-        if (statusFilter && statusFilter !== "all") {
-          if (statusFilter === "active") {
-            params.append("active", "true");
-          } else if (statusFilter === "inactive") {
-            params.append("active", "false");
+        if (statusFilter && statusFilter !== 'all') {
+          if (statusFilter === 'active') {
+            params.append('active', 'true');
+          } else if (statusFilter === 'inactive') {
+            params.append('active', 'false');
           }
         }
 
-        if (featuredFilter && featuredFilter !== "all") {
-          if (featuredFilter === "featured" || featuredFilter === "true") {
-            params.append("featured", "true");
+        if (featuredFilter && featuredFilter !== 'all') {
+          if (featuredFilter === 'featured' || featuredFilter === 'true') {
+            params.append('featured', 'true');
           } else if (
-            featuredFilter === "not-featured" ||
-            featuredFilter === "false"
+            featuredFilter === 'not-featured' ||
+            featuredFilter === 'false'
           ) {
-            params.append("featured", "false");
+            params.append('featured', 'false');
           }
         }
 
-        if (minPrice) params.append("minPrice", minPrice);
-        if (maxPrice) params.append("maxPrice", maxPrice);
+        if (minPrice) params.append('minPrice', minPrice);
+        if (maxPrice) params.append('maxPrice', maxPrice);
 
         const response = await fetch(`/api/admin/products?${params}`, {
-          credentials: "include",
+          credentials: 'include'
         });
 
         if (response.ok) {
@@ -119,18 +119,18 @@ export default function ProductsPage() {
               total: 0,
               totalPages: 0,
               hasNext: false,
-              hasPrev: false,
-            },
+              hasPrev: false
+            }
           );
         } else {
-          throw new Error("Failed to fetch products");
+          throw new Error('Failed to fetch products');
         }
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error('Error fetching products:', error);
         toast({
-          title: "Error",
-          description: "Failed to load products. Please try again.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'Failed to load products. Please try again.',
+          variant: 'destructive'
         });
       } finally {
         setIsLoading(false);
@@ -143,8 +143,8 @@ export default function ProductsPage() {
       statusFilter,
       featuredFilter,
       minPrice,
-      maxPrice,
-    ],
+      maxPrice
+    ]
   );
 
   useEffect(() => {
@@ -157,11 +157,11 @@ export default function ProductsPage() {
 
   const handleDeleteProduct = async (
     productId: string,
-    productName: string,
+    productName: string
   ) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${productName}"? This action cannot be undone.`,
+        `Are you sure you want to delete "${productName}"? This action cannot be undone.`
       )
     ) {
       return;
@@ -169,27 +169,27 @@ export default function ProductsPage() {
 
     try {
       const response = await fetch(`/api/admin/products/${productId}`, {
-        method: "DELETE",
-        credentials: "include",
+        method: 'DELETE',
+        credentials: 'include'
       });
 
       if (response.ok) {
         toast({
-          title: "Product deleted",
-          description: `Product "${productName}" has been deleted successfully.`,
+          title: 'Product deleted',
+          description: `Product "${productName}" has been deleted successfully.`
         });
         fetchProducts(currentPage, currentPageSize);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete product");
+        throw new Error(errorData.error || 'Failed to delete product');
       }
     } catch (error: any) {
-      console.error("Error deleting product:", error);
+      console.error('Error deleting product:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to delete product. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to delete product. Please try again.',
+        variant: 'destructive'
       });
     }
   };
@@ -197,37 +197,37 @@ export default function ProductsPage() {
   const handleToggleStatus = async (
     productId: string,
     currentStatus: boolean,
-    productName: string,
+    productName: string
   ) => {
     try {
       const formData = new FormData();
-      formData.append("active", (!currentStatus).toString());
+      formData.append('active', (!currentStatus).toString());
 
       const response = await fetch(`/api/admin/products/${productId}`, {
-        method: "PUT",
+        method: 'PUT',
         body: formData,
-        credentials: "include",
+        credentials: 'include'
       });
 
       if (response.ok) {
         toast({
-          title: "Status updated",
+          title: 'Status updated',
           description: `Product "${productName}" has been ${
-            !currentStatus ? "activated" : "deactivated"
-          }.`,
+            !currentStatus ? 'activated' : 'deactivated'
+          }.`
         });
         fetchProducts(currentPage, currentPageSize);
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update product status");
+        throw new Error(errorData.error || 'Failed to update product status');
       }
     } catch (error: any) {
-      console.error("Error updating product status:", error);
+      console.error('Error updating product status:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
-          error.message || "Failed to update product status. Please try again.",
-        variant: "destructive",
+          error.message || 'Failed to update product status. Please try again.',
+        variant: 'destructive'
       });
     }
   };
@@ -236,46 +236,46 @@ export default function ProductsPage() {
 
   const filterOptions = [
     {
-      name: "category",
-      label: "Category",
+      name: 'category',
+      label: 'Category',
       options: [
-        { value: "all", label: "All Categories" },
-        ...categories.map((cat) => ({ value: cat._id, label: cat.name })),
-      ],
+        { value: 'all', label: 'All Categories' },
+        ...categories.map((cat) => ({ value: cat._id, label: cat.name }))
+      ]
     },
     {
-      name: "status",
-      label: "Status",
+      name: 'status',
+      label: 'Status',
       options: [
-        { value: "all", label: "All Status" },
-        { value: "active", label: "Active" },
-        { value: "inactive", label: "Inactive" },
-      ],
+        { value: 'all', label: 'All Status' },
+        { value: 'active', label: 'Active' },
+        { value: 'inactive', label: 'Inactive' }
+      ]
     },
     {
-      name: "featured",
-      label: "Featured",
+      name: 'featured',
+      label: 'Featured',
       options: [
-        { value: "all", label: "All" },
-        { value: "featured", label: "Featured" },
-        { value: "not-featured", label: "Not Featured" },
-      ],
-    },
+        { value: 'all', label: 'All' },
+        { value: 'featured', label: 'Featured' },
+        { value: 'not-featured', label: 'Not Featured' }
+      ]
+    }
   ];
 
   const rangeFilters = [
     {
-      name: "minPrice",
-      label: "Min Price",
-      placeholder: "Min",
-      type: "number" as const,
+      name: 'minPrice',
+      label: 'Min Price',
+      placeholder: 'Min',
+      type: 'number' as const
     },
     {
-      name: "maxPrice",
-      label: "Max Price",
-      placeholder: "Max",
-      type: "number" as const,
-    },
+      name: 'maxPrice',
+      label: 'Max Price',
+      placeholder: 'Max',
+      type: 'number' as const
+    }
   ];
 
   return (
@@ -314,7 +314,7 @@ export default function ProductsPage() {
               total: pagination.total,
               pageCount: pagination.totalPages,
               page: pagination.page,
-              pageSize: pagination.limit,
+              pageSize: pagination.limit
             }}
           />
         </CardContent>

@@ -1,36 +1,36 @@
-"use client";
+'use client';
 
-import { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, MoreHorizontal } from "lucide-react";
+import { ColumnDef } from '@tanstack/react-table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Eye, MoreHorizontal } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { Order, OrderItem } from "@/types";
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
+import { Order, OrderItem } from '@/types';
 
 interface CreateOrderColumnsProps {
   onStatusUpdate?: (
     orderId: string,
     currentStatus: string,
-    orderNumber: string,
+    orderNumber: string
   ) => void;
   onDeleteOrder?: (orderId: string, orderNumber: string) => void;
 }
 
 export const createOrderColumns = ({
   onStatusUpdate,
-  onDeleteOrder,
+  onDeleteOrder
 }: CreateOrderColumnsProps): ColumnDef<Order>[] => [
   {
-    accessorKey: "orderNumber",
-    header: "Order ID",
+    accessorKey: 'orderNumber',
+    header: 'Order ID',
     cell: ({ row }) => {
       const order = row.original;
       return (
@@ -43,11 +43,11 @@ export const createOrderColumns = ({
           )}
         </div>
       );
-    },
+    }
   },
   {
-    accessorKey: "customer",
-    header: "Customer",
+    accessorKey: 'customer',
+    header: 'Customer',
     cell: ({ row }) => {
       const order = row.original;
       return (
@@ -58,29 +58,29 @@ export const createOrderColumns = ({
           </div>
         </div>
       );
-    },
+    }
   },
   {
-    accessorKey: "createdAt",
-    header: "Date",
+    accessorKey: 'createdAt',
+    header: 'Date',
     cell: ({ row }) => {
       const order = row.original;
       const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
+        return new Date(dateString).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
         });
       };
 
       return <div className="text-sm">{formatDate(order.createdAt)}</div>;
-    },
+    }
   },
   {
-    accessorKey: "items",
-    header: "Items",
+    accessorKey: 'items',
+    header: 'Items',
     cell: ({ row }) => {
       const order = row.original;
       const getTotalItems = (items: OrderItem[]) => {
@@ -88,11 +88,11 @@ export const createOrderColumns = ({
       };
 
       return <div className="text-sm">{getTotalItems(order.items)} items</div>;
-    },
+    }
   },
   {
-    accessorKey: "total",
-    header: "Total",
+    accessorKey: 'total',
+    header: 'Total',
     cell: ({ row }) => {
       const order = row.original;
       return (
@@ -103,23 +103,23 @@ export const createOrderColumns = ({
           </div>
         </div>
       );
-    },
+    }
   },
   {
-    accessorKey: "paymentMethod",
-    header: "Payment Method",
+    accessorKey: 'paymentMethod',
+    header: 'Payment Method',
     cell: ({ row }) => {
       const order = row.original;
       const getPaymentMethodText = (method: string) => {
         switch (method) {
-          case "credit_card":
-            return "Credit Card";
-          case "debit_card":
-            return "Debit Card";
-          case "paypal":
-            return "PayPal";
-          case "cash_on_delivery":
-            return "Cash on Delivery";
+          case 'credit_card':
+            return 'Credit Card';
+          case 'debit_card':
+            return 'Debit Card';
+          case 'paypal':
+            return 'PayPal';
+          case 'cash_on_delivery':
+            return 'Cash on Delivery';
           default:
             return method;
         }
@@ -130,25 +130,25 @@ export const createOrderColumns = ({
           {getPaymentMethodText(order.paymentMethod)}
         </div>
       );
-    },
+    }
   },
   {
-    accessorKey: "paymentStatus",
-    header: "Payment Status",
+    accessorKey: 'paymentStatus',
+    header: 'Payment Status',
     cell: ({ row }) => {
       const order = row.original;
       const getPaymentStatusColor = (status: string) => {
         switch (status) {
-          case "paid":
-            return "bg-green-100 text-green-800 border-green-200";
-          case "pending":
-            return "bg-yellow-100 text-yellow-800 border-yellow-200";
-          case "failed":
-            return "bg-red-100 text-red-800 border-red-200";
-          case "refunded":
-            return "bg-purple-100 text-purple-800 border-purple-200";
+          case 'paid':
+            return 'bg-green-100 text-green-800 border-green-200';
+          case 'pending':
+            return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+          case 'failed':
+            return 'bg-red-100 text-red-800 border-red-200';
+          case 'refunded':
+            return 'bg-purple-100 text-purple-800 border-purple-200';
           default:
-            return "bg-gray-100 text-gray-800 border-gray-200";
+            return 'bg-gray-100 text-gray-800 border-gray-200';
         }
       };
 
@@ -160,29 +160,29 @@ export const createOrderColumns = ({
           {order.paymentStatus}
         </Badge>
       );
-    },
+    }
   },
   {
-    accessorKey: "status",
-    header: "Order Status",
+    accessorKey: 'status',
+    header: 'Order Status',
     cell: ({ row }) => {
       const order = row.original;
       const getStatusColor = (status: string) => {
         switch (status) {
-          case "delivered":
-            return "bg-green-100 text-green-800 border-green-200";
-          case "shipped":
-            return "bg-blue-100 text-blue-800 border-blue-200";
-          case "processing":
-            return "bg-yellow-100 text-yellow-800 border-yellow-200";
-          case "pending":
-            return "bg-orange-100 text-orange-800 border-orange-200";
-          case "cancelled":
-            return "bg-red-100 text-red-800 border-red-200";
-          case "refunded":
-            return "bg-purple-100 text-purple-800 border-purple-200";
+          case 'delivered':
+            return 'bg-green-100 text-green-800 border-green-200';
+          case 'shipped':
+            return 'bg-blue-100 text-blue-800 border-blue-200';
+          case 'processing':
+            return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+          case 'pending':
+            return 'bg-orange-100 text-orange-800 border-orange-200';
+          case 'cancelled':
+            return 'bg-red-100 text-red-800 border-red-200';
+          case 'refunded':
+            return 'bg-purple-100 text-purple-800 border-purple-200';
           default:
-            return "bg-gray-100 text-gray-800 border-gray-200";
+            return 'bg-gray-100 text-gray-800 border-gray-200';
         }
       };
 
@@ -194,10 +194,10 @@ export const createOrderColumns = ({
           {order.status}
         </Badge>
       );
-    },
+    }
   },
   {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => {
       const order = row.original;
 
@@ -227,7 +227,7 @@ export const createOrderColumns = ({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() =>
-                  window.open(`/admin/orders/${order._id}/invoice`, "_blank")
+                  window.open(`/admin/orders/${order._id}/invoice`, '_blank')
                 }
               >
                 Download invoice
@@ -264,6 +264,6 @@ export const createOrderColumns = ({
           </DropdownMenu>
         </div>
       );
-    },
-  },
+    }
+  }
 ];

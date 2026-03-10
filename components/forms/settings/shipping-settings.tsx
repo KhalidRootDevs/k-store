@@ -1,26 +1,26 @@
-import { SettingsFormData } from "@/app/(admin)/admin/settings/page";
+import { SettingsFormData } from '@/app/(admin)/admin/settings/page';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
-import { useFormContext } from "react-hook-form";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { useFormContext } from 'react-hook-form';
 
 export default function Shipping({
-  handleBooleanChange,
+  handleBooleanChange
 }: {
   handleBooleanChange: (path: string, value: boolean) => void;
 }) {
   const {
     register,
     watch,
-    formState: { errors },
+    formState: { errors }
   } = useFormContext<SettingsFormData>();
   const watchedValues = watch();
 
@@ -49,22 +49,22 @@ export default function Shipping({
                 checked={watchedValues.shipping?.methods?.freeShipping?.enabled}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "shipping.methods.freeShipping.enabled",
+                    'shipping.methods.freeShipping.enabled',
                     value
                   )
                 }
               />
             </div>
             {watchedValues.shipping?.methods?.freeShipping?.enabled && (
-              <div className="pl-6 space-y-2">
+              <div className="space-y-2 pl-6">
                 <Label htmlFor="free-shipping-min">
                   Minimum Order Amount ($)
                 </Label>
                 <Input
                   id="free-shipping-min"
                   type="number"
-                  {...register("shipping.methods.freeShipping.minimumAmount", {
-                    valueAsNumber: true,
+                  {...register('shipping.methods.freeShipping.minimumAmount', {
+                    valueAsNumber: true
                   })}
                 />
                 <p className="text-xs text-muted-foreground">
@@ -89,21 +89,21 @@ export default function Shipping({
                 checked={watchedValues.shipping?.methods?.flatRate?.enabled}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "shipping.methods.flatRate.enabled",
+                    'shipping.methods.flatRate.enabled',
                     value
                   )
                 }
               />
             </div>
             {watchedValues.shipping?.methods?.flatRate?.enabled && (
-              <div className="pl-6 space-y-2">
+              <div className="space-y-2 pl-6">
                 <Label htmlFor="flat-rate-cost">Flat Rate Cost ($)</Label>
                 <Input
                   id="flat-rate-cost"
                   type="number"
                   step="0.01"
-                  {...register("shipping.methods.flatRate.cost", {
-                    valueAsNumber: true,
+                  {...register('shipping.methods.flatRate.cost', {
+                    valueAsNumber: true
                   })}
                 />
               </div>
@@ -127,21 +127,21 @@ export default function Shipping({
                 }
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "shipping.methods.expressShipping.enabled",
+                    'shipping.methods.expressShipping.enabled',
                     value
                   )
                 }
               />
             </div>
             {watchedValues.shipping?.methods?.expressShipping?.enabled && (
-              <div className="pl-6 space-y-2">
+              <div className="space-y-2 pl-6">
                 <Label htmlFor="express-cost">Express Shipping Cost ($)</Label>
                 <Input
                   id="express-cost"
                   type="number"
                   step="0.01"
-                  {...register("shipping.methods.expressShipping.cost", {
-                    valueAsNumber: true,
+                  {...register('shipping.methods.expressShipping.cost', {
+                    valueAsNumber: true
                   })}
                 />
               </div>
@@ -169,7 +169,7 @@ export default function Shipping({
               checked={watchedValues.shipping?.options?.shippingCalculator}
               onCheckedChange={(value) =>
                 handleBooleanChange(
-                  "shipping.options.shippingCalculator",
+                  'shipping.options.shippingCalculator',
                   value
                 )
               }
@@ -190,7 +190,7 @@ export default function Shipping({
               checked={watchedValues.shipping?.options?.internationalShipping}
               onCheckedChange={(value) =>
                 handleBooleanChange(
-                  "shipping.options.internationalShipping",
+                  'shipping.options.internationalShipping',
                   value
                 )
               }
@@ -202,7 +202,7 @@ export default function Shipping({
             <Textarea
               id="shipping-origin"
               rows={3}
-              {...register("shipping.options.shippingOrigin")}
+              {...register('shipping.options.shippingOrigin')}
             />
             {errors.shipping?.options?.shippingOrigin && (
               <p className="text-sm text-red-500">

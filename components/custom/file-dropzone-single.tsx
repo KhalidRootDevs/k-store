@@ -1,19 +1,19 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { DialogDescription } from "@radix-ui/react-dialog";
-import { useCallback, useState } from "react";
-import { useDropzone } from "react-dropzone";
-import { useFormContext } from "react-hook-form";
-import toast from "react-hot-toast";
+  DialogTitle
+} from '@/components/ui/dialog';
+import { DialogDescription } from '@radix-ui/react-dialog';
+import { useCallback, useState } from 'react';
+import { useDropzone } from 'react-dropzone';
+import { useFormContext } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
-import { Icons } from "@/components/icons";
-import Image from "next/image";
-import PDFViewer from "./pdf-viewer";
+import { Icons } from '@/components/icons';
+import Image from 'next/image';
+import PDFViewer from './pdf-viewer';
 
 type DropzoneSingleFileProps = {
   name: string;
@@ -29,23 +29,23 @@ const DropzoneSingleFile = ({
   disabled = false,
   maxSize = 3 * 1024 * 1024, // 3MB default
   accept = {
-    "application/pdf": [".pdf"],
-    "application/msword": [".doc", ".docx"],
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [
-      ".docx",
+    'application/pdf': ['.pdf'],
+    'application/msword': ['.doc', '.docx'],
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [
+      '.docx'
     ],
-    "application/vnd.ms-excel": [".xls"],
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [
-      ".xlsx",
-    ],
+    'application/vnd.ms-excel': ['.xls'],
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [
+      '.xlsx'
+    ]
   },
-  dialogTitle = "Document Preview",
-  dialogDescription = "Preview of the uploaded document.",
+  dialogTitle = 'Document Preview',
+  dialogDescription = 'Preview of the uploaded document.'
 }: DropzoneSingleFileProps) => {
   const {
     watch,
     setValue,
-    formState: { isSubmitting },
+    formState: { isSubmitting }
   } = useFormContext();
 
   const file = watch(name);
@@ -57,13 +57,13 @@ const DropzoneSingleFile = ({
       if (fileRejections.length > 0) {
         const sizeError = fileRejections.some((rejection: any) =>
           rejection.errors.some(
-            (e: { code: string }) => e.code === "file-too-large"
+            (e: { code: string }) => e.code === 'file-too-large'
           )
         );
 
         const typeError = fileRejections.some((rejection: any) =>
           rejection.errors.some(
-            (e: { code: string }) => e.code === "file-invalid-type"
+            (e: { code: string }) => e.code === 'file-invalid-type'
           )
         );
 
@@ -74,7 +74,7 @@ const DropzoneSingleFile = ({
         }
 
         if (typeError) {
-          const acceptedTypes = Object.values(accept).flat().join(", ");
+          const acceptedTypes = Object.values(accept).flat().join(', ');
           toast.error(`Invalid file type. Accepted types: ${acceptedTypes}`);
         }
         return;
@@ -84,12 +84,12 @@ const DropzoneSingleFile = ({
 
       const uploadedFile = acceptedFiles[0];
       const fileWithPreview = Object.assign(uploadedFile, {
-        preview: URL.createObjectURL(uploadedFile),
+        preview: URL.createObjectURL(uploadedFile)
       });
 
       setValue(name, fileWithPreview, {
         shouldValidate: true,
-        shouldDirty: true,
+        shouldDirty: true
       });
     },
     [name, setValue, maxSize, accept]
@@ -100,7 +100,7 @@ const DropzoneSingleFile = ({
     maxSize,
     onDrop,
     disabled: isFieldDisabled,
-    multiple: false,
+    multiple: false
   });
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -111,9 +111,9 @@ const DropzoneSingleFile = ({
       URL.revokeObjectURL(file.preview);
     }
 
-    setValue(name, "", {
+    setValue(name, '', {
       shouldValidate: true,
-      shouldDirty: true,
+      shouldDirty: true
     });
   };
 
@@ -124,40 +124,40 @@ const DropzoneSingleFile = ({
       setIsModalOpen(true);
     } else if (fileUrl) {
       // For non-PDF files, download or open in new tab
-      window.open(fileUrl, "_blank");
+      window.open(fileUrl, '_blank');
     }
   };
 
   const fileName =
-    typeof file === "string"
-      ? file.split("/").pop()
-      : file?.name || "No file selected";
+    typeof file === 'string'
+      ? file.split('/').pop()
+      : file?.name || 'No file selected';
 
-  const fileUrl = typeof file === "string" ? file : file?.preview;
-  const isPdf = fileName?.toLowerCase().endsWith(".pdf");
+  const fileUrl = typeof file === 'string' ? file : file?.preview;
+  const isPdf = fileName?.toLowerCase().endsWith('.pdf');
   const isDoc = fileName?.toLowerCase().match(/\.(doc|docx)$/);
   const isExcel = fileName?.toLowerCase().match(/\.(xls|xlsx)$/);
 
   // Get appropriate icon based on file type
   const getFileIcon = () => {
-    if (isPdf) return "/pdf.png";
-    if (isDoc) return "/doc.png"; // You might want to add doc.png icon
-    if (isExcel) return "/excel.png"; // You might want to add excel.png icon
-    return "/file.png"; // Generic file icon
+    if (isPdf) return '/pdf.png';
+    if (isDoc) return '/doc.png'; // You might want to add doc.png icon
+    if (isExcel) return '/excel.png'; // You might want to add excel.png icon
+    return '/file.png'; // Generic file icon
   };
 
   const formatFileSize = (bytes: number) => {
-    if (!bytes) return "";
-    if (bytes === 0) return "0 Bytes";
+    if (!bytes) return '';
+    if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const getAcceptedTypesText = () => {
     const types = Object.values(accept).flat();
-    return types.map((type) => type.replace(".", "")).join(", ");
+    return types.map((type) => type.replace('.', '')).join(', ');
   };
 
   return (
@@ -169,10 +169,10 @@ const DropzoneSingleFile = ({
             transition-all duration-200
             ${
               isFieldDisabled
-                ? "cursor-not-allowed opacity-60"
-                : "cursor-pointer hover:border-gray-500"
+                ? 'cursor-not-allowed opacity-60'
+                : 'cursor-pointer hover:border-gray-500'
             }
-            ${isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300"}
+            ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}
           `}
         >
           {file ? (
@@ -185,17 +185,17 @@ const DropzoneSingleFile = ({
                   width={70}
                   onClick={handlePreview}
                   className={`cursor-pointer transition-transform hover:scale-105 ${
-                    isFieldDisabled ? "cursor-not-allowed" : ""
+                    isFieldDisabled ? 'cursor-not-allowed' : ''
                   }`}
                 />
 
                 {/* File info */}
                 <div className="text-center">
-                  <p className="text-sm font-medium truncate max-w-[200px]">
+                  <p className="max-w-[200px] truncate text-sm font-medium">
                     {fileName}
                   </p>
                   {file.size && (
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="mt-1 text-xs text-gray-500">
                       {formatFileSize(file.size)}
                     </p>
                   )}
@@ -237,22 +237,22 @@ const DropzoneSingleFile = ({
                   alt="file-upload-icon"
                   height={70}
                   width={70}
-                  className={`${isFieldDisabled ? "opacity-50" : ""}`}
+                  className={`${isFieldDisabled ? 'opacity-50' : ''}`}
                 />
 
                 <div className="space-y-1">
                   <p
                     className={`font-medium ${
-                      isFieldDisabled ? "text-gray-400" : "text-gray-700"
+                      isFieldDisabled ? 'text-gray-400' : 'text-gray-700'
                     }`}
                   >
                     {isDragActive
-                      ? "Drop the file here"
-                      : "Click to upload or drag and drop"}
+                      ? 'Drop the file here'
+                      : 'Click to upload or drag and drop'}
                   </p>
                   <p
                     className={`text-xs ${
-                      isFieldDisabled ? "text-gray-400" : "text-gray-500"
+                      isFieldDisabled ? 'text-gray-400' : 'text-gray-500'
                     }`}
                   >
                     {getAcceptedTypesText()} (Max {formatFileSize(maxSize)})
@@ -279,13 +279,13 @@ const DropzoneSingleFile = ({
       {/* PDF Preview Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="h-[80vh] max-w-5xl">
-          <div className="h-full w-full flex flex-col">
+          <div className="flex h-full w-full flex-col">
             <DialogHeader>
               <DialogTitle>{dialogTitle}</DialogTitle>
               <DialogDescription>{dialogDescription}</DialogDescription>
             </DialogHeader>
 
-            <div className="flex-1 min-h-0">
+            <div className="min-h-0 flex-1">
               <PDFViewer link={fileUrl} />
             </div>
           </div>

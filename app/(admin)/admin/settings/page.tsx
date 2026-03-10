@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import AdvanceSettings from "@/components/forms/settings/advance-settings";
-import CmsSettings from "@/components/forms/settings/cms-settings";
-import EmailSettings from "@/components/forms/settings/email-settings";
-import GeneralSettings from "@/components/forms/settings/general-settings";
-import PaymentMethodSettings from "@/components/forms/settings/payment-method-settings";
-import ShippingSettings from "@/components/forms/settings/shipping-settings";
-import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/components/ui/use-toast";
-import { SettingsFormData, settingsSchema } from "@/lib/validations/index";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Save } from "lucide-react";
-import type React from "react";
-import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import AdvanceSettings from '@/components/forms/settings/advance-settings';
+import CmsSettings from '@/components/forms/settings/cms-settings';
+import EmailSettings from '@/components/forms/settings/email-settings';
+import GeneralSettings from '@/components/forms/settings/general-settings';
+import PaymentMethodSettings from '@/components/forms/settings/payment-method-settings';
+import ShippingSettings from '@/components/forms/settings/shipping-settings';
+import { Button } from '@/components/ui/button';
+import { Container } from '@/components/ui/container';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from '@/components/ui/use-toast';
+import { SettingsFormData, settingsSchema } from '@/lib/validations/index';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2, Save } from 'lucide-react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("general");
+  const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [logo, setLogo] = useState<string | null>(
-    "/placeholder.svg?height=100&width=200",
+    '/placeholder.svg?height=100&width=200'
   );
   const [favicon, setFavicon] = useState<string | null>(
-    "/placeholder.svg?height=32&width=32",
+    '/placeholder.svg?height=32&width=32'
   );
 
   const methods = useForm<SettingsFormData>({
@@ -33,78 +33,78 @@ export default function SettingsPage() {
     defaultValues: {
       general: {
         storeInfo: {
-          storeName: "",
-          storeEmail: "",
-          storePhone: "",
-          storeAddress: "",
+          storeName: '',
+          storeEmail: '',
+          storePhone: '',
+          storeAddress: ''
         },
         seo: {
-          metaTitle: "",
-          metaDescription: "",
-          metaKeywords: "",
+          metaTitle: '',
+          metaDescription: '',
+          metaKeywords: ''
         },
         socialMedia: {
-          facebook: "",
-          instagram: "",
-          twitter: "",
-          youtube: "",
-        },
+          facebook: '',
+          instagram: '',
+          twitter: '',
+          youtube: ''
+        }
       },
       payment: {
         paymentMethods: {
           creditCards: true,
           stripe: {
-            apiKey: "",
-            secretKey: "",
+            apiKey: '',
+            secretKey: ''
           },
           paypal: {
             enabled: false,
-            clientId: "",
-            secret: "",
+            clientId: '',
+            secret: ''
           },
-          cashOnDelivery: true,
+          cashOnDelivery: true
         },
         currency: {
-          defaultCurrency: "usd",
-          currencyFormat: "symbol",
+          defaultCurrency: 'usd',
+          currencyFormat: 'symbol'
         },
         tax: {
           enabled: false,
           taxRate: 0,
-          pricesIncludeTax: false,
-        },
+          pricesIncludeTax: false
+        }
       },
       shipping: {
         methods: {
           freeShipping: {
             enabled: false,
-            minimumAmount: 0,
+            minimumAmount: 0
           },
           flatRate: {
             enabled: true,
-            cost: 0,
+            cost: 0
           },
           expressShipping: {
             enabled: false,
-            cost: 0,
-          },
+            cost: 0
+          }
         },
         options: {
           shippingCalculator: true,
           internationalShipping: false,
-          shippingOrigin: "",
-        },
+          shippingOrigin: ''
+        }
       },
       email: {
         provider: {
-          service: "smtp",
+          service: 'smtp',
           smtp: {
-            host: "",
+            host: '',
             port: 587,
-            security: "tls",
-            username: "",
-            password: "",
-          },
+            security: 'tls',
+            username: '',
+            password: ''
+          }
         },
         notifications: {
           orderConfirmation: true,
@@ -112,49 +112,49 @@ export default function SettingsPage() {
           orderCanceled: true,
           customerAccount: true,
           passwordReset: true,
-          abandonedCart: false,
-        },
+          abandonedCart: false
+        }
       },
       cms: {
-        termsAndConditions: "",
-        privacyPolicy: "",
-        returnPolicy: "",
-        aboutUs: "",
-        faq: "",
+        termsAndConditions: '',
+        privacyPolicy: '',
+        returnPolicy: '',
+        aboutUs: '',
+        faq: ''
       },
       advanced: {
         analytics: {
-          googleAnalyticsId: "",
-          facebookPixelId: "",
-          enabled: false,
+          googleAnalyticsId: '',
+          facebookPixelId: '',
+          enabled: false
         },
         api: {
-          apiKey: "",
-          webhookUrl: "",
-          webhooksEnabled: false,
+          apiKey: '',
+          webhookUrl: '',
+          webhooksEnabled: false
         },
         cloudinary: {
-          cloudName: "",
-          apiKey: "",
-          apiSecret: "",
-          uploadPreset: "",
+          cloudName: '',
+          apiKey: '',
+          apiSecret: '',
+          uploadPreset: '',
           secure: true,
-          folder: "ecommerce",
+          folder: 'ecommerce'
         },
         performance: {
           pageCaching: true,
           cacheDuration: 3600,
           imageOptimization: true,
-          minifyAssets: true,
+          minifyAssets: true
         },
         maintenance: {
           enabled: false,
           message:
             "We're currently performing maintenance. Please check back later.",
-          allowAdminAccess: true,
-        },
-      },
-    },
+          allowAdminAccess: true
+        }
+      }
+    }
   });
 
   const {
@@ -164,7 +164,7 @@ export default function SettingsPage() {
     watch,
     setValue,
     getValues,
-    reset,
+    reset
   } = methods;
 
   // Fetch settings on component mount
@@ -172,10 +172,10 @@ export default function SettingsPage() {
     async function fetchSettings() {
       try {
         setIsLoading(true);
-        const response = await fetch("/api/settings");
+        const response = await fetch('/api/settings');
 
         if (!response.ok) {
-          throw new Error("Failed to fetch settings");
+          throw new Error('Failed to fetch settings');
         }
 
         const data = await response.json();
@@ -186,11 +186,11 @@ export default function SettingsPage() {
           reset(transformedSettings);
         }
       } catch (error) {
-        console.error("Error fetching settings:", error);
+        console.error('Error fetching settings:', error);
         toast({
-          title: "Error",
-          description: "Failed to load settings. Using default values.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'Failed to load settings. Using default values.',
+          variant: 'destructive'
         });
       } finally {
         setIsLoading(false);
@@ -205,52 +205,52 @@ export default function SettingsPage() {
     return {
       general: {
         storeInfo: {
-          storeName: apiSettings.general?.storeInfo?.storeName || "",
-          storeEmail: apiSettings.general?.storeInfo?.storeEmail || "",
-          storePhone: apiSettings.general?.storeInfo?.storePhone || "",
-          storeAddress: apiSettings.general?.storeInfo?.storeAddress || "",
+          storeName: apiSettings.general?.storeInfo?.storeName || '',
+          storeEmail: apiSettings.general?.storeInfo?.storeEmail || '',
+          storePhone: apiSettings.general?.storeInfo?.storePhone || '',
+          storeAddress: apiSettings.general?.storeInfo?.storeAddress || ''
         },
         seo: {
-          metaTitle: apiSettings.general?.seo?.metaTitle || "",
-          metaDescription: apiSettings.general?.seo?.metaDescription || "",
-          metaKeywords: apiSettings.general?.seo?.metaKeywords || "",
+          metaTitle: apiSettings.general?.seo?.metaTitle || '',
+          metaDescription: apiSettings.general?.seo?.metaDescription || '',
+          metaKeywords: apiSettings.general?.seo?.metaKeywords || ''
         },
         socialMedia: {
-          facebook: apiSettings.general?.socialMedia?.facebook || "",
-          instagram: apiSettings.general?.socialMedia?.instagram || "",
-          twitter: apiSettings.general?.socialMedia?.twitter || "",
-          youtube: apiSettings.general?.socialMedia?.youtube || "",
-        },
+          facebook: apiSettings.general?.socialMedia?.facebook || '',
+          instagram: apiSettings.general?.socialMedia?.instagram || '',
+          twitter: apiSettings.general?.socialMedia?.twitter || '',
+          youtube: apiSettings.general?.socialMedia?.youtube || ''
+        }
       },
       payment: {
         paymentMethods: {
           creditCards: apiSettings.payment?.paymentMethods?.creditCards ?? true,
           stripe: {
-            apiKey: apiSettings.payment?.paymentMethods?.stripe?.apiKey || "",
+            apiKey: apiSettings.payment?.paymentMethods?.stripe?.apiKey || '',
             secretKey:
-              apiSettings.payment?.paymentMethods?.stripe?.secretKey || "",
+              apiSettings.payment?.paymentMethods?.stripe?.secretKey || ''
           },
           paypal: {
             enabled:
               apiSettings.payment?.paymentMethods?.paypal?.enabled ?? false,
             clientId:
-              apiSettings.payment?.paymentMethods?.paypal?.clientId || "",
-            secret: apiSettings.payment?.paymentMethods?.paypal?.secret || "",
+              apiSettings.payment?.paymentMethods?.paypal?.clientId || '',
+            secret: apiSettings.payment?.paymentMethods?.paypal?.secret || ''
           },
           cashOnDelivery:
-            apiSettings.payment?.paymentMethods?.cashOnDelivery ?? true,
+            apiSettings.payment?.paymentMethods?.cashOnDelivery ?? true
         },
         currency: {
           defaultCurrency:
-            apiSettings.payment?.currency?.defaultCurrency || "usd",
+            apiSettings.payment?.currency?.defaultCurrency || 'usd',
           currencyFormat:
-            apiSettings.payment?.currency?.currencyFormat || "symbol",
+            apiSettings.payment?.currency?.currencyFormat || 'symbol'
         },
         tax: {
           enabled: apiSettings.payment?.tax?.enabled ?? false,
           taxRate: apiSettings.payment?.tax?.taxRate || 0,
-          pricesIncludeTax: apiSettings.payment?.tax?.pricesIncludeTax ?? false,
-        },
+          pricesIncludeTax: apiSettings.payment?.tax?.pricesIncludeTax ?? false
+        }
       },
       shipping: {
         methods: {
@@ -258,36 +258,36 @@ export default function SettingsPage() {
             enabled:
               apiSettings.shipping?.methods?.freeShipping?.enabled ?? false,
             minimumAmount:
-              apiSettings.shipping?.methods?.freeShipping?.minimumAmount || 0,
+              apiSettings.shipping?.methods?.freeShipping?.minimumAmount || 0
           },
           flatRate: {
             enabled: apiSettings.shipping?.methods?.flatRate?.enabled ?? true,
-            cost: apiSettings.shipping?.methods?.flatRate?.cost || 0,
+            cost: apiSettings.shipping?.methods?.flatRate?.cost || 0
           },
           expressShipping: {
             enabled:
               apiSettings.shipping?.methods?.expressShipping?.enabled ?? false,
-            cost: apiSettings.shipping?.methods?.expressShipping?.cost || 0,
-          },
+            cost: apiSettings.shipping?.methods?.expressShipping?.cost || 0
+          }
         },
         options: {
           shippingCalculator:
             apiSettings.shipping?.options?.shippingCalculator ?? true,
           internationalShipping:
             apiSettings.shipping?.options?.internationalShipping ?? false,
-          shippingOrigin: apiSettings.shipping?.options?.shippingOrigin || "",
-        },
+          shippingOrigin: apiSettings.shipping?.options?.shippingOrigin || ''
+        }
       },
       email: {
         provider: {
-          service: apiSettings.email?.provider?.service || "smtp",
+          service: apiSettings.email?.provider?.service || 'smtp',
           smtp: {
-            host: apiSettings.email?.provider?.smtp?.host || "",
+            host: apiSettings.email?.provider?.smtp?.host || '',
             port: apiSettings.email?.provider?.smtp?.port || 587,
-            security: apiSettings.email?.provider?.smtp?.security || "tls",
-            username: apiSettings.email?.provider?.smtp?.username || "",
-            password: apiSettings.email?.provider?.smtp?.password || "",
-          },
+            security: apiSettings.email?.provider?.smtp?.security || 'tls',
+            username: apiSettings.email?.provider?.smtp?.username || '',
+            password: apiSettings.email?.provider?.smtp?.password || ''
+          }
         },
         notifications: {
           orderConfirmation:
@@ -301,36 +301,36 @@ export default function SettingsPage() {
           passwordReset:
             apiSettings.email?.notifications?.passwordReset ?? true,
           abandonedCart:
-            apiSettings.email?.notifications?.abandonedCart ?? false,
-        },
+            apiSettings.email?.notifications?.abandonedCart ?? false
+        }
       },
       cms: {
-        termsAndConditions: apiSettings.cms?.termsAndConditions || "",
-        privacyPolicy: apiSettings.cms?.privacyPolicy || "",
-        returnPolicy: apiSettings.cms?.returnPolicy || "",
-        aboutUs: apiSettings.cms?.aboutUs || "",
-        faq: apiSettings.cms?.faq || "",
+        termsAndConditions: apiSettings.cms?.termsAndConditions || '',
+        privacyPolicy: apiSettings.cms?.privacyPolicy || '',
+        returnPolicy: apiSettings.cms?.returnPolicy || '',
+        aboutUs: apiSettings.cms?.aboutUs || '',
+        faq: apiSettings.cms?.faq || ''
       },
       advanced: {
         analytics: {
           googleAnalyticsId:
-            apiSettings.advanced?.analytics?.googleAnalyticsId || "",
+            apiSettings.advanced?.analytics?.googleAnalyticsId || '',
           facebookPixelId:
-            apiSettings.advanced?.analytics?.facebookPixelId || "",
-          enabled: apiSettings.advanced?.analytics?.enabled ?? false,
+            apiSettings.advanced?.analytics?.facebookPixelId || '',
+          enabled: apiSettings.advanced?.analytics?.enabled ?? false
         },
         api: {
-          apiKey: apiSettings.advanced?.api?.apiKey || "",
-          webhookUrl: apiSettings.advanced?.api?.webhookUrl || "",
-          webhooksEnabled: apiSettings.advanced?.api?.webhooksEnabled ?? false,
+          apiKey: apiSettings.advanced?.api?.apiKey || '',
+          webhookUrl: apiSettings.advanced?.api?.webhookUrl || '',
+          webhooksEnabled: apiSettings.advanced?.api?.webhooksEnabled ?? false
         },
         cloudinary: {
-          cloudName: apiSettings.advanced?.cloudinary?.cloudName || "",
-          apiKey: apiSettings.advanced?.cloudinary?.apiKey || "",
-          apiSecret: apiSettings.advanced?.cloudinary?.apiSecret || "",
-          uploadPreset: apiSettings.advanced?.cloudinary?.uploadPreset || "",
+          cloudName: apiSettings.advanced?.cloudinary?.cloudName || '',
+          apiKey: apiSettings.advanced?.cloudinary?.apiKey || '',
+          apiSecret: apiSettings.advanced?.cloudinary?.apiSecret || '',
+          uploadPreset: apiSettings.advanced?.cloudinary?.uploadPreset || '',
           secure: apiSettings.advanced?.cloudinary?.secure ?? true,
-          folder: apiSettings.advanced?.cloudinary?.folder || "ecommerce",
+          folder: apiSettings.advanced?.cloudinary?.folder || 'ecommerce'
         },
         performance: {
           pageCaching: apiSettings.advanced?.performance?.pageCaching ?? true,
@@ -338,7 +338,7 @@ export default function SettingsPage() {
             apiSettings.advanced?.performance?.cacheDuration || 3600,
           imageOptimization:
             apiSettings.advanced?.performance?.imageOptimization ?? true,
-          minifyAssets: apiSettings.advanced?.performance?.minifyAssets ?? true,
+          minifyAssets: apiSettings.advanced?.performance?.minifyAssets ?? true
         },
         maintenance: {
           enabled: apiSettings.advanced?.maintenance?.enabled ?? false,
@@ -346,9 +346,9 @@ export default function SettingsPage() {
             apiSettings.advanced?.maintenance?.message ||
             "We're currently performing maintenance. Please check back later.",
           allowAdminAccess:
-            apiSettings.advanced?.maintenance?.allowAdminAccess ?? true,
-        },
-      },
+            apiSettings.advanced?.maintenance?.allowAdminAccess ?? true
+        }
+      }
     };
   };
 
@@ -378,37 +378,37 @@ export default function SettingsPage() {
     setIsSaving(true);
 
     try {
-      const response = await fetch("/api/admin/settings", {
-        method: "PUT",
+      const response = await fetch('/api/admin/settings', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ settings: data }),
+        body: JSON.stringify({ settings: data })
       });
 
-      console.log("Settings Response", response);
+      console.log('Settings Response', response);
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save settings");
+        throw new Error(errorData.error || 'Failed to save settings');
       }
 
       const result = await response.json();
 
       toast({
-        title: "Settings saved",
+        title: 'Settings saved',
         description:
-          result.message || "Your settings have been saved successfully.",
+          result.message || 'Your settings have been saved successfully.'
       });
     } catch (error) {
-      console.error("Error saving settings:", error);
+      console.error('Error saving settings:', error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
           error instanceof Error
             ? error.message
-            : "Failed to save settings. Please try again.",
-        variant: "destructive",
+            : 'Failed to save settings. Please try again.',
+        variant: 'destructive'
       });
     } finally {
       setIsSaving(false);
@@ -419,38 +419,38 @@ export default function SettingsPage() {
   const saveSection = async (section: string, sectionData: any) => {
     try {
       const response = await fetch(`/api/settings/${section}`, {
-        method: "PATCH",
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ [section]: sectionData }),
+        body: JSON.stringify({ [section]: sectionData })
       });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || `Failed to save ${section} settings`,
+          errorData.error || `Failed to save ${section} settings`
         );
       }
 
       const result = await response.json();
 
       toast({
-        title: "Settings saved",
+        title: 'Settings saved',
         description:
-          result.message || `${section} settings have been saved successfully.`,
+          result.message || `${section} settings have been saved successfully.`
       });
 
       return true;
     } catch (error) {
       console.error(`Error saving ${section} settings:`, error);
       toast({
-        title: "Error",
+        title: 'Error',
         description:
           error instanceof Error
             ? error.message
             : `Failed to save ${section} settings. Please try again.`,
-        variant: "destructive",
+        variant: 'destructive'
       });
       return false;
     }
@@ -463,9 +463,9 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin" />
           <p>Loading settings...</p>
         </div>
       </div>
@@ -489,7 +489,7 @@ export default function SettingsPage() {
               onValueChange={setActiveTab}
               className="space-y-4"
             >
-              <TabsList className="grid grid-cols-2 md:grid-cols-6 w-full">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
                 <TabsTrigger value="general">General</TabsTrigger>
                 <TabsTrigger value="payment">Payment</TabsTrigger>
                 <TabsTrigger value="shipping">Shipping</TabsTrigger>

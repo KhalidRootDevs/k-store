@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+  CardTitle
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import {
   Package,
   ArrowLeft,
@@ -19,59 +19,59 @@ import {
   CreditCard,
   User,
   Calendar,
-  Loader2,
-} from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
-import Image from "next/image";
-import { Order, OrderItem } from "@/types";
+  Loader2
+} from 'lucide-react';
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { toast } from '@/components/ui/use-toast';
+import Image from 'next/image';
+import { Order, OrderItem } from '@/types';
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "delivered":
-      return "bg-green-100 text-green-800 border-green-200";
-    case "shipped":
-      return "bg-blue-100 text-blue-800 border-blue-200";
-    case "processing":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "pending":
-      return "bg-orange-100 text-orange-800 border-orange-200";
-    case "cancelled":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "refunded":
-      return "bg-purple-100 text-purple-800 border-purple-200";
+    case 'delivered':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'shipped':
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    case 'processing':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'pending':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'cancelled':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'refunded':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
 const getPaymentStatusColor = (status: string) => {
   switch (status) {
-    case "paid":
-      return "bg-green-100 text-green-800 border-green-200";
-    case "pending":
-      return "bg-yellow-100 text-yellow-800 border-yellow-200";
-    case "failed":
-      return "bg-red-100 text-red-800 border-red-200";
-    case "refunded":
-      return "bg-purple-100 text-purple-800 border-purple-200";
+    case 'paid':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'failed':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'refunded':
+      return 'bg-purple-100 text-purple-800 border-purple-200';
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
 const getPaymentMethodText = (method: string) => {
   switch (method) {
-    case "credit_card":
-      return "Credit Card";
-    case "debit_card":
-      return "Debit Card";
-    case "paypal":
-      return "PayPal";
-    case "cash_on_delivery":
-      return "Cash on Delivery";
+    case 'credit_card':
+      return 'Credit Card';
+    case 'debit_card':
+      return 'Debit Card';
+    case 'paypal':
+      return 'PayPal';
+    case 'cash_on_delivery':
+      return 'Cash on Delivery';
     default:
       return method;
   }
@@ -79,18 +79,18 @@ const getPaymentMethodText = (method: string) => {
 
 const getStatusText = (status: string) => {
   switch (status) {
-    case "pending":
-      return "Pending";
-    case "processing":
-      return "Processing";
-    case "shipped":
-      return "Shipped";
-    case "delivered":
-      return "Delivered";
-    case "cancelled":
-      return "Cancelled";
-    case "refunded":
-      return "Refunded";
+    case 'pending':
+      return 'Pending';
+    case 'processing':
+      return 'Processing';
+    case 'shipped':
+      return 'Shipped';
+    case 'delivered':
+      return 'Delivered';
+    case 'cancelled':
+      return 'Cancelled';
+    case 'refunded':
+      return 'Refunded';
     default:
       return status;
   }
@@ -114,16 +114,16 @@ export default function OrderDetailsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch order");
+        throw new Error(data.error || 'Failed to fetch order');
       }
 
       setOrder(data.order);
     } catch (error: any) {
-      console.error("Error fetching order:", error);
+      console.error('Error fetching order:', error);
       toast({
-        title: "Error",
-        description: error.message || "Failed to load order details",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'Failed to load order details',
+        variant: 'destructive'
       });
     } finally {
       setLoading(false);
@@ -132,20 +132,20 @@ export default function OrderDetailsPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
-  const getVariantText = (variant: OrderItem["variant"]) => {
-    if (!variant?.attributes) return "";
+  const getVariantText = (variant: OrderItem['variant']) => {
+    if (!variant?.attributes) return '';
     return Object.entries(variant.attributes)
       .map(([key, value]) => `${key}: ${value}`)
-      .join(", ");
+      .join(', ');
   };
 
   const downloadInvoice = async () => {
@@ -153,16 +153,16 @@ export default function OrderDetailsPage() {
 
     try {
       const response = await fetch(
-        `/api/user/orders/${order.orderNumber}/invoice`,
+        `/api/user/orders/${order.orderNumber}/invoice`
       );
       if (!response.ok) {
-        throw new Error("Failed to download invoice");
+        throw new Error('Failed to download invoice');
       }
 
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.style.display = "none";
+      const a = document.createElement('a');
+      a.style.display = 'none';
       a.href = url;
       a.download = `invoice-${order.orderNumber}.pdf`;
       document.body.appendChild(a);
@@ -170,14 +170,14 @@ export default function OrderDetailsPage() {
       window.URL.revokeObjectURL(url);
 
       toast({
-        title: "Invoice downloaded",
-        description: `Invoice for order ${order.orderNumber} has been downloaded.`,
+        title: 'Invoice downloaded',
+        description: `Invoice for order ${order.orderNumber} has been downloaded.`
       });
     } catch (error) {
       toast({
-        title: "Download failed",
-        description: "Failed to download invoice. Please try again.",
-        variant: "destructive",
+        title: 'Download failed',
+        description: 'Failed to download invoice. Please try again.',
+        variant: 'destructive'
       });
     }
   };
@@ -185,17 +185,17 @@ export default function OrderDetailsPage() {
   const trackPackage = () => {
     if (!order?.trackingNumber) {
       toast({
-        title: "No tracking available",
-        description: "Tracking number is not available for this order yet.",
-        variant: "destructive",
+        title: 'No tracking available',
+        description: 'Tracking number is not available for this order yet.',
+        variant: 'destructive'
       });
       return;
     }
 
     // This would typically redirect to the carrier's tracking page
     toast({
-      title: "Track Package",
-      description: `Tracking number: ${order.trackingNumber}`,
+      title: 'Track Package',
+      description: `Tracking number: ${order.trackingNumber}`
     });
   };
 
@@ -212,10 +212,10 @@ export default function OrderDetailsPage() {
   if (!order) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center py-12">
-          <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Order Not Found</h2>
-          <p className="text-muted-foreground mb-4">
+        <div className="py-12 text-center">
+          <Package className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+          <h2 className="mb-2 text-2xl font-bold">Order Not Found</h2>
+          <p className="mb-4 text-muted-foreground">
             The order you're looking for doesn't exist.
           </p>
           <Button asChild>
@@ -228,7 +228,7 @@ export default function OrderDetailsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center gap-4 mb-6">
+      <div className="mb-6 flex items-center gap-4">
         <Button variant="outline" size="icon" asChild>
           <Link href="/account/orders">
             <ArrowLeft className="h-4 w-4" />
@@ -256,9 +256,9 @@ export default function OrderDetailsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Order Summary */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -292,9 +292,9 @@ export default function OrderDetailsPage() {
                         <tr key={item.id}>
                           <td className="px-4 py-3 text-sm">
                             <div className="flex items-center gap-3">
-                              <div className="relative h-12 w-12 rounded-md overflow-hidden flex-shrink-0">
+                              <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md">
                                 <Image
-                                  src={item.image || "/placeholder.svg"}
+                                  src={item.image || '/placeholder.svg'}
                                   alt={item.name}
                                   fill
                                   className="object-cover"
@@ -319,7 +319,7 @@ export default function OrderDetailsPage() {
                             ${item.price.toFixed(2)}
                           </td>
                           <td className="px-4 py-3 text-sm">{item.quantity}</td>
-                          <td className="px-4 py-3 text-sm text-right">
+                          <td className="px-4 py-3 text-right text-sm">
                             ${(item.price * item.quantity).toFixed(2)}
                           </td>
                         </tr>
@@ -370,7 +370,7 @@ export default function OrderDetailsPage() {
                         </th>
                         <td className="px-4 py-3 text-right text-sm">
                           {order.shipping === 0
-                            ? "Free"
+                            ? 'Free'
                             : `$${order.shipping.toFixed(2)}`}
                         </td>
                       </tr>
@@ -401,12 +401,12 @@ export default function OrderDetailsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="relative pl-6 border-l">
+              <div className="relative border-l pl-6">
                 {order.timeline.map((event, index) => (
                   <div key={index} className="mb-6 last:mb-0">
-                    <div className="absolute w-3 h-3 bg-primary rounded-full -left-[6.5px] border-2 border-background"></div>
+                    <div className="absolute -left-[6.5px] h-3 w-3 rounded-full border-2 border-background bg-primary"></div>
                     <div className="flex flex-col">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="mb-1 flex items-center gap-2">
                         <Badge
                           variant="outline"
                           className={getStatusColor(event.status)}
@@ -448,7 +448,7 @@ export default function OrderDetailsPage() {
               <Separator />
               <div className="space-y-1 text-sm">
                 <div>
-                  <span className="font-medium">Phone:</span>{" "}
+                  <span className="font-medium">Phone:</span>{' '}
                   {order.shippingAddress.phone}
                 </div>
               </div>
@@ -468,7 +468,7 @@ export default function OrderDetailsPage() {
                 <p className="font-medium">{order.shippingAddress.fullName}</p>
                 <p>{order.shippingAddress.address}</p>
                 <p>
-                  {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                  {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
                   {order.shippingAddress.zipCode}
                 </p>
                 <p>{order.shippingAddress.country}</p>
@@ -476,12 +476,12 @@ export default function OrderDetailsPage() {
               <Separator />
               <div className="space-y-1 text-sm">
                 <div>
-                  <span className="font-medium">Method:</span>{" "}
+                  <span className="font-medium">Method:</span>{' '}
                   {order.shippingMethod}
                 </div>
                 {order.trackingNumber && (
                   <div>
-                    <span className="font-medium">Tracking:</span>{" "}
+                    <span className="font-medium">Tracking:</span>{' '}
                     {order.trackingNumber}
                   </div>
                 )}
@@ -511,9 +511,9 @@ export default function OrderDetailsPage() {
               </div>
               <Separator />
               <div className="space-y-1 text-sm">
-                {order.paymentMethod === "credit_card" && order.cardDetails && (
+                {order.paymentMethod === 'credit_card' && order.cardDetails && (
                   <div>
-                    <span className="font-medium">Card:</span>{" "}
+                    <span className="font-medium">Card:</span>{' '}
                     {order.cardDetails.type} ending in {order.cardDetails.last4}
                   </div>
                 )}
@@ -536,7 +536,7 @@ export default function OrderDetailsPage() {
                   <p className="font-medium">{order.billingAddress.fullName}</p>
                   <p>{order.billingAddress.address}</p>
                   <p>
-                    {order.billingAddress.city}, {order.billingAddress.state}{" "}
+                    {order.billingAddress.city}, {order.billingAddress.state}{' '}
                     {order.billingAddress.zipCode}
                   </p>
                   <p>{order.billingAddress.country}</p>

@@ -1,36 +1,36 @@
-"use client";
+'use client';
 
-import { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, MoreHorizontal } from "lucide-react";
+import { ColumnDef } from '@tanstack/react-table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Eye, MoreHorizontal } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { User } from "@/types";
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
+import { User } from '@/types';
 
 interface CreateUserColumnsProps {
   onStatusUpdate: (
     userId: string,
     currentStatus: string,
-    userName: string,
+    userName: string
   ) => void;
   onDeleteUser?: (userId: string, userName: string) => void;
 }
 
 export const createUserColumns = ({
   onStatusUpdate,
-  onDeleteUser,
+  onDeleteUser
 }: CreateUserColumnsProps): ColumnDef<User>[] => [
   {
-    accessorKey: "name",
-    header: "User",
+    accessorKey: 'name',
+    header: 'User',
     cell: ({ row }) => {
       const user = row.original;
       const formattedDate = new Date(user.createdAt).toLocaleDateString();
@@ -38,7 +38,7 @@ export const createUserColumns = ({
       return (
         <div className="flex items-center gap-3">
           {user.avatar && (
-            <div className="relative h-8 w-8 rounded-full overflow-hidden">
+            <div className="relative h-8 w-8 overflow-hidden rounded-full">
               <img src={user.avatar} alt={user.name} className="object-cover" />
             </div>
           )}
@@ -50,17 +50,17 @@ export const createUserColumns = ({
           </div>
         </div>
       );
-    },
+    }
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: 'email',
+    header: 'Email',
     cell: ({ row }) => {
       const user = row.original;
       return (
         <div className="flex flex-col">
           <span>{user.email}</span>
-          <div className="flex items-center gap-1 mt-1">
+          <div className="mt-1 flex items-center gap-1">
             {user.emailVerified && (
               <Badge variant="outline" className="text-xs">
                 Verified
@@ -69,42 +69,42 @@ export const createUserColumns = ({
           </div>
         </div>
       );
-    },
+    }
   },
   {
-    accessorKey: "phone",
-    header: "Phone",
+    accessorKey: 'phone',
+    header: 'Phone',
     cell: ({ row }) => {
       const user = row.original;
       return (
         <div className="flex flex-col">
-          <span>{user.phone || "N/A"}</span>
+          <span>{user.phone || 'N/A'}</span>
           {user.phone && user.phoneVerified && (
-            <Badge variant="outline" className="text-xs mt-1">
+            <Badge variant="outline" className="mt-1 text-xs">
               Verified
             </Badge>
           )}
         </div>
       );
-    },
+    }
   },
   {
-    accessorKey: "role",
-    header: "Role",
+    accessorKey: 'role',
+    header: 'Role',
     cell: ({ row }) => {
       const user = row.original;
       const getRoleVariant = (role: string) => {
         switch (role) {
-          case "admin":
-            return "destructive";
-          case "moderator":
-            return "default";
-          case "support":
-            return "secondary";
-          case "user":
-            return "outline";
+          case 'admin':
+            return 'destructive';
+          case 'moderator':
+            return 'default';
+          case 'support':
+            return 'secondary';
+          case 'user':
+            return 'outline';
           default:
-            return "outline";
+            return 'outline';
         }
       };
 
@@ -113,16 +113,16 @@ export const createUserColumns = ({
           {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
         </Badge>
       );
-    },
+    }
   },
   {
-    accessorKey: "orders",
-    header: "Orders",
+    accessorKey: 'orders',
+    header: 'Orders',
     cell: ({ row }) => {
       const user = row.original;
       const totalOrders = user.orders?.length || 0;
       const completedOrders =
-        user.orders?.filter((order) => order.status === "delivered").length ||
+        user.orders?.filter((order) => order.status === 'delivered').length ||
         0;
 
       return (
@@ -133,37 +133,37 @@ export const createUserColumns = ({
           </span>
         </div>
       );
-    },
+    }
   },
   {
-    accessorKey: "totalSpent",
-    header: "Total Spent",
+    accessorKey: 'totalSpent',
+    header: 'Total Spent',
     cell: ({ row }) => {
       const user = row.original;
       const totalSpent =
         user.orders?.reduce((sum, order) => sum + order.total, 0) || 0;
 
       return <div className="font-medium">${totalSpent.toFixed(2)}</div>;
-    },
+    }
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: 'status',
+    header: 'Status',
     cell: ({ row }) => {
       const user = row.original;
 
       const getStatusVariant = (status: string) => {
         switch (status) {
-          case "active":
-            return "default";
-          case "inactive":
-            return "secondary";
-          case "suspended":
-            return "destructive";
-          case "pending":
-            return "outline";
+          case 'active':
+            return 'default';
+          case 'inactive':
+            return 'secondary';
+          case 'suspended':
+            return 'destructive';
+          case 'pending':
+            return 'outline';
           default:
-            return "secondary";
+            return 'secondary';
         }
       };
 
@@ -173,22 +173,22 @@ export const createUserColumns = ({
           size="sm"
           onClick={() => onStatusUpdate(user._id, user.status, user.name)}
           className={`h-6 px-2 text-xs capitalize ${
-            user.status === "active"
-              ? "bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900"
-              : user.status === "inactive"
-                ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 hover:text-yellow-900"
-                : user.status === "suspended"
-                  ? "bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900"
-                  : "bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900"
+            user.status === 'active'
+              ? 'bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900'
+              : user.status === 'inactive'
+              ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 hover:text-yellow-900'
+              : user.status === 'suspended'
+              ? 'bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900'
+              : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900'
           }`}
         >
           {user.status}
         </Button>
       );
-    },
+    }
   },
   {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => {
       const user = row.original;
 
@@ -219,7 +219,7 @@ export const createUserColumns = ({
               <DropdownMenuItem
                 onClick={() => onStatusUpdate(user._id, user.status, user.name)}
               >
-                {user.status === "active" ? "Deactivate" : "Activate"} user
+                {user.status === 'active' ? 'Deactivate' : 'Activate'} user
               </DropdownMenuItem>
               {onDeleteUser && (
                 <DropdownMenuItem
@@ -233,6 +233,6 @@ export const createUserColumns = ({
           </DropdownMenu>
         </div>
       );
-    },
-  },
+    }
+  }
 ];

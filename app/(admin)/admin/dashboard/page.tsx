@@ -1,14 +1,27 @@
-"use client"
+'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowDown, ArrowUp, DollarSign, Package, ShoppingCart, Users } from "lucide-react"
-import { Container } from "@/components/ui/container"
-import { useState } from "react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  ArrowDown,
+  ArrowUp,
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Users
+} from 'lucide-react';
+import { Container } from '@/components/ui/container';
+import { useState } from 'react';
 
 export default function AdminDashboard() {
   // Use client-side state instead of server functions
-  const [activeTab, setActiveTab] = useState("overview")
+  const [activeTab, setActiveTab] = useState('overview');
 
   return (
     <Container>
@@ -16,10 +29,16 @@ export default function AdminDashboard() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-2xl font-bold tracking-tight">Dashboard</h2>
-            <p className="text-muted-foreground">Overview of your store's performance and recent activity.</p>
+            <p className="text-muted-foreground">
+              Overview of your store's performance and recent activity.
+            </p>
           </div>
         </div>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-4"
+        >
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -29,12 +48,16 @@ export default function AdminDashboard() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Revenue
+                  </CardTitle>
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">$45,231.89</div>
-                  <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+                  <p className="text-xs text-muted-foreground">
+                    +20.1% from last month
+                  </p>
                 </CardContent>
               </Card>
               <Card>
@@ -52,7 +75,9 @@ export default function AdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Products</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Products
+                  </CardTitle>
                   <Package className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -65,7 +90,9 @@ export default function AdminDashboard() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Customers</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Customers
+                  </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -81,36 +108,38 @@ export default function AdminDashboard() {
               <Card className="col-span-4">
                 <CardHeader>
                   <CardTitle>Revenue Overview</CardTitle>
-                  <CardDescription>Monthly revenue for the current year</CardDescription>
+                  <CardDescription>
+                    Monthly revenue for the current year
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="pl-2">
                   <div className="h-[300px]">
                     <Chart
                       type="bar"
                       data={[
-                        { month: "Jan", revenue: 18000 },
-                        { month: "Feb", revenue: 16000 },
-                        { month: "Mar", revenue: 21000 },
-                        { month: "Apr", revenue: 17000 },
-                        { month: "May", revenue: 23000 },
-                        { month: "Jun", revenue: 25000 },
-                        { month: "Jul", revenue: 28000 },
-                        { month: "Aug", revenue: 24000 },
-                        { month: "Sep", revenue: 30000 },
-                        { month: "Oct", revenue: 29000 },
-                        { month: "Nov", revenue: 32000 },
-                        { month: "Dec", revenue: 34000 },
+                        { month: 'Jan', revenue: 18000 },
+                        { month: 'Feb', revenue: 16000 },
+                        { month: 'Mar', revenue: 21000 },
+                        { month: 'Apr', revenue: 17000 },
+                        { month: 'May', revenue: 23000 },
+                        { month: 'Jun', revenue: 25000 },
+                        { month: 'Jul', revenue: 28000 },
+                        { month: 'Aug', revenue: 24000 },
+                        { month: 'Sep', revenue: 30000 },
+                        { month: 'Oct', revenue: 29000 },
+                        { month: 'Nov', revenue: 32000 },
+                        { month: 'Dec', revenue: 34000 }
                       ]}
                       options={{
-                        xAxis: { dataKey: "month" },
+                        xAxis: { dataKey: 'month' },
                         datasets: [
                           {
-                            dataKey: "revenue",
-                            label: "Revenue",
-                            backgroundColor: "hsl(var(--primary))",
-                            borderRadius: 4,
-                          },
-                        ],
+                            dataKey: 'revenue',
+                            label: 'Revenue',
+                            backgroundColor: 'hsl(var(--primary))',
+                            borderRadius: 4
+                          }
+                        ]
                       }}
                     />
                   </div>
@@ -119,32 +148,34 @@ export default function AdminDashboard() {
               <Card className="col-span-3">
                 <CardHeader>
                   <CardTitle>Top Products</CardTitle>
-                  <CardDescription>Best selling products this month</CardDescription>
+                  <CardDescription>
+                    Best selling products this month
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="h-[300px]">
                     <Chart
                       type="pie"
                       data={[
-                        { name: "T-Shirts", value: 35 },
-                        { name: "Headphones", value: 25 },
-                        { name: "Sneakers", value: 15 },
-                        { name: "Watches", value: 10 },
-                        { name: "Other", value: 15 },
+                        { name: 'T-Shirts', value: 35 },
+                        { name: 'Headphones', value: 25 },
+                        { name: 'Sneakers', value: 15 },
+                        { name: 'Watches', value: 10 },
+                        { name: 'Other', value: 15 }
                       ]}
                       options={{
-                        dataKey: "value",
+                        dataKey: 'value',
                         datasets: [
                           {
                             backgroundColor: [
-                              "hsl(var(--primary))",
-                              "hsl(var(--primary) / 0.8)",
-                              "hsl(var(--primary) / 0.6)",
-                              "hsl(var(--primary) / 0.4)",
-                              "hsl(var(--primary) / 0.2)",
-                            ],
-                          },
-                        ],
+                              'hsl(var(--primary))',
+                              'hsl(var(--primary) / 0.8)',
+                              'hsl(var(--primary) / 0.6)',
+                              'hsl(var(--primary) / 0.4)',
+                              'hsl(var(--primary) / 0.2)'
+                            ]
+                          }
+                        ]
                       }}
                     />
                   </div>
@@ -156,11 +187,15 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Advanced Analytics</CardTitle>
-                <CardDescription>Detailed performance metrics and trends</CardDescription>
+                <CardDescription>
+                  Detailed performance metrics and trends
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[400px] flex items-center justify-center border rounded-md">
-                  <p className="text-muted-foreground">Advanced analytics content will appear here</p>
+                <div className="flex h-[400px] items-center justify-center rounded-md border">
+                  <p className="text-muted-foreground">
+                    Advanced analytics content will appear here
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -169,11 +204,15 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Reports</CardTitle>
-                <CardDescription>Generate and download custom reports</CardDescription>
+                <CardDescription>
+                  Generate and download custom reports
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-[400px] flex items-center justify-center border rounded-md">
-                  <p className="text-muted-foreground">Reports content will appear here</p>
+                <div className="flex h-[400px] items-center justify-center rounded-md border">
+                  <p className="text-muted-foreground">
+                    Reports content will appear here
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -181,8 +220,8 @@ export default function AdminDashboard() {
         </Tabs>
       </div>
     </Container>
-  )
+  );
 }
 
 // Import the Chart component
-import { Chart } from "@/components/ui/chart"
+import { Chart } from '@/components/ui/chart';

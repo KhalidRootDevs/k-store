@@ -3,12 +3,12 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useFormContext } from "react-hook-form";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useFormContext } from 'react-hook-form';
 
 export default function ProductSeo() {
   const { register } = useFormContext();
@@ -27,7 +27,7 @@ export default function ProductSeo() {
           <Input
             id="seo.title"
             placeholder="e.g., Premium T-Shirt - 100% Cotton"
-            {...register("seo.title")}
+            {...register('seo.title')}
           />
           <p className="text-sm text-muted-foreground">
             Leave blank to use product name.
@@ -39,7 +39,7 @@ export default function ProductSeo() {
             id="seo.description"
             placeholder="Brief description for search results..."
             rows={3}
-            {...register("seo.description")}
+            {...register('seo.description')}
           />
           <p className="text-sm text-muted-foreground">
             Recommended length: 120-160 characters.
@@ -50,7 +50,7 @@ export default function ProductSeo() {
           <Input
             id="seo.keywords"
             placeholder="e.g., t-shirt, cotton, premium"
-            {...register("seo.keywords")}
+            {...register('seo.keywords')}
           />
           <p className="text-sm text-muted-foreground">
             Comma-separated keywords.

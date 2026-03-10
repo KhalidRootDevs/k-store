@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from 'react';
 
-type AuthMode = "login" | "register";
+type AuthMode = 'login' | 'register';
 
 interface ModalContextType {
   isLoginModalOpen: boolean;
@@ -16,26 +16,26 @@ interface ModalContextType {
 // Create a default context value
 const defaultModalContext: ModalContextType = {
   isLoginModalOpen: false,
-  authMode: "login",
+  authMode: 'login',
   openLoginModal: () => {},
   openRegisterModal: () => {},
   closeAuthModal: () => {},
-  switchAuthMode: () => {},
+  switchAuthMode: () => {}
 };
 
 const ModalContext = createContext<ModalContextType>(defaultModalContext);
 
 export function ModalProvider({ children }: { children: ReactNode }) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [authMode, setAuthMode] = useState<AuthMode>('login');
 
   const openLoginModal = () => {
-    setAuthMode("login");
+    setAuthMode('login');
     setIsLoginModalOpen(true);
   };
 
   const openRegisterModal = () => {
-    setAuthMode("register");
+    setAuthMode('register');
     setIsLoginModalOpen(true);
   };
 
@@ -51,7 +51,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
         openLoginModal,
         openRegisterModal,
         closeAuthModal,
-        switchAuthMode,
+        switchAuthMode
       }}
     >
       {children}

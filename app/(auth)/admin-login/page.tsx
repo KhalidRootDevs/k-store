@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import AdminLoginForm from "@/components/forms/auth/admin-login-form";
+import AdminLoginForm from '@/components/forms/auth/admin-login-form';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Shield } from "lucide-react";
+  CardTitle
+} from '@/components/ui/card';
+import { Shield } from 'lucide-react';
 
 export default function AdminLogin() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-slate-800/50 backdrop-blur-sm border-slate-700/50 shadow-2xl">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <Card className="w-full max-w-md border-slate-700/50 bg-slate-800/50 shadow-2xl backdrop-blur-sm">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center">
-            <div className="p-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-600">
+            <div className="rounded-full bg-gradient-to-r from-purple-600 to-blue-600 p-3">
               <Shield className="h-8 w-8 text-white" />
             </div>
           </div>
@@ -35,8 +35,8 @@ export default function AdminLogin() {
 
           <div className="text-center">
             <p className="text-sm text-slate-500">
-              Forgot your password?{" "}
-              <button className="text-purple-400 hover:text-purple-300 transition-colors font-medium">
+              Forgot your password?{' '}
+              <button className="font-medium text-purple-400 transition-colors hover:text-purple-300">
                 Reset here
               </button>
             </p>

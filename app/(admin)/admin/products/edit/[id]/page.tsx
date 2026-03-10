@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { ProductForm } from "@/components/forms/product/product-form";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { ProductForm } from '@/components/forms/product/product-form';
+import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface EditProductPageProps {
   params: {
@@ -21,20 +21,20 @@ export default function EditProductPage({ params }: EditProductPageProps) {
     const fetchProduct = async () => {
       try {
         const response = await fetch(`/api/admin/products/${params.id}`, {
-          credentials: "include",
+          credentials: 'include'
         });
 
         if (response.ok) {
           const data = await response.json();
           setProduct(data.product);
         } else if (response.status === 404) {
-          setError("Product not found");
+          setError('Product not found');
         } else {
-          throw new Error("Failed to fetch product");
+          throw new Error('Failed to fetch product');
         }
       } catch (error) {
-        console.error("Error fetching product:", error);
-        setError("Failed to load product");
+        console.error('Error fetching product:', error);
+        setError('Failed to load product');
       } finally {
         setIsLoading(false);
       }
@@ -45,12 +45,12 @@ export default function EditProductPage({ params }: EditProductPageProps) {
 
   const handleSuccess = () => {
     // Redirect to products list after successful update
-    router.push("/admin/products");
+    router.push('/admin/products');
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );

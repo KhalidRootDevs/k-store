@@ -1,25 +1,25 @@
-import { SettingsFormData } from "@/app/(admin)/admin/settings/page";
+import { SettingsFormData } from '@/app/(admin)/admin/settings/page';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { useFormContext } from "react-hook-form";
+  SelectValue
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { useFormContext } from 'react-hook-form';
 
 export default function PaymentMethod({
-  handleBooleanChange,
+  handleBooleanChange
 }: {
   handleBooleanChange: (path: string, value: boolean) => void;
 }) {
@@ -27,7 +27,7 @@ export default function PaymentMethod({
     register,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors }
   } = useFormContext<SettingsFormData>();
   const watchedValues = watch();
 
@@ -44,7 +44,7 @@ export default function PaymentMethod({
           <div className="space-y-4">
             <div className="flex items-center justify-between space-x-2">
               <div className="flex items-center space-x-2">
-                <div className="w-10 h-6 bg-[#3D95CE] rounded flex items-center justify-center text-white text-xs font-bold">
+                <div className="flex h-6 w-10 items-center justify-center rounded bg-[#3D95CE] text-xs font-bold text-white">
                   VISA
                 </div>
                 <Label htmlFor="visa" className="font-medium">
@@ -56,20 +56,20 @@ export default function PaymentMethod({
                 checked={watchedValues.payment?.paymentMethods?.creditCards}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "payment.paymentMethods.creditCards",
+                    'payment.paymentMethods.creditCards',
                     value
                   )
                 }
               />
             </div>
             {watchedValues.payment?.paymentMethods?.creditCards && (
-              <div className="pl-12 space-y-4">
+              <div className="space-y-4 pl-12">
                 <div className="space-y-2">
                   <Label htmlFor="stripe-key">Stripe API Key</Label>
                   <Input
                     id="stripe-key"
                     type="password"
-                    {...register("payment.paymentMethods.stripe.apiKey")}
+                    {...register('payment.paymentMethods.stripe.apiKey')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -77,7 +77,7 @@ export default function PaymentMethod({
                   <Input
                     id="stripe-secret"
                     type="password"
-                    {...register("payment.paymentMethods.stripe.secretKey")}
+                    {...register('payment.paymentMethods.stripe.secretKey')}
                   />
                 </div>
               </div>
@@ -87,7 +87,7 @@ export default function PaymentMethod({
           <div className="space-y-4">
             <div className="flex items-center justify-between space-x-2">
               <div className="flex items-center space-x-2">
-                <div className="w-10 h-6 bg-[#0070BA] rounded flex items-center justify-center text-white text-xs font-bold">
+                <div className="flex h-6 w-10 items-center justify-center rounded bg-[#0070BA] text-xs font-bold text-white">
                   PP
                 </div>
                 <Label htmlFor="paypal" className="font-medium">
@@ -99,19 +99,19 @@ export default function PaymentMethod({
                 checked={watchedValues.payment?.paymentMethods?.paypal?.enabled}
                 onCheckedChange={(value) =>
                   handleBooleanChange(
-                    "payment.paymentMethods.paypal.enabled",
+                    'payment.paymentMethods.paypal.enabled',
                     value
                   )
                 }
               />
             </div>
             {watchedValues.payment?.paymentMethods?.paypal?.enabled && (
-              <div className="pl-12 space-y-4">
+              <div className="space-y-4 pl-12">
                 <div className="space-y-2">
                   <Label htmlFor="paypal-client">PayPal Client ID</Label>
                   <Input
                     id="paypal-client"
-                    {...register("payment.paymentMethods.paypal.clientId")}
+                    {...register('payment.paymentMethods.paypal.clientId')}
                   />
                 </div>
                 <div className="space-y-2">
@@ -119,7 +119,7 @@ export default function PaymentMethod({
                   <Input
                     id="paypal-secret"
                     type="password"
-                    {...register("payment.paymentMethods.paypal.secret")}
+                    {...register('payment.paymentMethods.paypal.secret')}
                   />
                 </div>
               </div>
@@ -128,7 +128,7 @@ export default function PaymentMethod({
 
           <div className="flex items-center justify-between space-x-2">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-6 bg-gray-800 rounded flex items-center justify-center text-white text-xs font-bold">
+              <div className="flex h-6 w-10 items-center justify-center rounded bg-gray-800 text-xs font-bold text-white">
                 COD
               </div>
               <Label htmlFor="cod" className="font-medium">
@@ -140,7 +140,7 @@ export default function PaymentMethod({
               checked={watchedValues.payment?.paymentMethods?.cashOnDelivery}
               onCheckedChange={(value) =>
                 handleBooleanChange(
-                  "payment.paymentMethods.cashOnDelivery",
+                  'payment.paymentMethods.cashOnDelivery',
                   value
                 )
               }
@@ -156,13 +156,13 @@ export default function PaymentMethod({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="currency">Default Currency</Label>
               <Select
                 value={watchedValues.payment?.currency?.defaultCurrency}
                 onValueChange={(value: any) =>
-                  setValue("payment.currency.defaultCurrency", value)
+                  setValue('payment.currency.defaultCurrency', value)
                 }
               >
                 <SelectTrigger id="currency">
@@ -182,7 +182,7 @@ export default function PaymentMethod({
               <Select
                 value={watchedValues.payment?.currency?.currencyFormat}
                 onValueChange={(value: any) =>
-                  setValue("payment.currency.currencyFormat", value)
+                  setValue('payment.currency.currencyFormat', value)
                 }
               >
                 <SelectTrigger id="currency-format">
@@ -219,7 +219,7 @@ export default function PaymentMethod({
               id="enable-tax"
               checked={watchedValues.payment?.tax?.enabled}
               onCheckedChange={(value) =>
-                handleBooleanChange("payment.tax.enabled", value)
+                handleBooleanChange('payment.tax.enabled', value)
               }
             />
           </div>
@@ -231,8 +231,8 @@ export default function PaymentMethod({
                 <Input
                   id="tax-rate"
                   type="number"
-                  {...register("payment.tax.taxRate", {
-                    valueAsNumber: true,
+                  {...register('payment.tax.taxRate', {
+                    valueAsNumber: true
                   })}
                 />
                 {errors.payment?.tax?.taxRate && (
@@ -255,7 +255,7 @@ export default function PaymentMethod({
                   id="prices-include-tax"
                   checked={watchedValues.payment?.tax?.pricesIncludeTax}
                   onCheckedChange={(value) =>
-                    handleBooleanChange("payment.tax.pricesIncludeTax", value)
+                    handleBooleanChange('payment.tax.pricesIncludeTax', value)
                   }
                 />
               </div>

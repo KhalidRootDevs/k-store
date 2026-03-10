@@ -1,74 +1,94 @@
-"use client"
+'use client';
 
-import { useCart } from "@/context/cart-context"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
-import { ChevronLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { useState } from "react"
-import { Container } from "@/components/ui/container"
+import { useCart } from '@/context/cart-context';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { ChevronLeft, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { Container } from '@/components/ui/container';
 
 export default function CartPage() {
-  const { items, updateQuantity, removeItem, subtotal, shipping, tax, total } = useCart()
-  const [promoCode, setPromoCode] = useState("")
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false)
+  const { items, updateQuantity, removeItem, subtotal, shipping, tax, total } =
+    useCart();
+  const [promoCode, setPromoCode] = useState('');
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
   const handleApplyPromo = () => {
-    if (!promoCode) return
+    if (!promoCode) return;
 
-    setIsApplyingPromo(true)
+    setIsApplyingPromo(true);
 
     // Simulate API call to validate promo code
     setTimeout(() => {
-      setIsApplyingPromo(false)
+      setIsApplyingPromo(false);
       // For demo purposes, we'll just show an alert
-      alert(`Promo code "${promoCode}" applied!`)
-    }, 1000)
-  }
+      alert(`Promo code "${promoCode}" applied!`);
+    }, 1000);
+  };
 
   if (items.length === 0) {
     return (
       <Container>
-        <div className="text-center py-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+        <div className="py-12 text-center">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-muted">
             <ShoppingBag className="h-8 w-8 text-muted-foreground" />
           </div>
-          <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">Looks like you haven't added anything to your cart yet.</p>
+          <h2 className="mb-2 text-xl font-semibold">Your cart is empty</h2>
+          <p className="mb-6 text-muted-foreground">
+            Looks like you haven't added anything to your cart yet.
+          </p>
           <Link href="/products">
             <Button>Continue Shopping</Button>
           </Link>
         </div>
       </Container>
-    )
+    );
   }
 
   return (
     <Container>
-      <div className="flex items-center mb-8">
+      <div className="mb-8 flex items-center">
         <h1 className="text-3xl font-bold">Shopping Cart</h1>
-        <span className="ml-2 text-muted-foreground">({items.length} items)</span>
+        <span className="ml-2 text-muted-foreground">
+          ({items.length} items)
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="space-y-4">
             {items.map((item) => (
               <Card key={item.id}>
                 <CardContent className="p-4">
                   <div className="flex gap-4">
-                    <div className="relative h-24 w-24 rounded-md overflow-hidden">
-                      <Image src={item.image || "/placeholder.svg"} alt={item.name} fill className="object-cover" />
+                    <div className="relative h-24 w-24 overflow-hidden rounded-md">
+                      <Image
+                        src={item.image || '/placeholder.svg'}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
                     <div className="flex-1">
                       <div className="flex justify-between">
                         <div>
                           <h3 className="font-semibold">{item.name}</h3>
-                          <p className="text-sm text-muted-foreground">{item.variant}</p>
-                          <p className="font-medium mt-1">${item.price.toFixed(2)}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {item.variant}
+                          </p>
+                          <p className="mt-1 font-medium">
+                            ${item.price.toFixed(2)}
+                          </p>
                         </div>
                         <Button
                           variant="ghost"
@@ -80,30 +100,38 @@ export default function CartPage() {
                           <span className="sr-only">Remove item</span>
                         </Button>
                       </div>
-                      <div className="flex items-center mt-4">
-                        <div className="flex items-center border rounded-md">
+                      <div className="mt-4 flex items-center">
+                        <div className="flex items-center rounded-md border">
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-none"
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity - 1)
+                            }
                             disabled={item.quantity <= 1}
                           >
                             <Minus className="h-3 w-3" />
                             <span className="sr-only">Decrease quantity</span>
                           </Button>
-                          <span className="w-8 text-center text-sm">{item.quantity}</span>
+                          <span className="w-8 text-center text-sm">
+                            {item.quantity}
+                          </span>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 rounded-none"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity + 1)
+                            }
                           >
                             <Plus className="h-3 w-3" />
                             <span className="sr-only">Increase quantity</span>
                           </Button>
                         </div>
-                        <div className="ml-auto font-medium">${(item.price * item.quantity).toFixed(2)}</div>
+                        <div className="ml-auto font-medium">
+                          ${(item.price * item.quantity).toFixed(2)}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -132,18 +160,22 @@ export default function CartPage() {
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                <span>
+                  {shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
                 <span>${tax.toFixed(2)}</span>
               </div>
               <Separator />
-              <div className="flex justify-between font-medium text-lg">
+              <div className="flex justify-between text-lg font-medium">
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
-              <div className="text-xs text-muted-foreground">Taxes calculated at checkout</div>
+              <div className="text-xs text-muted-foreground">
+                Taxes calculated at checkout
+              </div>
             </CardContent>
             <CardFooter>
               <Link href="/checkout" className="w-full">
@@ -155,7 +187,7 @@ export default function CartPage() {
           </Card>
           <Card className="mt-4">
             <CardContent className="p-4">
-              <div className="flex gap-4 items-center">
+              <div className="flex items-center gap-4">
                 <div className="flex-1">
                   <h3 className="font-medium">Have a promo code?</h3>
                 </div>
@@ -167,11 +199,15 @@ export default function CartPage() {
                   value={promoCode}
                   onChange={(e) => setPromoCode(e.target.value)}
                 />
-                <Button variant="outline" onClick={handleApplyPromo} disabled={isApplyingPromo || !promoCode}>
+                <Button
+                  variant="outline"
+                  onClick={handleApplyPromo}
+                  disabled={isApplyingPromo || !promoCode}
+                >
                   {isApplyingPromo ? (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                   ) : (
-                    "Apply"
+                    'Apply'
                   )}
                 </Button>
               </div>
@@ -180,5 +216,5 @@ export default function CartPage() {
         </div>
       </div>
     </Container>
-  )
+  );
 }
