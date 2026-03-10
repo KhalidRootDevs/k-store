@@ -102,7 +102,20 @@ export async function PUT(
       }
 
       // Check for circular references (parent cannot be a descendant)
-      const descendants = await category.getDescendants();
+      const getDescendantsHelper = async (categoryId: any): Promise<any[]> => {
+        const descendants: any[] = [];
+        const children = await Category.find({
+          parentCategoryId: categoryId,
+        });
+        for (const child of children) {
+          descendants.push(child);
+          const childDescendants = await getDescendantsHelper(child._id);
+          descendants.push(...childDescendants);
+        }
+        return descendants;
+      };
+
+      const descendants = await getDescendantsHelper(category._id);
       if (
         descendants.some((d) => d._id.toString() === parentCategoryId.toString())
       ) {
