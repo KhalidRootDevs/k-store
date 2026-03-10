@@ -176,7 +176,7 @@ export function Header() {
         const filtered = allProducts.filter((product) =>
           product.name
             .toLowerCase()
-            .includes(debouncedSearchQuery.toLowerCase())
+            .includes(debouncedSearchQuery.toLowerCase()),
         );
         setSearchResults(filtered.slice(0, 5)); // Limit to 5 results
         setIsSearching(false);
@@ -232,7 +232,7 @@ export function Header() {
               <SheetContent side="left" className="w-[300px] sm:w-[400px]">
                 <div className="flex items-center mb-6">
                   <ShoppingBag className="h-6 w-6 mr-2" />
-                  <span className="font-bold text-xl">K-Store</span>
+                  <span className="font-bold text-xl">Single Vendor</span>
                 </div>
 
                 <nav className="flex flex-col gap-4">
@@ -282,7 +282,7 @@ export function Header() {
             <Link href="/" className="flex items-center">
               <ShoppingBag className="h-6 w-6 mr-2" />
               <span className="font-bold text-xl hidden sm:inline-block">
-                K-Store
+                Single Vendor
               </span>
             </Link>
           </div>
@@ -291,7 +291,7 @@ export function Header() {
           <div
             className={cn(
               "absolute left-0 right-0 mx-auto flex justify-center transition-opacity duration-200",
-              isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+              isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100",
             )}
           >
             <NavigationMenu className="hidden md:flex">
@@ -301,7 +301,9 @@ export function Header() {
                     <NavigationMenuLink
                       className={cn(
                         navigationMenuTriggerStyle(),
-                        isActive("/") ? "text-primary" : "text-muted-foreground"
+                        isActive("/")
+                          ? "text-primary"
+                          : "text-muted-foreground",
                       )}
                     >
                       Home
@@ -438,7 +440,7 @@ export function Header() {
                         navigationMenuTriggerStyle(),
                         isActive("/products")
                           ? "text-primary"
-                          : "text-muted-foreground"
+                          : "text-muted-foreground",
                       )}
                     >
                       Products
@@ -516,7 +518,7 @@ export function Header() {
           <div
             className={cn(
               "absolute left-0 right-0 mx-auto flex justify-center transition-opacity duration-200 z-10",
-              isSearchOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+              isSearchOpen ? "opacity-100" : "opacity-0 pointer-events-none",
             )}
           >
             <div
@@ -609,8 +611,8 @@ export function Header() {
                           onClick={() => {
                             router.push(
                               `/products?q=${encodeURIComponent(
-                                searchQuery.trim()
-                              )}`
+                                searchQuery.trim(),
+                              )}`,
                             );
                             setIsSearchOpen(false);
                             setSearchQuery("");

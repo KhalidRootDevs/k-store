@@ -6,16 +6,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 // This would typically come from an API or CMS
 const defaultAboutContent = {
-  title: "About K-Store",
+  title: "About single vendor",
   subtitle: "Your Trusted Shopping Destination",
   mainContent: `
-    <p>Welcome to K-Store, where shopping meets convenience and quality. Established in 2023, we've quickly grown to become a trusted name in online retail.</p>
+    <p>Welcome to single vendor, where shopping meets convenience and quality. Established in 2023, we've quickly grown to become a trusted name in online retail.</p>
     
     <h2>Our Story</h2>
-    <p>K-Store was founded with a simple mission: to make online shopping easy, enjoyable, and accessible to everyone. What started as a small venture has now grown into a comprehensive e-commerce platform offering thousands of products across multiple categories.</p>
+    <p>single vendor was founded with a simple mission: to make online shopping easy, enjoyable, and accessible to everyone. What started as a small venture has now grown into a comprehensive e-commerce platform offering thousands of products across multiple categories.</p>
     
     <h2>Our Values</h2>
-    <p>At K-Store, we believe in:</p>
+    <p>At single vendor, we believe in:</p>
     <ul>
       <li><strong>Quality:</strong> We carefully curate our product selection to ensure only the best items make it to our store.</li>
       <li><strong>Customer Satisfaction:</strong> Your happiness is our priority. We strive to provide exceptional service at every step.</li>
@@ -24,12 +24,12 @@ const defaultAboutContent = {
     </ul>
     
     <h2>Our Team</h2>
-    <p>Behind K-Store is a dedicated team of professionals passionate about e-commerce and customer service. From our product specialists to our customer support representatives, everyone works together to ensure you have the best shopping experience.</p>
+    <p>Behind single vendor is a dedicated team of professionals passionate about e-commerce and customer service. From our product specialists to our customer support representatives, everyone works together to ensure you have the best shopping experience.</p>
     
     <h2>Looking Forward</h2>
     <p>As we continue to grow, we remain committed to our core values and to bringing you the best products at competitive prices. We're constantly expanding our catalog and improving our services based on your feedback.</p>
     
-    <p>Thank you for choosing K-Store. We look forward to serving you and exceeding your expectations.</p>
+    <p>Thank you for choosing single vendor. We look forward to serving you and exceeding your expectations.</p>
   `,
   updatedAt: "2023-10-15",
 };

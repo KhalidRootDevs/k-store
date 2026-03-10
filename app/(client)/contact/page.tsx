@@ -62,7 +62,7 @@ export default function ContactPage() {
       // Store the contact form submission in localStorage for demo purposes
       // In a real app, this would be sent to a server
       const submissions = JSON.parse(
-        localStorage.getItem("contactSubmissions") || "[]"
+        localStorage.getItem("contactSubmissions") || "[]",
       );
       submissions.push({
         id: Date.now(),
@@ -114,10 +114,10 @@ export default function ContactPage() {
                     <div>
                       <h3 className="font-medium">Email</h3>
                       <p className="text-sm text-muted-foreground">
-                        support@K-Store.com
+                        support@single vendor.com
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        info@K-Store.com
+                        info@single vendor.com
                       </p>
                     </div>
                   </div>

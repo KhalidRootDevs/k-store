@@ -5,8 +5,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Categories | K-Store",
-  description: "Browse all product categories at K-Store",
+  title: "Categories | Single Vendor",
+  description: "Browse all product categories at single vendor",
 };
 
 // Mock category data
