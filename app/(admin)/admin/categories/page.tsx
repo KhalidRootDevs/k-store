@@ -72,7 +72,7 @@ export default function CategoriesPage() {
     status: "all",
   });
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
@@ -114,7 +114,7 @@ export default function CategoriesPage() {
             totalPages: 0,
             hasNext: false,
             hasPrev: false,
-          }
+          },
         );
       } else {
         throw new Error("Failed to fetch categories");
@@ -149,11 +149,11 @@ export default function CategoriesPage() {
 
   const handleDeleteCategory = async (
     categoryId: string,
-    categoryName: string
+    categoryName: string,
   ) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${categoryName}"? This action cannot be undone.`
+        `Are you sure you want to delete "${categoryName}"? This action cannot be undone.`,
       )
     ) {
       return;
@@ -194,7 +194,7 @@ export default function CategoriesPage() {
   const handleToggleStatus = async (
     categoryId: string,
     currentStatus: boolean,
-    categoryName: string
+    categoryName: string,
   ) => {
     try {
       const formData = new FormData();
@@ -268,11 +268,11 @@ export default function CategoriesPage() {
     const maxVisiblePages = 5;
     let startPage = Math.max(
       1,
-      pagination.page - Math.floor(maxVisiblePages / 2)
+      pagination.page - Math.floor(maxVisiblePages / 2),
     );
     let endPage = Math.min(
       pagination.totalPages,
-      startPage + maxVisiblePages - 1
+      startPage + maxVisiblePages - 1,
     );
 
     if (endPage - startPage + 1 < maxVisiblePages) {
@@ -451,68 +451,66 @@ export default function CategoriesPage() {
               </>
             )}
 
-                {/* Pagination */}
-                {pagination.totalPages > 1 && (
-                  <div className="flex items-center justify-between px-4 py-4 border-t">
-                    <div className="text-sm text-muted-foreground">
-                      Page {pagination.page} of {pagination.totalPages}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(1)}
-                        disabled={!pagination.hasPrev}
-                      >
-                        <ChevronsLeft className="h-4 w-4" />
-                        <span className="sr-only">First page</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pagination.page - 1)}
-                        disabled={!pagination.hasPrev}
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                        <span className="sr-only">Previous page</span>
-                      </Button>
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-4 border-t">
+                <div className="text-sm text-muted-foreground">
+                  Page {pagination.page} of {pagination.totalPages}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(1)}
+                    disabled={!pagination.hasPrev}
+                  >
+                    <ChevronsLeft className="h-4 w-4" />
+                    <span className="sr-only">First page</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(pagination.page - 1)}
+                    disabled={!pagination.hasPrev}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span className="sr-only">Previous page</span>
+                  </Button>
 
-                      {/* Page numbers */}
-                      {getPageNumbers().map((pageNum) => (
-                        <Button
-                          key={pageNum}
-                          variant={
-                            pageNum === pagination.page ? "default" : "outline"
-                          }
-                          size="sm"
-                          onClick={() => handlePageChange(pageNum)}
-                        >
-                          {pageNum}
-                        </Button>
-                      ))}
+                  {/* Page numbers */}
+                  {getPageNumbers().map((pageNum) => (
+                    <Button
+                      key={pageNum}
+                      variant={
+                        pageNum === pagination.page ? "default" : "outline"
+                      }
+                      size="sm"
+                      onClick={() => handlePageChange(pageNum)}
+                    >
+                      {pageNum}
+                    </Button>
+                  ))}
 
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pagination.page + 1)}
-                        disabled={!pagination.hasNext}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                        <span className="sr-only">Next page</span>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePageChange(pagination.totalPages)}
-                        disabled={!pagination.hasNext}
-                      >
-                        <ChevronsRight className="h-4 w-4" />
-                        <span className="sr-only">Last page</span>
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(pagination.page + 1)}
+                    disabled={!pagination.hasNext}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                    <span className="sr-only">Next page</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(pagination.totalPages)}
+                    disabled={!pagination.hasNext}
+                  >
+                    <ChevronsRight className="h-4 w-4" />
+                    <span className="sr-only">Last page</span>
+                  </Button>
+                </div>
+              </div>
             )}
           </div>
         </CardContent>
@@ -532,7 +530,7 @@ interface CategoryTreeItemProps {
   onToggleStatus: (
     categoryId: string,
     currentStatus: boolean,
-    categoryName: string
+    categoryName: string,
   ) => void;
   expandedCategories: Set<string>;
   toggleExpanded: (categoryId: string) => void;
@@ -555,7 +553,10 @@ function CategoryTreeItem({
   return (
     <>
       <div className="grid grid-cols-12 gap-4 px-4 py-3 items-center hover:bg-muted/50 transition-colors">
-        <div className="col-span-4 flex items-center gap-2" style={{ paddingLeft }}>
+        <div
+          className="col-span-4 flex items-center gap-2"
+          style={{ paddingLeft }}
+        >
           {hasChildren ? (
             <button
               onClick={onToggleExpand}
