@@ -1,0 +1,8 @@
+# Block committing .env ONLY if it is staged
+git diff --cached --name-only | grep -q '^\.env$' && {
+  echo ".env must not be committed"
+  exit 1
+}
+
+# Format + fix staged files and re-stage them
+npx lint-staged

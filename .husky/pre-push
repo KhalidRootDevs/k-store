@@ -1,0 +1,5 @@
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+echo "$BRANCH" | grep -Eq "^(main|staging|release/.*)$" || exit 0
+
+npm run build
