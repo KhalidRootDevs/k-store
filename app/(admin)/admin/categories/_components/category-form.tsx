@@ -95,7 +95,6 @@ export function CategoryForm({
       try {
         const params = new URLSearchParams({
           limit: "100", // Get up to 100 categories
-          active: "true",
         });
         const response = await fetch(`/api/admin/categories?${params}`, {
           credentials: "include",
@@ -103,9 +102,13 @@ export function CategoryForm({
         if (response.ok) {
           const data = await response.json();
           // Filter out the current category being edited from the list
-          const filtered = data.categories.filter(
-            (cat: Category) => !isEditing || cat._id !== category?._id
-          );
+          const filtered = data.categories.filter((cat: Category) => {
+            // When editing, exclude the current category itself
+            if (isEditing && category && cat._id === category._id) {
+              return false;
+            }
+            return true;
+          });
           setParentCategories(filtered);
         }
       } catch (error) {
@@ -116,17 +119,18 @@ export function CategoryForm({
     };
 
     fetchParentCategories();
-  }, [isEditing, category?._id]);
+  }, []);
 
   // Initialize form with category data when editing
   useEffect(() => {
     if (category && isEditing) {
+      const parentId = category.parentCategoryId ? category.parentCategoryId.toString() : "";
       reset({
         name: category.name,
         description: category.description || "",
         featured: category.featured,
         active: category.active,
-        parentCategoryId: category.parentCategoryId || "",
+        parentCategoryId: parentId,
       });
       setImage(category.image);
     }
