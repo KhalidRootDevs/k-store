@@ -30,6 +30,9 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  ChevronDown,
+  Folder,
+  FolderOpen,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -44,9 +47,11 @@ interface Category {
   featured: boolean;
   active: boolean;
   slug: string;
+  parentCategoryId?: string;
   products?: number;
   createdAt: string;
   updatedAt: string;
+  childrenCount?: number;
 }
 
 interface PaginationInfo {
@@ -66,6 +71,9 @@ export default function CategoriesPage() {
     featured: "all",
     status: "all",
   });
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set()
+  );
   const [pagination, setPagination] = useState<PaginationInfo>({
     page: 1,
     limit: 10,
@@ -231,6 +239,26 @@ export default function CategoriesPage() {
     });
   };
 
+  const toggleExpanded = (categoryId: string) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    });
+  };
+
+  const getChildCategories = (parentId: string): Category[] => {
+    return categories.filter((cat) => cat.parentCategoryId === parentId);
+  };
+
+  const hasChildren = (categoryId: string): boolean => {
+    return categories.some((cat) => cat.parentCategoryId === categoryId);
+  };
+
   const hasActiveFilters =
     searchTerm || filters.featured !== "all" || filters.status !== "all";
 
@@ -366,7 +394,7 @@ export default function CategoriesPage() {
             </div>
           </div>
 
-          {/* Categories Table */}
+          {/* Categories Tree View */}
           <div className="rounded-md border">
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
@@ -391,105 +419,37 @@ export default function CategoriesPage() {
               </div>
             ) : (
               <>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[80px]">Image</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Description
-                      </TableHead>
-                      <TableHead>Slug</TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Featured
-                      </TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {categories.map((category) => (
-                      <TableRow key={category._id}>
-                        <TableCell>
-                          <div className="relative h-10 w-10 rounded-md overflow-hidden">
-                            <Image
-                              src={category.image || "/placeholder.svg"}
-                              alt={category.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {category.name}
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell max-w-[300px] truncate">
-                          {category.description || "No description"}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className="font-mono text-xs"
-                          >
-                            {category.slug}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell">
-                          {category.featured ? (
-                            <Badge variant="secondary">Featured</Badge>
-                          ) : (
-                            <Badge variant="outline">Regular</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              handleToggleStatus(
-                                category._id,
-                                category.active,
-                                category.name
-                              )
-                            }
-                            className={`h-6 px-2 text-xs ${
-                              category.active
-                                ? "bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900"
-                                : "bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900"
-                            }`}
-                          >
-                            {category.active ? "Active" : "Inactive"}
-                          </Button>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-2">
-                            <Link
-                              href={`/admin/categories/edit/${category._id}`}
-                            >
-                              <Button variant="ghost" size="icon">
-                                <Edit className="h-4 w-4" />
-                                <span className="sr-only">Edit</span>
-                              </Button>
-                            </Link>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() =>
-                                handleDeleteCategory(
-                                  category._id,
-                                  category.name
-                                )
-                              }
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
+                {/* Tree View Header */}
+                <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b bg-muted/50 font-medium text-sm">
+                  <div className="col-span-4">Name</div>
+                  <div className="col-span-2 hidden md:block">Slug</div>
+                  <div className="col-span-2 hidden md:block">Featured</div>
+                  <div className="col-span-2 hidden md:block">Status</div>
+                  <div className="col-span-2 text-right">Actions</div>
+                </div>
+
+                {/* Recursively render categories as tree */}
+                <div className="divide-y">
+                  {categories
+                    .filter((cat) => !cat.parentCategoryId) // Only show top-level categories
+                    .map((category) => (
+                      <CategoryTreeItem
+                        key={category._id}
+                        category={category}
+                        level={0}
+                        isExpanded={expandedCategories.has(category._id)}
+                        onToggleExpand={() => toggleExpanded(category._id)}
+                        hasChildren={hasChildren(category._id)}
+                        getChildCategories={getChildCategories}
+                        onDelete={handleDeleteCategory}
+                        onToggleStatus={handleToggleStatus}
+                        expandedCategories={expandedCategories}
+                        toggleExpanded={toggleExpanded}
+                      />
                     ))}
-                  </TableBody>
-                </Table>
+                </div>
+              </>
+            )}
 
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (
@@ -558,5 +518,146 @@ export default function CategoriesPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+interface CategoryTreeItemProps {
+  category: Category;
+  level: number;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+  hasChildren: boolean;
+  getChildCategories: (parentId: string) => Category[];
+  onDelete: (categoryId: string, categoryName: string) => void;
+  onToggleStatus: (
+    categoryId: string,
+    currentStatus: boolean,
+    categoryName: string
+  ) => void;
+  expandedCategories: Set<string>;
+  toggleExpanded: (categoryId: string) => void;
+}
+
+function CategoryTreeItem({
+  category,
+  level,
+  isExpanded,
+  onToggleExpand,
+  hasChildren,
+  getChildCategories,
+  onDelete,
+  onToggleStatus,
+  expandedCategories,
+  toggleExpanded,
+}: CategoryTreeItemProps) {
+  const paddingLeft = level * 24;
+
+  return (
+    <>
+      <div className="grid grid-cols-12 gap-4 px-4 py-3 items-center hover:bg-muted/50 transition-colors">
+        <div className="col-span-4 flex items-center gap-2" style={{ paddingLeft }}>
+          {hasChildren ? (
+            <button
+              onClick={onToggleExpand}
+              className="p-0.5 hover:bg-muted rounded"
+              aria-label="Toggle expand"
+            >
+              {isExpanded ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </button>
+          ) : (
+            <div className="w-5" />
+          )}
+
+          <div className="relative h-8 w-8 rounded overflow-hidden flex-shrink-0">
+            <Image
+              src={category.image || "/placeholder.svg"}
+              alt={category.name}
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <span className="font-medium truncate">{category.name}</span>
+            <span className="text-xs text-muted-foreground hidden sm:block truncate">
+              {category.description || "No description"}
+            </span>
+          </div>
+        </div>
+
+        <div className="col-span-2 hidden md:block">
+          <Badge variant="outline" className="font-mono text-xs">
+            {category.slug}
+          </Badge>
+        </div>
+
+        <div className="col-span-2 hidden md:block">
+          {category.featured ? (
+            <Badge variant="secondary">Featured</Badge>
+          ) : (
+            <Badge variant="outline">Regular</Badge>
+          )}
+        </div>
+
+        <div className="col-span-2 hidden md:block">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() =>
+              onToggleStatus(category._id, category.active, category.name)
+            }
+            className={`h-6 px-2 text-xs ${
+              category.active
+                ? "bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900"
+                : "bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900"
+            }`}
+          >
+            {category.active ? "Active" : "Inactive"}
+          </Button>
+        </div>
+
+        <div className="col-span-2 text-right flex justify-end gap-2">
+          <Link href={`/admin/categories/edit/${category._id}`}>
+            <Button variant="ghost" size="icon">
+              <Edit className="h-4 w-4" />
+              <span className="sr-only">Edit</span>
+            </Button>
+          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onDelete(category._id, category.name)}
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Delete</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Render child categories */}
+      {hasChildren && isExpanded && (
+        <>
+          {getChildCategories(category._id).map((child) => (
+            <CategoryTreeItem
+              key={child._id}
+              category={child}
+              level={level + 1}
+              isExpanded={expandedCategories.has(child._id)}
+              onToggleExpand={() => toggleExpanded(child._id)}
+              hasChildren={getChildCategories(child._id).length > 0}
+              getChildCategories={getChildCategories}
+              onDelete={onDelete}
+              onToggleStatus={onToggleStatus}
+              expandedCategories={expandedCategories}
+              toggleExpanded={toggleExpanded}
+            />
+          ))}
+        </>
+      )}
+    </>
   );
 }

@@ -52,6 +52,7 @@ export async function PUT(
     const featured = formData.get("featured") === "true";
     const active = formData.get("active") === "true";
     const imageFile = formData.get("image") as Blob | null;
+    const parentCategoryId = formData.get("parentCategoryId") as string | null;
 
     const category = await Category.findById(params.id);
     if (!category) {
@@ -72,6 +73,42 @@ export async function PUT(
         return NextResponse.json(
           { error: "Category name already exists" },
           { status: 409 }
+        );
+      }
+    }
+
+    // Validate parent category if provided
+    if (parentCategoryId) {
+      // Check if trying to set as own parent
+      if (parentCategoryId === params.id) {
+        return NextResponse.json(
+          { error: "A category cannot be its own parent" },
+          { status: 400 }
+        );
+      }
+
+      const parentCategory = await Category.findById(parentCategoryId);
+      if (!parentCategory) {
+        return NextResponse.json(
+          { error: "Parent category not found" },
+          { status: 404 }
+        );
+      }
+      if (!parentCategory.active) {
+        return NextResponse.json(
+          { error: "Parent category must be active" },
+          { status: 400 }
+        );
+      }
+
+      // Check for circular references (parent cannot be a descendant)
+      const descendants = await category.getDescendants();
+      if (
+        descendants.some((d) => d._id.toString() === parentCategoryId.toString())
+      ) {
+        return NextResponse.json(
+          { error: "Cannot create circular hierarchy" },
+          { status: 400 }
         );
       }
     }
@@ -104,6 +141,12 @@ export async function PUT(
         image: imageUrl,
         featured,
         active,
+        ...(parentCategoryId !== null && {
+          parentCategoryId:
+            parentCategoryId === "" || parentCategoryId === "null"
+              ? null
+              : parentCategoryId,
+        }),
       },
       { new: true, runValidators: true }
     );
@@ -146,6 +189,21 @@ export async function DELETE(
       return NextResponse.json(
         { error: "Category not found" },
         { status: 404 }
+      );
+    }
+
+    // Check if category has children
+    const childrenCount = await Category.countDocuments({
+      parentCategoryId: params.id,
+    });
+
+    if (childrenCount > 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Cannot delete category with subcategories. Please move or delete subcategories first.",
+        },
+        { status: 400 }
       );
     }
 

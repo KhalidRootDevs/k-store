@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
     const featured = searchParams.get("featured");
     const active = searchParams.get("active");
     const topCategories = searchParams.get("topCategories"); // New parameter
+    const hierarchical = searchParams.get("hierarchical") === "true"; // New parameter for nested response
+    const parentId = searchParams.get("parentId"); // New parameter to filter by parent
 
     // Build query
     const query: any = {};
@@ -43,14 +45,50 @@ export async function GET(request: NextRequest) {
       query.active = true;
     }
 
+    // Filter by parent category if provided
+    if (parentId) {
+      query.parentCategoryId = parentId;
+    }
+
+    // If hierarchical response is requested, only get top-level categories
+    if (hierarchical && !parentId) {
+      query.parentCategoryId = null;
+    }
+
     const skip = (page - 1) * limit;
 
     // Get categories with pagination
-    const categories = await Category.find(query)
+    let categories = await Category.find(query)
       .sort({ order: 1, createdAt: -1 }) // Sort by order field if you have one
       .skip(skip)
       .limit(limit)
       .select("-__v");
+
+    // If hierarchical response is requested, build nested structure
+    if (hierarchical) {
+      const buildHierarchy = async (parentCategories: any[]) => {
+        const withChildren = await Promise.all(
+          parentCategories.map(async (cat) => {
+            const children = await Category.find({
+              parentCategoryId: cat._id,
+            })
+              .sort({ order: 1, createdAt: -1 })
+              .select("-__v");
+
+            const childrenWithNested = await buildHierarchy(children);
+
+            return {
+              ...cat.toObject(),
+              children: childrenWithNested,
+              childrenCount: children.length,
+            };
+          })
+        );
+        return withChildren;
+      };
+
+      categories = await buildHierarchy(categories);
+    }
 
     const total = await Category.countDocuments(query);
     const totalPages = Math.ceil(total / limit);
