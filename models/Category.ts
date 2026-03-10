@@ -68,8 +68,19 @@ categorySchema.pre<ICategory>("save", async function (next) {
   }
 
   // Check for circular references (parent cannot be a descendant)
-  if (this.parentCategoryId) {
-    const descendants = await this.getDescendants();
+  if (this.parentCategoryId && this._id) {
+    const descendants: ICategory[] = [];
+    const getDescendantsHelper = async (categoryId: any): Promise<void> => {
+      const children = await mongoose.models.Category.find({
+        parentCategoryId: categoryId,
+      });
+      for (const child of children) {
+        descendants.push(child);
+        await getDescendantsHelper(child._id);
+      }
+    };
+
+    await getDescendantsHelper(this._id);
     const descendantIds = descendants.map((d) => d._id.toString());
     if (descendantIds.includes(this.parentCategoryId.toString())) {
       throw new Error("Cannot create circular hierarchy");
