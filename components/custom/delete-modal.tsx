@@ -7,8 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CustomDeleteModalProps } from "@/lib/types";
+
 import { Button } from "../ui/button";
+import { CustomDeleteModalProps } from "@/types";
 
 export default function DeleteModal({
   open,

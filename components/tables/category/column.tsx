@@ -7,21 +7,7 @@ import { Edit, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { DataTableColumnHeader } from "../data-table-column-header";
-
-interface Category {
-  _id: string;
-  name: string;
-  description: string;
-  image: string;
-  featured: boolean;
-  active: boolean;
-  slug: string;
-  parentId?: { _id: string; name: string } | null;
-  products?: number;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Category } from "@/types";
 
 interface CategoryActionsProps {
   category: Category;
@@ -56,7 +42,7 @@ function CategoryActions({
 
 export const createCategoryColumns = (
   onDelete: (id: string) => void,
-  onToggleStatus: (id: string, currentStatus: boolean, name: string) => void
+  onToggleStatus: (id: string, currentStatus: boolean, name: string) => void,
 ): ColumnDef<Category>[] => [
   {
     accessorKey: "image",
@@ -145,7 +131,7 @@ export const createCategoryColumns = (
           onToggleStatus(
             row.original._id,
             row.original.active,
-            row.original.name
+            row.original.name,
           )
         }
         className={`h-6 px-2 text-xs ${

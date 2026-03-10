@@ -1,31 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Product } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  images: string[];
-  categoryId: {
-    _id: string;
-    name: string;
-    slug: string;
-  };
-  featured: boolean;
-  rating: number;
-  reviewCount: number;
-  salesCount: number;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
 async function getProducts(
-  type: "featured" | "best-selling" | "top-rated" | "new-arrivals"
+  type: "featured" | "best-selling" | "top-rated" | "new-arrivals",
 ): Promise<Product[]> {
   try {
     const response = await fetch(
@@ -35,7 +15,7 @@ async function getProducts(
           revalidate: 3600, // Revalidate every hour
           tags: ["products"],
         },
-      }
+      },
     );
 
     if (!response.ok) {
@@ -277,7 +257,7 @@ export async function ProductGrid({
       {displayProducts.map((product) => {
         const discount = calculateDiscount(
           product.price,
-          product.compareAtPrice
+          product.compareAtPrice,
         );
         const isNew = isNewProduct(product.createdAt);
 

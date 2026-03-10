@@ -14,15 +14,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useSearchParams, useRouter } from "next/navigation";
 import { DataTable } from "@/components/tables/data-table";
 import { createOrderColumns, Order } from "@/components/tables/order/columns";
-
-interface PaginationInfo {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
+import { PaginationInfo } from "@/types";
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -82,7 +74,7 @@ export default function OrdersPage() {
               totalPages: 0,
               hasNext: false,
               hasPrev: false,
-            }
+            },
           );
         } else {
           throw new Error("Failed to fetch orders");
@@ -100,7 +92,7 @@ export default function OrdersPage() {
         isFetchingRef.current = false;
       }
     },
-    [searchTerm, statusFilter, paymentFilter]
+    [searchTerm, statusFilter, paymentFilter],
   );
 
   useEffect(() => {
@@ -115,7 +107,7 @@ export default function OrdersPage() {
   const handleStatusUpdate = async (
     orderId: string,
     currentStatus: string,
-    orderNumber: string
+    orderNumber: string,
   ) => {
     // Implement order status update logic here
     toast({
@@ -127,7 +119,7 @@ export default function OrdersPage() {
   const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
     if (
       !confirm(
-        `Are you sure you want to cancel order "${orderNumber}"? This action cannot be undone.`
+        `Are you sure you want to cancel order "${orderNumber}"? This action cannot be undone.`,
       )
     ) {
       return;

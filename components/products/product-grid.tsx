@@ -1,27 +1,14 @@
-import { ProductCard } from "@/components/product-card"
-
-interface Product {
-  id: number
-  name: string
-  price: number
-  discount?: number
-  image: string
-  category: string
-  brand: string
-  rating: number
-  isBestSeller?: boolean
-  isNew?: boolean
-  dateAdded: string
-}
+import { ProductCard } from "@/components/product-card";
+import { Product } from "@/types";
 
 interface Category {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 interface ProductGridProps {
-  products: Product[]
-  categories: Category[]
+  products: Product[];
+  categories: Category[];
 }
 
 export function ProductGrid({ products, categories }: ProductGridProps) {
@@ -33,5 +20,5 @@ export function ProductGrid({ products, categories }: ProductGridProps) {
         </div>
       ))}
     </div>
-  )
+  );
 }

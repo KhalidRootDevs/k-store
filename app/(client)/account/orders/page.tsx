@@ -29,24 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface Order {
-  _id: string;
-  orderNumber: string;
-  createdAt: string;
-  status:
-    | "pending"
-    | "processing"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  total: number;
-  items: Array<{
-    quantity: number;
-  }>;
-  trackingNumber?: string;
-}
+import { Order } from "@/types";
 
 const getStatusColor = (status: string) => {
   switch (status) {

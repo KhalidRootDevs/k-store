@@ -10,154 +10,22 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
+import { SettingsFormData, settingsSchema } from "@/lib/validations/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Save } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { z } from "zod";
-
-// Updated Zod Schema with Cloudinary
-const settingsSchema = z.object({
-  general: z.object({
-    storeInfo: z.object({
-      storeName: z.string().min(1, "Store name is required"),
-      storeEmail: z.string().email("Invalid email address"),
-      storePhone: z.string().min(1, "Phone number is required"),
-      storeAddress: z.string().min(1, "Address is required"),
-    }),
-    seo: z.object({
-      metaTitle: z.string().min(1, "Meta title is required"),
-      metaDescription: z.string().min(1, "Meta description is required"),
-      metaKeywords: z.string().min(1, "Meta keywords are required"),
-    }),
-    socialMedia: z.object({
-      facebook: z.string().url("Invalid URL").or(z.literal("")),
-      instagram: z.string().url("Invalid URL").or(z.literal("")),
-      twitter: z.string().url("Invalid URL").or(z.literal("")),
-      youtube: z.string().url("Invalid URL").or(z.literal("")),
-    }),
-  }),
-  payment: z.object({
-    paymentMethods: z.object({
-      creditCards: z.boolean(),
-      stripe: z.object({
-        apiKey: z.string().optional(),
-        secretKey: z.string().optional(),
-      }),
-      paypal: z.object({
-        enabled: z.boolean(),
-        clientId: z.string().optional(),
-        secret: z.string().optional(),
-      }),
-      cashOnDelivery: z.boolean(),
-    }),
-    currency: z.object({
-      defaultCurrency: z.enum(["usd", "eur", "gbp", "cad", "aud"]),
-      currencyFormat: z.enum(["symbol", "code", "symbol-code"]),
-    }),
-    tax: z.object({
-      enabled: z.boolean(),
-      taxRate: z.number().min(0).max(100),
-      pricesIncludeTax: z.boolean(),
-    }),
-  }),
-  shipping: z.object({
-    methods: z.object({
-      freeShipping: z.object({
-        enabled: z.boolean(),
-        minimumAmount: z.number().min(0),
-      }),
-      flatRate: z.object({
-        enabled: z.boolean(),
-        cost: z.number().min(0),
-      }),
-      expressShipping: z.object({
-        enabled: z.boolean(),
-        cost: z.number().min(0),
-      }),
-    }),
-    options: z.object({
-      shippingCalculator: z.boolean(),
-      internationalShipping: z.boolean(),
-      shippingOrigin: z.string().min(1, "Shipping origin is required"),
-    }),
-  }),
-  email: z.object({
-    provider: z.object({
-      service: z.enum(["smtp", "sendgrid", "mailchimp", "aws-ses"]),
-      smtp: z
-        .object({
-          host: z.string().min(1, "SMTP host is required").optional(),
-          port: z.number().min(1).max(65535).optional(),
-          security: z.enum(["none", "ssl", "tls"]).optional(),
-          username: z.string().optional(),
-          password: z.string().optional(),
-        })
-        .optional(),
-    }),
-    notifications: z.object({
-      orderConfirmation: z.boolean(),
-      shippingConfirmation: z.boolean(),
-      orderCanceled: z.boolean(),
-      customerAccount: z.boolean(),
-      passwordReset: z.boolean(),
-      abandonedCart: z.boolean(),
-    }),
-  }),
-  cms: z.object({
-    termsAndConditions: z
-      .string()
-      .min(1, "Terms and conditions content is required"),
-    privacyPolicy: z.string().min(1, "Privacy policy content is required"),
-    returnPolicy: z.string().min(1, "Return policy content is required"),
-    aboutUs: z.string().min(1, "About us content is required"),
-    faq: z.string().min(1, "FAQ content is required"),
-  }),
-  advanced: z.object({
-    analytics: z.object({
-      googleAnalyticsId: z.string().optional(),
-      facebookPixelId: z.string().optional(),
-      enabled: z.boolean(),
-    }),
-    api: z.object({
-      apiKey: z.string().min(1, "API key is required"),
-      webhookUrl: z.string().url("Invalid URL").or(z.literal("")),
-      webhooksEnabled: z.boolean(),
-    }),
-    cloudinary: z.object({
-      cloudName: z.string().min(1, "Cloud name is required"),
-      apiKey: z.string().min(1, "API key is required"),
-      apiSecret: z.string().min(1, "API secret is required"),
-      uploadPreset: z.string().optional(),
-      secure: z.boolean(),
-      folder: z.string().min(1, "Folder is required"),
-    }),
-    performance: z.object({
-      pageCaching: z.boolean(),
-      cacheDuration: z.number().min(1),
-      imageOptimization: z.boolean(),
-      minifyAssets: z.boolean(),
-    }),
-    maintenance: z.object({
-      enabled: z.boolean(),
-      message: z.string().min(1, "Maintenance message is required"),
-      allowAdminAccess: z.boolean(),
-    }),
-  }),
-});
-
-export type SettingsFormData = z.infer<typeof settingsSchema>;
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState("general");
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [logo, setLogo] = useState<string | null>(
-    "/placeholder.svg?height=100&width=200"
+    "/placeholder.svg?height=100&width=200",
   );
   const [favicon, setFavicon] = useState<string | null>(
-    "/placeholder.svg?height=32&width=32"
+    "/placeholder.svg?height=32&width=32",
   );
 
   const methods = useForm<SettingsFormData>({
@@ -561,7 +429,7 @@ export default function SettingsPage() {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || `Failed to save ${section} settings`
+          errorData.error || `Failed to save ${section} settings`,
         );
       }
 

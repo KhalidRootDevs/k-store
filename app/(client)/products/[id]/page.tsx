@@ -18,64 +18,7 @@ import { WishlistButton } from "@/components/wishlist-button";
 import { RecentlyViewed } from "@/components/recently-viewed";
 import { ProductRecommendations } from "@/components/product-recommendations";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  cost?: number;
-  sku?: string;
-  barcode?: string;
-  categoryId: {
-    _id: string;
-    name: string;
-    slug: string;
-  };
-  tags: string[];
-  stock: number;
-  weight?: number;
-  length?: number;
-  width?: number;
-  height?: number;
-  brand?: string;
-  active: boolean;
-  featured: boolean;
-  rating: number;
-  reviewCount: number;
-  salesCount: number;
-  variants: Array<{
-    sku?: string;
-    attributes: Record<string, string>;
-    price?: number;
-    stock?: number;
-    image?: string;
-  }>;
-  seo: {
-    title?: string;
-    description?: string;
-    keywords?: string;
-  };
-  images: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Review {
-  id: string;
-  user: string;
-  rating: number;
-  comment: string;
-  date: string;
-}
-
-interface GroupedVariant {
-  name: string;
-  options: string[];
-  hasPriceVariation: boolean;
-  hasStockVariation: boolean;
-}
+import { GroupedVariant, Product, Review } from "@/types";
 
 // Mock reviews data (you can replace this with an API later)
 const mockReviews: Review[] = [
@@ -164,8 +107,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
     return product.variants.find((variant) =>
       Object.entries(selectedOptions).every(
-        ([key, value]) => variant.attributes[key] === value
-      )
+        ([key, value]) => variant.attributes[key] === value,
+      ),
     );
   }, [product?.variants, selectedOptions]);
 
@@ -244,8 +187,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     const validVariants =
       product?.variants.filter((variant) =>
         currentAttributes.every(
-          (key) => newSelectedOptions[key] === variant.attributes[key]
-        )
+          (key) => newSelectedOptions[key] === variant.attributes[key],
+        ),
       ) || [];
 
     // Find which attributes are still valid

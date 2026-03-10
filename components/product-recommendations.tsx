@@ -13,26 +13,7 @@ import { useCart } from "@/context/cart-context";
 import { WishlistButton } from "@/components/wishlist-button";
 import { toast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  images: string[];
-  categoryId: {
-    _id: string;
-    name: string;
-    slug: string;
-  };
-  rating: number;
-  reviewCount: number;
-  salesCount: number;
-  featured: boolean;
-  active: boolean;
-  createdAt: string;
-}
+import { Product } from "@/types";
 
 interface ProductRecommendationsProps {
   productId: string;
@@ -55,7 +36,7 @@ export function ProductRecommendations({
       try {
         setLoading(true);
         const response = await fetch(
-          `/api/products/${productId}/related?limit=4`
+          `/api/products/${productId}/related?limit=4`,
         );
 
         if (!response.ok) {
@@ -71,7 +52,7 @@ export function ProductRecommendations({
         // Fallback: Fetch featured products if related products fail
         try {
           const fallbackResponse = await fetch(
-            "/api/products?type=featured&limit=4"
+            "/api/products?type=featured&limit=4",
           );
           if (fallbackResponse.ok) {
             const fallbackData = await fallbackResponse.json();
@@ -167,7 +148,7 @@ export function ProductRecommendations({
         {recommendedProducts.map((product) => {
           const discount = calculateDiscount(
             product.price,
-            product.compareAtPrice
+            product.compareAtPrice,
           );
           const isNew = isNewProduct(product.createdAt);
           const isBestSeller = product.salesCount > 100;

@@ -33,19 +33,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useAuth } from "@/context/auth-context";
-
-interface Address {
-  _id: string;
-  label: string;
-  fullName: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  phone: string;
-  isDefault: boolean;
-}
+import { Address } from "@/types";
 
 export default function AddressesPage() {
   const { user } = useAuth();
@@ -155,8 +143,8 @@ export default function AddressesPage() {
         const data = await response.json();
         setAddresses((prev) =>
           prev.map((addr) =>
-            addr._id === editingAddress._id ? data.address : addr
-          )
+            addr._id === editingAddress._id ? data.address : addr,
+          ),
         );
         setIsDialogOpen(false);
         setEditingAddress(null);
@@ -194,7 +182,7 @@ export default function AddressesPage() {
 
       if (response.ok) {
         setAddresses((prev) =>
-          prev.filter((addr) => addr._id !== addressToDelete._id)
+          prev.filter((addr) => addr._id !== addressToDelete._id),
         );
         setIsDeleteDialogOpen(false);
         setAddressToDelete(null);
@@ -238,7 +226,7 @@ export default function AddressesPage() {
           prev.map((addr) => ({
             ...addr,
             isDefault: addr._id === id,
-          }))
+          })),
         );
         toast({
           title: "Default address updated",

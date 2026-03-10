@@ -9,23 +9,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/auth-context";
 import { useModal } from "@/context/modal-context";
+import { LoginFormValues, loginSchema } from "@/lib/validations/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: "Email is required" })
-    .email({ message: "Please enter a valid email address" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function UserLoginForm() {
   const { login } = useAuth();
@@ -72,7 +60,7 @@ export default function UserLoginForm() {
   };
 
   const handleSocialLogin = async (
-    provider: "google" | "facebook" | "apple"
+    provider: "google" | "facebook" | "apple",
   ) => {
     setIsLoading(true);
     setError(null);

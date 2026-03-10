@@ -13,42 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-
-export interface User {
-  _id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  avatar?: string;
-  role: "user" | "admin" | "moderator" | "support";
-  status: "active" | "inactive" | "suspended" | "pending";
-  orders: Array<{
-    orderId: string;
-    orderNumber: string;
-    date: string;
-    total: number;
-    status: string;
-    items: number;
-    paymentStatus: string;
-  }>;
-  notes: Array<{
-    content: string;
-    createdBy: string;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  lastLogin?: string;
-  emailVerified: boolean;
-  phoneVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import { User } from "@/types";
 
 interface CreateUserColumnsProps {
   onStatusUpdate: (
     userId: string,
     currentStatus: string,
-    userName: string
+    userName: string,
   ) => void;
   onDeleteUser?: (userId: string, userName: string) => void;
 }
@@ -205,10 +176,10 @@ export const createUserColumns = ({
             user.status === "active"
               ? "bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900"
               : user.status === "inactive"
-              ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 hover:text-yellow-900"
-              : user.status === "suspended"
-              ? "bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900"
-              : "bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900"
+                ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 hover:text-yellow-900"
+                : user.status === "suspended"
+                  ? "bg-red-100 text-red-800 hover:bg-red-200 hover:text-red-900"
+                  : "bg-gray-100 text-gray-800 hover:bg-gray-200 hover:text-gray-900"
           }`}
         >
           {user.status}

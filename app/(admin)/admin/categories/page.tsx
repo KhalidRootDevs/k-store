@@ -17,30 +17,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-
-interface Category {
-  _id: string;
-  name: string;
-  description: string;
-  image: string;
-  featured: boolean;
-  active: boolean;
-  slug: string;
-  parentId?: { _id: string; name: string } | null;
-  products?: number;
-  order: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface PaginationInfo {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
+import { Category, PaginationInfo } from "@/types";
 
 export default function CategoriesPage() {
   const searchParams = useSearchParams();
@@ -114,7 +91,7 @@ export default function CategoriesPage() {
               totalPages: 0,
               hasNext: false,
               hasPrev: false,
-            }
+            },
           );
         } else {
           throw new Error("Failed to fetch categories");
@@ -131,7 +108,7 @@ export default function CategoriesPage() {
         isFetchingRef.current = false;
       }
     },
-    [searchTerm, featuredFilter, statusFilter]
+    [searchTerm, featuredFilter, statusFilter],
   );
 
   useEffect(() => {
@@ -179,7 +156,7 @@ export default function CategoriesPage() {
   const handleToggleStatus = async (
     categoryId: string,
     currentStatus: boolean,
-    categoryName: string
+    categoryName: string,
   ) => {
     try {
       const formData = new FormData();

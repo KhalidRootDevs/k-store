@@ -1,52 +1,60 @@
-"use client"
+"use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Minus, Plus, ShoppingCart, X } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { useState } from "react"
-import { useCart } from "@/context/cart-context"
-import { WishlistButton } from "@/components/wishlist-button"
-import { toast } from "@/components/ui/use-toast"
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Minus, Plus, ShoppingCart, X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { useCart } from "@/context/cart-context";
+import { WishlistButton } from "@/components/wishlist-button";
+import { toast } from "@/components/ui/use-toast";
 
 interface ProductQuickViewProps {
   product: {
-    id: number
-    name: string
-    price: number
-    discount?: number
-    image: string
-    category: string
-    description?: string
-    rating?: number
-    isNew?: boolean
-    isBestSeller?: boolean
-  }
-  isOpen: boolean
-  onClose: () => void
+    id: number;
+    name: string;
+    price: number;
+    discount?: number;
+    image: string;
+    category: string;
+    description?: string;
+    rating?: number;
+    isNew?: boolean;
+    isBestSeller?: boolean;
+  };
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewProps) {
-  const { addItem } = useCart()
-  const [quantity, setQuantity] = useState(1)
-  const [activeImage, setActiveImage] = useState(0)
-  const [isAddingToCart, setIsAddingToCart] = useState(false)
+export function ProductQuickView({
+  product,
+  isOpen,
+  onClose,
+}: ProductQuickViewProps) {
+  const { addItem } = useCart();
+  const [quantity, setQuantity] = useState(1);
+  const [activeImage, setActiveImage] = useState(0);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Mock multiple images
-  const images = [product.image, "/placeholder.svg?height=600&width=600", "/placeholder.svg?height=600&width=600"]
+  const images = [
+    product.image,
+    "/placeholder.svg?height=600&width=600",
+    "/placeholder.svg?height=600&width=600",
+  ];
 
   const increaseQuantity = () => {
-    setQuantity((prev) => Math.min(prev + 1, 10))
-  }
+    setQuantity((prev) => Math.min(prev + 1, 10));
+  };
 
   const decreaseQuantity = () => {
-    setQuantity((prev) => Math.max(prev - 1, 1))
-  }
+    setQuantity((prev) => Math.max(prev - 1, 1));
+  };
 
   const handleAddToCart = () => {
-    setIsAddingToCart(true)
+    setIsAddingToCart(true);
 
     // Simulate a slight delay for better UX
     setTimeout(() => {
@@ -54,21 +62,23 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
         id: Date.now(),
         productId: product.id,
         name: product.name,
-        price: product.discount ? product.price * (1 - product.discount / 100) : product.price,
+        price: product.discount
+          ? product.price * (1 - product.discount / 100)
+          : product.price,
         quantity,
         image: product.image,
         variant: "Default",
-      })
+      });
 
       toast({
         title: "Added to cart",
         description: `${quantity} × ${product.name} has been added to your cart.`,
-      })
+      });
 
-      setIsAddingToCart(false)
-      onClose()
-    }, 600)
-  }
+      setIsAddingToCart(false);
+      onClose();
+    }, 600);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -97,12 +107,20 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
               />
 
               {product.discount && product.discount > 0 && (
-                <Badge className="absolute top-2 right-2 bg-red-500">{product.discount}% OFF</Badge>
+                <Badge className="absolute top-2 right-2 bg-red-500">
+                  {product.discount}% OFF
+                </Badge>
               )}
 
-              {product.isNew && <Badge className="absolute top-2 left-2">New</Badge>}
+              {product.isNew && (
+                <Badge className="absolute top-2 left-2">New</Badge>
+              )}
 
-              {product.isBestSeller && <Badge className="absolute bottom-2 left-2 bg-amber-500">Best Seller</Badge>}
+              {product.isBestSeller && (
+                <Badge className="absolute bottom-2 left-2 bg-amber-500">
+                  Best Seller
+                </Badge>
+              )}
             </div>
 
             {/* Thumbnail Navigation */}
@@ -124,7 +142,9 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
           {/* Product Details */}
           <div className="p-6 flex flex-col">
             <div className="mb-2">
-              <p className="text-sm text-muted-foreground">{product.category}</p>
+              <p className="text-sm text-muted-foreground">
+                {product.category}
+              </p>
               <h2 className="text-2xl font-bold mt-1">{product.name}</h2>
             </div>
 
@@ -146,7 +166,9 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
                       />
                     </svg>
                   ))}
-                  <span className="ml-1 text-sm text-muted-foreground">({product.rating})</span>
+                  <span className="ml-1 text-sm text-muted-foreground">
+                    ({product.rating})
+                  </span>
                 </div>
               )}
             </div>
@@ -157,10 +179,14 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
                   <span className="text-2xl font-bold">
                     ${(product.price * (1 - product.discount / 100)).toFixed(2)}
                   </span>
-                  <span className="text-lg text-muted-foreground line-through">${product.price.toFixed(2)}</span>
+                  <span className="text-lg text-muted-foreground line-through">
+                    ${product.price.toFixed(2)}
+                  </span>
                 </div>
               ) : (
-                <span className="text-2xl font-bold">${product.price.toFixed(2)}</span>
+                <span className="text-2xl font-bold">
+                  ${product.price.toFixed(2)}
+                </span>
               )}
             </div>
 
@@ -186,7 +212,12 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
                     <span className="sr-only">Decrease quantity</span>
                   </Button>
                   <span className="w-8 text-center text-sm">{quantity}</span>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={increaseQuantity}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-full"
+                    onClick={increaseQuantity}
+                  >
                     <Plus className="h-3 w-3" />
                     <span className="sr-only">Increase quantity</span>
                   </Button>
@@ -194,7 +225,11 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
               </div>
 
               <div className="flex gap-2">
-                <Button className="flex-1" onClick={handleAddToCart} disabled={isAddingToCart}>
+                <Button
+                  className="flex-1"
+                  onClick={handleAddToCart}
+                  disabled={isAddingToCart}
+                >
                   {isAddingToCart ? (
                     <div className="flex items-center">
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
@@ -208,7 +243,11 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
                   )}
                 </Button>
 
-                <WishlistButton product={product} variant="default" className="flex-1" />
+                <WishlistButton
+                  product={product}
+                  variant="default"
+                  className="flex-1"
+                />
               </div>
 
               <div className="pt-4">
@@ -225,5 +264,5 @@ export function ProductQuickView({ product, isOpen, onClose }: ProductQuickViewP
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

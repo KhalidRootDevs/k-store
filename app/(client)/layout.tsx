@@ -1,17 +1,8 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { Category } from "@/types";
 import type { Metadata } from "next";
 import type React from "react";
-
-interface Category {
-  _id: string;
-  name: string;
-  image: string;
-  description: string;
-  slug: string;
-  featured: boolean;
-  active: boolean;
-}
 
 export const metadata: Metadata = {
   title: "E-Commerce Platform",

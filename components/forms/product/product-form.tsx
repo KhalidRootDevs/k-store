@@ -9,109 +9,14 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import { z } from "zod";
 import ProductAdditionalImage from "./product-additional-image";
 import ProductBasicInfo from "./product-basic-info";
 import ProductMainImage from "./product-main-image";
 import ProductSeo from "./product-seo";
 import ProductShippingInfo from "./product-shipping-Info";
 import ProductVariant from "./product-variant";
-
-const productSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: "Product name must be at least 2 characters" }),
-  description: z
-    .string()
-    .min(10, { message: "Description must be at least 10 characters" }),
-  price: z.coerce
-    .number()
-    .positive({ message: "Price must be a positive number" }),
-  compareAtPrice: z.coerce.number().positive().optional().nullable(),
-  cost: z.coerce.number().positive().optional().nullable(),
-  sku: z.string().optional(),
-  barcode: z.string().optional(),
-  categoryId: z.string({ required_error: "Please select a category" }),
-  tags: z.array(z.string()).optional(),
-  stock: z.coerce
-    .number()
-    .int()
-    .nonnegative({ message: "Stock must be a non-negative integer" }),
-  weight: z.coerce.number().positive().optional().nullable(),
-  length: z.coerce.number().positive().optional().nullable(),
-  width: z.coerce.number().positive().optional().nullable(),
-  height: z.coerce.number().positive().optional().nullable(),
-  brand: z.string().optional(),
-  active: z.boolean().default(true).optional(),
-  featured: z.boolean().default(true).optional(),
-  variants: z
-    .array(
-      z.object({
-        sku: z.string().optional(),
-        attributes: z
-          .record(z.string())
-          .refine((attrs) => Object.keys(attrs).length > 0, {
-            message: "At least one attribute is required",
-          }),
-        price: z.coerce.number().positive().optional().nullable(),
-        stock: z.coerce.number().int().nonnegative().optional().nullable(),
-        image: z.string().optional(),
-      })
-    )
-    .optional(),
-  seo: z
-    .object({
-      title: z.string().optional(),
-      description: z.string().optional(),
-      keywords: z.string().optional(),
-    })
-    .optional(),
-});
-
-export type ProductFormValues = z.infer<typeof productSchema>;
-
-interface Category {
-  _id: string;
-  name: string;
-  slug: string;
-  parentId?: { _id: string; name: string } | null;
-}
-
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  cost?: number;
-  sku: string;
-  barcode?: string;
-  categoryId: string | Category;
-  tags: string[];
-  stock: number;
-  weight?: number;
-  length?: number;
-  width?: number;
-  height?: number;
-  brand?: string;
-  active: boolean;
-  featured: boolean;
-  variants: Array<{
-    sku?: string;
-    attributes: Record<string, string>;
-    price?: number;
-    stock?: number;
-    image?: string;
-  }>;
-  seo?: {
-    title?: string;
-    description?: string;
-    keywords?: string;
-  };
-  images: string[];
-  createdAt: string;
-  updatedAt: string;
-}
+import { Category, Product } from "@/types";
+import { ProductFormValues, productSchema } from "@/lib/validations/index";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -266,7 +171,7 @@ export function ProductForm({
   }, [product, isEditing, reset]);
 
   const handleAdditionalImagesChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const files = e.target.files;
     if (files) {
@@ -390,13 +295,13 @@ export function ProductForm({
         const errorData = await response.json();
         throw new Error(
           errorData.error ||
-            `Failed to ${isEditing ? "update" : "create"} product`
+            `Failed to ${isEditing ? "update" : "create"} product`,
         );
       }
     } catch (error: any) {
       console.error(
         `Error ${isEditing ? "updating" : "creating"} product:`,
-        error
+        error,
       );
       toast({
         title: "Error",
@@ -424,7 +329,7 @@ export function ProductForm({
 
   const addAttributeToVariant = (
     variantIndex: number,
-    attributeName: string
+    attributeName: string,
   ) => {
     const currentAttributes =
       watch(`variants.${variantIndex}.attributes`) || {};
@@ -436,7 +341,7 @@ export function ProductForm({
 
   const removeAttributeFromVariant = (
     variantIndex: number,
-    attributeName: string
+    attributeName: string,
   ) => {
     const currentAttributes = {
       ...watch(`variants.${variantIndex}.attributes`),
@@ -448,7 +353,7 @@ export function ProductForm({
   const updateVariantAttribute = (
     variantIndex: number,
     attributeName: string,
-    value: string
+    value: string,
   ) => {
     const currentAttributes = {
       ...watch(`variants.${variantIndex}.attributes`),

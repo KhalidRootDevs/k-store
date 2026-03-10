@@ -15,15 +15,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useSearchParams, useRouter } from "next/navigation";
 import { DataTable } from "@/components/tables/data-table";
 import { createUserColumns, User } from "@/components/tables/user/columns";
-
-interface PaginationInfo {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
+import { PaginationInfo } from "@/types";
 
 export default function UsersPage() {
   const router = useRouter();
@@ -82,7 +74,7 @@ export default function UsersPage() {
               totalPages: 0,
               hasNext: false,
               hasPrev: false,
-            }
+            },
           );
         } else {
           throw new Error("Failed to fetch users");
@@ -99,7 +91,7 @@ export default function UsersPage() {
         isFetchingRef.current = false;
       }
     },
-    [searchTerm, statusFilter, roleFilter]
+    [searchTerm, statusFilter, roleFilter],
   );
 
   useEffect(() => {
@@ -109,7 +101,7 @@ export default function UsersPage() {
   const handleStatusUpdate = async (
     userId: string,
     currentStatus: string,
-    userName: string
+    userName: string,
   ) => {
     try {
       const newStatus = currentStatus === "active" ? "inactive" : "active";
@@ -149,7 +141,7 @@ export default function UsersPage() {
   const handleDeleteUser = async (userId: string, userName: string) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${userName}"? This action cannot be undone.`
+        `Are you sure you want to delete "${userName}"? This action cannot be undone.`,
       )
     ) {
       return;

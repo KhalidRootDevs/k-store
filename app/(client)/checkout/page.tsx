@@ -16,61 +16,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Container } from "@/components/ui/container";
 import { Elements } from "@stripe/react-stripe-js";
 import { getStripe } from "@/lib/stripe";
 import { StripePaymentForm } from "@/components/checkout/stripe-payment-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-
-const checkoutSchema = z.object({
-  contactInfo: z.object({
-    fullName: z.string().min(2, { message: "Full name is required" }),
-    email: z.string().email({ message: "Invalid email address" }),
-    phone: z.string().min(5, { message: "Phone number is required" }),
-  }),
-  shippingAddress: z.object({
-    fullName: z.string().min(2, { message: "Full name is required" }),
-    address: z.string().min(5, { message: "Address is required" }),
-    city: z.string().min(2, { message: "City is required" }),
-    state: z.string().min(2, { message: "State is required" }),
-    zipCode: z.string().min(4, { message: "ZIP code is required" }),
-    country: z.string().min(2, { message: "Country is required" }),
-    phone: z.string().min(5, { message: "Phone number is required" }),
-  }),
-  billingAddress: z.object({
-    fullName: z.string().optional(),
-    address: z.string().optional(),
-    city: z.string().optional(),
-    state: z.string().optional(),
-    zipCode: z.string().optional(),
-    country: z.string().optional(),
-  }),
-  paymentMethod: z.enum([
-    "credit_card",
-    "debit_card",
-    "paypal",
-    "cash_on_delivery",
-  ]),
-  shippingMethod: z.string().min(1, { message: "Shipping method is required" }),
-  notes: z.string().optional(),
-});
-
-type CheckoutFormValues = z.infer<typeof checkoutSchema>;
-
-interface Address {
-  _id: string;
-  label: string;
-  fullName: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  phone: string;
-  isDefault: boolean;
-}
+import { Address } from "@/types";
+import { CheckoutFormValues, checkoutSchema } from "@/lib/validations/index";
 
 // Shipping method options
 const shippingMethods = [
@@ -138,7 +91,7 @@ export default function CheckoutPage() {
 
         // Auto-select default address if available
         const defaultAddress = data.addresses?.find(
-          (addr: Address) => addr.isDefault
+          (addr: Address) => addr.isDefault,
         );
         if (defaultAddress && !useNewAddress) {
           setSelectedAddressId(defaultAddress._id);
@@ -178,7 +131,7 @@ export default function CheckoutPage() {
       setUseNewAddress(false);
       setSelectedAddressId(addressId);
       const selectedAddress = savedAddresses.find(
-        (addr) => addr._id === addressId
+        (addr) => addr._id === addressId,
       );
       if (selectedAddress) {
         populateAddressFields(selectedAddress);
@@ -195,7 +148,7 @@ export default function CheckoutPage() {
 
       if (!stripe) {
         setStripeError(
-          "Credit card payments are currently unavailable. Please use an alternative payment method."
+          "Credit card payments are currently unavailable. Please use an alternative payment method.",
         );
       }
     } catch (error) {
@@ -264,7 +217,7 @@ export default function CheckoutPage() {
   // Update shipping cost when shipping method changes
   useEffect(() => {
     const selectedMethod = shippingMethods.find(
-      (method) => method.id === shippingMethod
+      (method) => method.id === shippingMethod,
     );
     if (selectedMethod) {
       console.log("Selected shipping method:", selectedMethod);
@@ -344,7 +297,7 @@ export default function CheckoutPage() {
       ) {
         if (!stripeConfigured || !clientSecret) {
           setStripeError(
-            "Payment system unavailable. Please select another payment method."
+            "Payment system unavailable. Please select another payment method.",
           );
           toast({
             title: "Payment unavailable",
@@ -372,7 +325,7 @@ export default function CheckoutPage() {
 
   const processOrder = async (
     data: CheckoutFormValues,
-    paymentIntent?: any
+    paymentIntent?: any,
   ) => {
     setIsSubmitting(true);
     try {
@@ -387,7 +340,7 @@ export default function CheckoutPage() {
           ? {
               attributes: item.selectedOptions,
               sku: `${item.productId}-${Object.values(
-                item.selectedOptions
+                item.selectedOptions,
               ).join("-")}`,
             }
           : undefined,
@@ -397,7 +350,7 @@ export default function CheckoutPage() {
 
       // Get selected shipping method details
       const selectedShippingMethod = shippingMethods.find(
-        (method) => method.id === data.shippingMethod
+        (method) => method.id === data.shippingMethod,
       );
 
       const billingAddressData = sameAsShipping
@@ -506,7 +459,7 @@ export default function CheckoutPage() {
     console.log("🔄 Setting payment method to:", value);
     setValue(
       "paymentMethod",
-      value as "credit_card" | "debit_card" | "paypal" | "cash_on_delivery"
+      value as "credit_card" | "debit_card" | "paypal" | "cash_on_delivery",
     );
   };
 

@@ -23,21 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const bannerSchema = z.object({
-  title: z.string().min(2, { message: "Title must be at least 2 characters" }),
-  description: z
-    .string()
-    .min(10, { message: "Description must be at least 10 characters" }),
-  link: z.string().url({ message: "Please enter a valid URL" }),
-  buttonText: z.string().min(1, { message: "Button text is required" }),
-  startDate: z.string().min(1, { message: "Start date is required" }),
-  endDate: z.string().min(1, { message: "End date is required" }),
-  active: z.boolean().default(true).optional(),
-});
-
-type BannerFormValues = z.infer<typeof bannerSchema>;
+import { BannerFormValues, bannerSchema } from "@/lib/validations/index";
 
 export default function NewBannerPage() {
   const router = useRouter();

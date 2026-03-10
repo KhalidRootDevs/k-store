@@ -15,57 +15,7 @@ import { toast } from "@/components/ui/use-toast";
 import { useSearchParams, useRouter } from "next/navigation";
 import { DataTable } from "@/components/tables/data-table";
 import { createProductColumns } from "@/components/tables/product/column";
-import { Product } from "@/models/Product";
-
-interface Category {
-  _id: string;
-  name: string;
-  slug: string;
-}
-
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  cost?: number;
-  sku: string;
-  barcode?: string;
-  categoryId: Category;
-  tags: string[];
-  stock: number;
-  weight?: number;
-  length?: number;
-  width?: number;
-  height?: number;
-  active: boolean;
-  featured: boolean;
-  variants: Array<{
-    name: string;
-    options: string;
-    price?: number;
-    stock?: number;
-    sku?: string;
-  }>;
-  seo?: {
-    title?: string;
-    description?: string;
-    keywords?: string;
-  };
-  images: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface PaginationInfo {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
+import { Category, PaginationInfo, Product } from "@/types";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -170,7 +120,7 @@ export default function ProductsPage() {
               totalPages: 0,
               hasNext: false,
               hasPrev: false,
-            }
+            },
           );
         } else {
           throw new Error("Failed to fetch products");
@@ -194,7 +144,7 @@ export default function ProductsPage() {
       featuredFilter,
       minPrice,
       maxPrice,
-    ]
+    ],
   );
 
   useEffect(() => {
@@ -207,11 +157,11 @@ export default function ProductsPage() {
 
   const handleDeleteProduct = async (
     productId: string,
-    productName: string
+    productName: string,
   ) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${productName}"? This action cannot be undone.`
+        `Are you sure you want to delete "${productName}"? This action cannot be undone.`,
       )
     ) {
       return;
@@ -247,7 +197,7 @@ export default function ProductsPage() {
   const handleToggleStatus = async (
     productId: string,
     currentStatus: boolean,
-    productName: string
+    productName: string,
   ) => {
     try {
       const formData = new FormData();

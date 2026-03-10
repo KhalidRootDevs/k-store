@@ -43,87 +43,9 @@ import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Customer, Order, OrderItem, TimelineEvent } from "@/types";
 
-interface OrderItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  variant?: {
-    attributes: Record<string, string>;
-    sku?: string;
-  };
-  productId?: any; // Can be string or populated object
-  sku?: string;
-}
 
-interface TimelineEvent {
-  status: string;
-  date: string;
-  description: string;
-  updatedBy?: any; // Can be string or populated object
-}
-
-interface Customer {
-  id: string;
-  _id?: string; // MongoDB _id
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-}
-
-interface Order {
-  _id: string;
-  orderNumber: string;
-  customer: Customer | any; // Can be object or populated user
-  shippingAddress: {
-    fullName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    phone: string;
-  };
-  billingAddress?: {
-    fullName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
-  items: OrderItem[];
-  total: number;
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  discount?: number;
-  status:
-    | "pending"
-    | "processing"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  paymentMethod: "credit_card" | "debit_card" | "paypal" | "cash_on_delivery";
-  paymentStatus: "pending" | "paid" | "failed" | "refunded";
-  cardDetails?: {
-    type: string;
-    last4: string;
-    brand?: string;
-    expiryMonth?: number;
-    expiryYear?: number;
-  };
-  shippingMethod: string;
-  trackingNumber?: string;
-  timeline: TimelineEvent[];
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
 // Helper function to normalize customer data
 const normalizeCustomer = (customer: any): Customer => {

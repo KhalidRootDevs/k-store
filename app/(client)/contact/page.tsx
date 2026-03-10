@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Mail, Phone, MapPin, Loader2 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
@@ -18,19 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
-
-const contactFormSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  subject: z
-    .string()
-    .min(5, { message: "Subject must be at least 5 characters" }),
-  message: z
-    .string()
-    .min(10, { message: "Message must be at least 10 characters" }),
-});
-
-type ContactFormValues = z.infer<typeof contactFormSchema>;
+import { contactFormSchema, ContactFormValues } from "@/lib/validations/index";
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,7 +49,7 @@ export default function ContactPage() {
       // Store the contact form submission in localStorage for demo purposes
       // In a real app, this would be sent to a server
       const submissions = JSON.parse(
-        localStorage.getItem("contactSubmissions") || "[]"
+        localStorage.getItem("contactSubmissions") || "[]",
       );
       submissions.push({
         id: Date.now(),

@@ -18,22 +18,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-
 import InputField from "../custom/input";
-import { CategoryFormValues, categorySchema } from "@/lib/validations";
 
-interface Category {
-  _id: string;
-  name: string;
-  description: string;
-  image: string;
-  featured: boolean;
-  active: boolean;
-  slug: string;
-  parentId?: string | { _id: string; name: string };
-  createdAt: string;
-  updatedAt: string;
-}
+import { Category } from "@/types";
+import { CategoryFormValues, categorySchema } from "@/lib/validations/index";
 
 interface CategoryFormProps {
   category?: Category | null;
@@ -74,7 +62,7 @@ export function CategoryForm({
         const categories =
           isEditing && category
             ? data.categories.filter(
-                (cat: Category) => cat._id !== category._id
+                (cat: Category) => cat._id !== category._id,
               )
             : data.categories;
         setParentCategories(categories || []);
@@ -138,7 +126,7 @@ export function CategoryForm({
         const result = await response.json();
 
         toast.success(
-          `Category has been ${isEditing ? "updated" : "created"} successfully!`
+          `Category has been ${isEditing ? "updated" : "created"} successfully!`,
         );
 
         reset();
@@ -147,13 +135,13 @@ export function CategoryForm({
         const errorData = await response.json();
         throw new Error(
           errorData.error ||
-            `Failed to ${isEditing ? "update" : "create"} category`
+            `Failed to ${isEditing ? "update" : "create"} category`,
         );
       }
     } catch (error: any) {
       console.error(
         `Error ${isEditing ? "updating" : "creating"} category:`,
-        error
+        error,
       );
 
       toast.error(error.message);

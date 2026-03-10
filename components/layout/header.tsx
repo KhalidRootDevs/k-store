@@ -47,6 +47,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { Category } from "@/types";
 
 // Debounce function to limit how often a function can be called
 function useDebounce<T>(value: T, delay: number): T {
@@ -151,19 +152,6 @@ const featuredCategories = [
   },
 ];
 
-interface Category {
-  _id: string;
-  name: string;
-  image: string;
-  description: string;
-  slug: string;
-  featured: boolean;
-  active: boolean;
-  parentId?: string | null;
-  subCategories?: Category[];
-  level?: number;
-}
-
 interface HeaderProps {
   categoryTree: Category[];
 }
@@ -195,7 +183,7 @@ export function Header({ categoryTree }: HeaderProps) {
         const filtered = allProducts.filter((product) =>
           product.name
             .toLowerCase()
-            .includes(debouncedSearchQuery.toLowerCase())
+            .includes(debouncedSearchQuery.toLowerCase()),
         );
         setSearchResults(filtered.slice(0, 5)); // Limit to 5 results
         setIsSearching(false);
@@ -310,7 +298,7 @@ export function Header({ categoryTree }: HeaderProps) {
           <div
             className={cn(
               "absolute left-0 right-0 mx-auto flex justify-center transition-opacity duration-200",
-              isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+              isSearchOpen ? "opacity-0 pointer-events-none" : "opacity-100",
             )}
           >
             <NavigationMenu className="hidden md:flex">
@@ -320,7 +308,9 @@ export function Header({ categoryTree }: HeaderProps) {
                     <NavigationMenuLink
                       className={cn(
                         navigationMenuTriggerStyle(),
-                        isActive("/") ? "text-primary" : "text-muted-foreground"
+                        isActive("/")
+                          ? "text-primary"
+                          : "text-muted-foreground",
                       )}
                     >
                       Home
@@ -364,7 +354,7 @@ export function Header({ categoryTree }: HeaderProps) {
                                           {subCategory.name}
                                         </span>
                                       </Link>
-                                    )
+                                    ),
                                   )
                                 ) : (
                                   <></>
@@ -426,7 +416,7 @@ export function Header({ categoryTree }: HeaderProps) {
                         navigationMenuTriggerStyle(),
                         isActive("/products")
                           ? "text-primary"
-                          : "text-muted-foreground"
+                          : "text-muted-foreground",
                       )}
                     >
                       Products
@@ -504,7 +494,7 @@ export function Header({ categoryTree }: HeaderProps) {
           <div
             className={cn(
               "absolute left-0 right-0 mx-auto flex justify-center transition-opacity duration-200 z-10",
-              isSearchOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+              isSearchOpen ? "opacity-100" : "opacity-0 pointer-events-none",
             )}
           >
             <div
@@ -597,8 +587,8 @@ export function Header({ categoryTree }: HeaderProps) {
                           onClick={() => {
                             router.push(
                               `/products?q=${encodeURIComponent(
-                                searchQuery.trim()
-                              )}`
+                                searchQuery.trim(),
+                              )}`,
                             );
                             setIsSearchOpen(false);
                             setSearchQuery("");

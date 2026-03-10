@@ -1,17 +1,7 @@
-// components/top-categories.tsx
 import Image from "next/image";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-
-interface Category {
-  _id: string;
-  name: string;
-  image: string;
-  description: string;
-  slug: string;
-  featured: boolean;
-  active: boolean;
-}
+import { Category } from "@/types";
 
 async function getFeaturedCategories(): Promise<Category[]> {
   try {
@@ -22,7 +12,7 @@ async function getFeaturedCategories(): Promise<Category[]> {
           revalidate: 3600, // Revalidate every hour
           tags: ["categories"],
         },
-      }
+      },
     );
 
     if (!response.ok) {

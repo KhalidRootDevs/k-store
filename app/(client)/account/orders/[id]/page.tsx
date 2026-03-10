@@ -26,84 +26,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
 import Image from "next/image";
-
-interface OrderItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  variant?: {
-    attributes: Record<string, string>;
-    sku?: string;
-  };
-  productId?: any;
-  sku?: string;
-}
-
-interface TimelineEvent {
-  status: string;
-  date: string;
-  description: string;
-  updatedBy?: any;
-}
-
-interface Order {
-  _id: string;
-  orderNumber: string;
-  customer: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  shippingAddress: {
-    fullName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    phone: string;
-  };
-  billingAddress?: {
-    fullName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
-  items: OrderItem[];
-  total: number;
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  discount?: number;
-  status:
-    | "pending"
-    | "processing"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  paymentMethod: "credit_card" | "debit_card" | "paypal" | "cash_on_delivery";
-  paymentStatus: "pending" | "paid" | "failed" | "refunded";
-  cardDetails?: {
-    type: string;
-    last4: string;
-    brand?: string;
-    expiryMonth?: number;
-    expiryYear?: number;
-  };
-  shippingMethod: string;
-  trackingNumber?: string;
-  timeline: TimelineEvent[];
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Order, OrderItem } from "@/types";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -230,7 +153,7 @@ export default function OrderDetailsPage() {
 
     try {
       const response = await fetch(
-        `/api/user/orders/${order.orderNumber}/invoice`
+        `/api/user/orders/${order.orderNumber}/invoice`,
       );
       if (!response.ok) {
         throw new Error("Failed to download invoice");

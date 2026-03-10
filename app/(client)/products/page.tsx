@@ -13,38 +13,7 @@ import { sortOptions } from "@/lib/product-data";
 import { Container } from "@/components/ui/container";
 import { ProductCard } from "@/components/product-card";
 import { SkeletonProductCard } from "@/components/skeleton-product-card";
-
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  compareAtPrice?: number;
-  images: string[];
-  categoryId: {
-    _id: string;
-    name: string;
-    slug: string;
-  };
-  brand?: string;
-  tags: string[];
-  stock: number;
-  active: boolean;
-  featured: boolean;
-  rating: number;
-  reviewCount: number;
-  salesCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Category {
-  _id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  image?: string;
-}
+import { Category, Product } from "@/types";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -237,7 +206,7 @@ export default function ProductsPage() {
   // Handle category selection
   const handleCategoryChange = (categoryId: string, checked: boolean) => {
     setSelectedCategories((prev) =>
-      checked ? [...prev, categoryId] : prev.filter((id) => id !== categoryId)
+      checked ? [...prev, categoryId] : prev.filter((id) => id !== categoryId),
     );
     setCurrentPage(1);
   };
@@ -245,7 +214,7 @@ export default function ProductsPage() {
   // Handle brand selection
   const handleBrandChange = (brandId: string, checked: boolean) => {
     setSelectedBrands((prev) =>
-      checked ? [...prev, brandId] : prev.filter((id) => id !== brandId)
+      checked ? [...prev, brandId] : prev.filter((id) => id !== brandId),
     );
     setCurrentPage(1);
   };

@@ -11,30 +11,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/auth-context";
 import { useModal } from "@/context/modal-context";
+import { RegisterFormValues, registerSchema } from "@/lib/validations/index";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const registerSchema = z
-  .object({
-    name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-    email: z
-      .string()
-      .min(1, { message: "Email is required" })
-      .email({ message: "Please enter a valid email address" }),
-    password: z
-      .string()
-      .min(6, { message: "Password must be at least 6 characters" }),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function UserRegisterForm() {
   const { register: registerUser } = useAuth();
@@ -74,7 +55,7 @@ export default function UserRegisterForm() {
         }, 1500);
       } else {
         setError(
-          "Email already registered. Please use a different email address."
+          "Email already registered. Please use a different email address.",
         );
       }
     } catch (err) {
@@ -86,7 +67,7 @@ export default function UserRegisterForm() {
   };
 
   const handleSocialLogin = async (
-    provider: "google" | "facebook" | "apple"
+    provider: "google" | "facebook" | "apple",
   ) => {
     setIsLoading(true);
     setError(null);

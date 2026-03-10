@@ -49,105 +49,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  avatar?: string;
-  role: "user" | "admin" | "moderator" | "support";
-  status: "active" | "inactive" | "suspended" | "pending";
-  dateOfBirth?: string;
-  addresses: Array<{
-    _id: string;
-    label: string;
-    fullName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    phone: string;
-    isDefault: boolean;
-  }>;
-  orders: Array<{
-    orderId: string;
-    orderNumber: string;
-    date: string;
-    total: number;
-    status: string;
-    items: number;
-    paymentStatus: string;
-  }>;
-  notes: Array<{
-    _id: string;
-    content: string;
-    createdBy: {
-      _id: string;
-      name: string;
-      email: string;
-    };
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  lastLogin?: string;
-  emailVerified: boolean;
-  phoneVerified: boolean;
-  preferences: {
-    newsletter: boolean;
-    marketing: boolean;
-    notifications: boolean;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Order {
-  _id: string;
-  orderNumber: string;
-  customer: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  date: string;
-  total: number;
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  status:
-    | "pending"
-    | "processing"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  paymentMethod: string;
-  paymentStatus: "pending" | "paid" | "failed" | "refunded";
-  items: Array<{
-    id: number;
-    name: string;
-    price: number;
-    quantity: number;
-    image: string;
-    variant?: string;
-  }>;
-  timeline: Array<{
-    status: string;
-    date: string;
-    description: string;
-  }>;
-}
+import { Order, User as IUser } from "@/types";
 
 export default function UserDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const userId = params.id as string;
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<IUser | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
@@ -197,7 +106,7 @@ export default function UserDetailsPage() {
         `/api/admin/orders?userId=${userId}&limit=50`,
         {
           credentials: "include",
-        }
+        },
       );
 
       if (response.ok) {
@@ -381,7 +290,7 @@ export default function UserDetailsPage() {
     const totalOrders = user.orders.length;
     const totalSpent = user.orders.reduce((sum, order) => sum + order.total, 0);
     const completedOrders = user.orders.filter(
-      (order) => order.status === "delivered"
+      (order) => order.status === "delivered",
     ).length;
 
     return {
@@ -800,14 +709,14 @@ export default function UserDetailsPage() {
                                 <TableCell>
                                   {order.items.reduce(
                                     (sum, item) => sum + item.quantity,
-                                    0
+                                    0,
                                   )}
                                 </TableCell>
                                 <TableCell>${order.total.toFixed(2)}</TableCell>
                                 <TableCell>
                                   <Badge
                                     variant={getOrderStatusVariant(
-                                      order.status
+                                      order.status,
                                     )}
                                     className="capitalize"
                                   >

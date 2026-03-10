@@ -13,71 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-
-export interface OrderItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  variant?: {
-    attributes: Record<string, string>;
-    sku?: string;
-  };
-  productId?: string;
-  sku?: string;
-}
-
-export interface Order {
-  _id: string;
-  orderNumber: string;
-  customer: {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-  };
-  shippingAddress: {
-    fullName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    phone: string;
-  };
-  items: OrderItem[];
-  total: number;
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  status:
-    | "pending"
-    | "processing"
-    | "shipped"
-    | "delivered"
-    | "cancelled"
-    | "refunded";
-  paymentMethod: "credit_card" | "debit_card" | "paypal" | "cash_on_delivery";
-  paymentStatus: "pending" | "paid" | "failed" | "refunded";
-  shippingMethod: string;
-  trackingNumber?: string;
-  timeline: Array<{
-    status: string;
-    date: string;
-    description: string;
-  }>;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { Order, OrderItem } from "@/types";
 
 interface CreateOrderColumnsProps {
   onStatusUpdate?: (
     orderId: string,
     currentStatus: string,
-    orderNumber: string
+    orderNumber: string,
   ) => void;
   onDeleteOrder?: (orderId: string, orderNumber: string) => void;
 }
