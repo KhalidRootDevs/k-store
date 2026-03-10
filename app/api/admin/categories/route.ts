@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     const featured = formData.get("featured") === "true";
     const active = formData.get("active") === "true";
     const imageFile = formData.get("image") as Blob | null;
+    const parentCategoryId = formData.get("parentCategoryId") as string | null;
 
     // Validate required fields
     if (!name || !imageFile) {
@@ -38,6 +39,23 @@ export async function POST(request: NextRequest) {
         { error: "Category name already exists" },
         { status: 409 }
       );
+    }
+
+    // Validate parent category exists if provided
+    if (parentCategoryId) {
+      const parentCategory = await Category.findById(parentCategoryId);
+      if (!parentCategory) {
+        return NextResponse.json(
+          { error: "Parent category not found" },
+          { status: 404 }
+        );
+      }
+      if (!parentCategory.active) {
+        return NextResponse.json(
+          { error: "Parent category must be active" },
+          { status: 400 }
+        );
+      }
     }
 
     // Generate unique slug
@@ -64,6 +82,7 @@ export async function POST(request: NextRequest) {
       featured,
       active,
       slug,
+      ...(parentCategoryId && { parentCategoryId }),
     });
 
     return NextResponse.json(
@@ -77,6 +96,7 @@ export async function POST(request: NextRequest) {
           featured: category.featured,
           active: category.active,
           slug: category.slug,
+          parentCategoryId: category.parentCategoryId,
           createdAt: category.createdAt,
           updatedAt: category.updatedAt,
         },

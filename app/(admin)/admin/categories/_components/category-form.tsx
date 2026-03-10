@@ -31,6 +31,7 @@ const categorySchema = z.object({
   description: z.string().optional(),
   featured: z.boolean().default(false),
   active: z.boolean().default(true),
+  parentCategoryId: z.string().optional(),
 });
 
 export type CategoryFormValues = z.infer<typeof categorySchema>;
@@ -43,6 +44,7 @@ interface Category {
   featured: boolean;
   active: boolean;
   slug: string;
+  parentCategoryId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -61,6 +63,8 @@ export function CategoryForm({
   const [image, setImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [parentCategories, setParentCategories] = useState<Category[]>([]);
+  const [isLoadingParents, setIsLoadingParents] = useState(false);
 
   const {
     register,
@@ -76,11 +80,43 @@ export function CategoryForm({
       description: "",
       featured: false,
       active: true,
+      parentCategoryId: "",
     },
   });
 
   const featured = watch("featured");
   const active = watch("active");
+  const selectedParentId = watch("parentCategoryId");
+
+  // Fetch available parent categories
+  useEffect(() => {
+    const fetchParentCategories = async () => {
+      setIsLoadingParents(true);
+      try {
+        const params = new URLSearchParams({
+          limit: "100", // Get up to 100 categories
+          active: "true",
+        });
+        const response = await fetch(`/api/admin/categories?${params}`, {
+          credentials: "include",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          // Filter out the current category being edited from the list
+          const filtered = data.categories.filter(
+            (cat: Category) => !isEditing || cat._id !== category?._id
+          );
+          setParentCategories(filtered);
+        }
+      } catch (error) {
+        console.error("Error fetching parent categories:", error);
+      } finally {
+        setIsLoadingParents(false);
+      }
+    };
+
+    fetchParentCategories();
+  }, [isEditing, category?._id]);
 
   // Initialize form with category data when editing
   useEffect(() => {
@@ -90,6 +126,7 @@ export function CategoryForm({
         description: category.description || "",
         featured: category.featured,
         active: category.active,
+        parentCategoryId: category.parentCategoryId || "",
       });
       setImage(category.image);
     }
@@ -146,6 +183,11 @@ export function CategoryForm({
       formData.append("description", data.description || "");
       formData.append("featured", data.featured.toString());
       formData.append("active", data.active.toString());
+      
+      // Add parent category if selected
+      if (data.parentCategoryId) {
+        formData.append("parentCategoryId", data.parentCategoryId);
+      }
 
       // Only append image if a new one was selected
       if (imageFile) {
@@ -255,6 +297,27 @@ export function CategoryForm({
                 {errors.name && (
                   <p className="text-sm text-red-500">{errors.name.message}</p>
                 )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="parentCategoryId">Parent Category</Label>
+                <select
+                  id="parentCategoryId"
+                  {...register("parentCategoryId")}
+                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-foreground shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  disabled={isLoadingParents}
+                >
+                  <option value="">None (Top-level category)</option>
+                  {parentCategories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-sm text-muted-foreground">
+                  {isLoadingParents
+                    ? "Loading categories..."
+                    : "Select a parent to create a subcategory"}
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="description">Description</Label>

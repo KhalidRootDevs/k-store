@@ -7,8 +7,13 @@ export interface ICategory extends Document {
   featured: boolean;
   active: boolean;
   slug: string;
+  parentCategoryId?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
+  getHierarchyPath(): Promise<string>;
+  getChildCategories(): Promise<ICategory[]>;
+  getDescendants(): Promise<ICategory[]>;
+  getAncestors(): Promise<ICategory[]>;
 }
 
 const categorySchema = new Schema<ICategory>(
@@ -44,11 +49,35 @@ const categorySchema = new Schema<ICategory>(
       lowercase: true,
       trim: true,
     },
+    parentCategoryId: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Validate no circular references before saving
+categorySchema.pre<ICategory>("save", async function (next) {
+  // Check if category is trying to be its own parent
+  if (this.parentCategoryId && this.parentCategoryId.equals(this._id)) {
+    throw new Error("A category cannot be its own parent");
+  }
+
+  // Check for circular references (parent cannot be a descendant)
+  if (this.parentCategoryId) {
+    const descendants = await this.getDescendants();
+    const descendantIds = descendants.map((d) => d._id.toString());
+    if (descendantIds.includes(this.parentCategoryId.toString())) {
+      throw new Error("Cannot create circular hierarchy");
+    }
+  }
+
+  next();
+});
 
 // Generate slug from name before saving
 categorySchema.pre<ICategory>("save", async function (next) {
@@ -78,6 +107,50 @@ categorySchema.pre<ICategory>("save", async function (next) {
   }
   next();
 });
+
+// Instance methods for hierarchy operations
+categorySchema.methods.getHierarchyPath = async function (): Promise<string> {
+  const ancestors = await this.getAncestors();
+  const path = [...ancestors.map((a) => a.name), this.name];
+  return path.join(" → ");
+};
+
+categorySchema.methods.getChildCategories = async function (): Promise<
+  ICategory[]
+> {
+  return mongoose.models.Category.find({ parentCategoryId: this._id });
+};
+
+categorySchema.methods.getDescendants = async function (): Promise<
+  ICategory[]
+> {
+  const descendants: ICategory[] = [];
+  const children = await this.getChildCategories();
+
+  for (const child of children) {
+    descendants.push(child);
+    const childDescendants = await child.getDescendants();
+    descendants.push(...childDescendants);
+  }
+
+  return descendants;
+};
+
+categorySchema.methods.getAncestors = async function (): Promise<ICategory[]> {
+  const ancestors: ICategory[] = [];
+  let current = this;
+
+  while (current.parentCategoryId) {
+    const parent = await mongoose.models.Category.findById(
+      current.parentCategoryId
+    );
+    if (!parent) break;
+    ancestors.unshift(parent);
+    current = parent;
+  }
+
+  return ancestors;
+};
 
 // Static method for slug generation
 categorySchema.statics.generateSlug = async function (
@@ -111,6 +184,8 @@ categorySchema.statics.generateSlug = async function (
 // Define all indexes explicitly
 categorySchema.index({ slug: 1 }, { unique: true }); // Explicit unique index
 categorySchema.index({ featured: 1, active: 1 }); // Compound index
+categorySchema.index({ parentCategoryId: 1 }); // Index for hierarchy queries
+categorySchema.index({ parentCategoryId: 1, active: 1 }); // Compound index for active children
 
 export const Category: Model<ICategory> =
   mongoose.models.Category ||
